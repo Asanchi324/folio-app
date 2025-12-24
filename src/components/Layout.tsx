@@ -22,25 +22,25 @@ export function Layout({
   children
 }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-surface text-ink">
-      <header className="border-b border-border bg-surface-elevated sticky top-0 z-20 backdrop-blur">
+    <div className="min-h-screen bg-gradient-to-br from-white via-accent-soft/10 to-white text-ink">
+      <header className="border-b-2 border-accent/20 bg-white/80 backdrop-blur-lg sticky top-0 z-20 shadow-subtle">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-soft text-sm font-semibold text-accent">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-dark text-white text-lg font-bold shadow-lg">
               F
             </div>
             <div>
-              <div className="text-sm font-semibold tracking-tight">Folio</div>
+              <div className="text-base font-bold tracking-tight text-ink">Folio</div>
               <div className="text-xs text-ink-soft">
                 Your extracurriculars, roadmap, and odds—clarified.
               </div>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-xs">
-            <div className="flex items-center gap-1 rounded-full bg-surface px-2 py-1 shadow-subtle">
-              <span className="text-ink-soft">Grade</span>
+            <div className="flex items-center gap-1 rounded-full bg-white border-2 border-accent/20 px-3 py-1.5 shadow-subtle">
+              <span className="text-ink-soft text-xs">Grade</span>
               <select
-                className="rounded-full border border-border bg-surface-elevated px-2 py-1 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-full border-0 bg-transparent px-2 py-1 text-xs font-medium text-ink focus:outline-none focus:ring-0"
                 value={gradeLevel}
                 onChange={(e) => onGradeChange(e.target.value as GradeLevel)}
               >
@@ -51,10 +51,10 @@ export function Layout({
                 <option value="Gap">Gap year</option>
               </select>
             </div>
-            <div className="flex items-center gap-1 rounded-full bg-surface px-2 py-1 shadow-subtle">
-              <span className="text-ink-soft">Target region</span>
+            <div className="flex items-center gap-1 rounded-full bg-white border-2 border-accent/20 px-3 py-1.5 shadow-subtle">
+              <span className="text-ink-soft text-xs">Target region</span>
               <select
-                className="rounded-full border border-border bg-surface-elevated px-2 py-1 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-full border-0 bg-transparent px-2 py-1 text-xs font-medium text-ink focus:outline-none focus:ring-0"
                 value={region}
                 onChange={(e) =>
                   onRegionChange(e.target.value as TargetRegion)
@@ -70,13 +70,13 @@ export function Layout({
             <div className="flex items-center gap-2">
               {userEmail ? (
                 <>
-                  <span className="max-w-[120px] truncate text-ink-soft">
+                  <span className="max-w-[120px] truncate text-ink-soft text-xs">
                     {userEmail}
                   </span>
                   <button
                     type="button"
                     onClick={onSignOut}
-                    className="rounded-full border border-border bg-surface-elevated px-2 py-1 text-[11px] text-ink-soft hover:bg-surface"
+                    className="rounded-full border-2 border-accent/20 bg-white px-3 py-1.5 text-xs font-medium text-ink-soft hover:bg-accent-soft hover:text-accent transition-colors"
                   >
                     Выйти
                   </button>
@@ -85,7 +85,7 @@ export function Layout({
                 <button
                   type="button"
                   onClick={onSignIn}
-                  className="rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-white hover:bg-blue-700"
+                  className="rounded-full bg-gradient-to-r from-accent to-accent-dark px-4 py-2 text-xs font-semibold text-white shadow-lg hover:shadow-xl transition-all"
                 >
                   Войти с Google
                 </button>

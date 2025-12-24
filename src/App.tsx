@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { Extracurriculars } from "./components/Extracurriculars";
 import { Roadmap } from "./components/Roadmap";
 import { AdmissionsAI } from "./components/AdmissionsAI";
+import { Universities } from "./components/Universities";
 import type {
   Activity,
   GradeLevel,
@@ -18,7 +19,7 @@ import {
 } from "./firebase";
 import type { User } from "firebase/auth";
 
-type Page = "portfolio" | "roadmap" | "ai";
+type Page = "portfolio" | "roadmap" | "ai" | "universities";
 
 export default function App() {
   const [gradeLevel, setGradeLevel] = useState<GradeLevel>("11");
@@ -77,6 +78,11 @@ export default function App() {
             active={page === "ai"}
             onClick={() => setPage("ai")}
           />
+          <TabButton
+            label="Universities"
+            active={page === "universities"}
+            onClick={() => setPage("universities")}
+          />
         </nav>
 
         {authLoading && (
@@ -101,23 +107,25 @@ export default function App() {
         {page === "ai" && (
           <div className="space-y-4">
             <AdmissionsAI activities={activities} />
-            <div className="rounded-xl border border-border bg-surface-elevated p-3 text-[11px] text-ink-soft shadow-subtle">
-              <div className="text-xs font-semibold text-ink">
-                How to read this estimate
+            <div className="rounded-xl border-2 border-accent/20 bg-gradient-to-br from-white to-accent-soft/30 p-4 text-sm text-ink-soft shadow-subtle">
+              <div className="text-sm font-semibold text-ink mb-2">
+                📖 How to read this estimate
               </div>
-              <ul className="mt-1 list-disc space-y-0.5 pl-4">
+              <ul className="space-y-1 list-disc pl-5">
                 <li>
                   Используй результат как ориентир для планирования, а не как
                   приговор.
                 </li>
                 <li>
-                  Обращай больше внимания на разделы &quot;Gaps&quot; и
-                  &quot;Specific next moves&quot;.
+                  Обращай больше внимания на разделы &quot;Areas to Improve&quot; и
+                  &quot;Action Steps&quot;.
                 </li>
               </ul>
             </div>
           </div>
         )}
+
+        {page === "universities" && <Universities />}
       </div>
     </Layout>
   );
@@ -134,10 +142,10 @@ function TabButton({ label, active, onClick }: TabButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full px-3 py-1 text-xs transition-colors ${
+      className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
         active
-          ? "bg-ink text-white shadow-subtle"
-          : "bg-surface-elevated text-ink-soft border border-border hover:text-ink"
+          ? "bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg"
+          : "bg-white text-ink-soft border-2 border-accent/20 hover:text-accent hover:border-accent/40 hover:shadow-subtle"
       }`}
     >
       {label}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Activity, EvaluationResult, ProfileInputs } from "../types";
+import { evaluateProfileWithChatGPT } from "../ai/chatgpt";
 import { evaluateProfile } from "../ai/mockAi";
 
 interface Props {
@@ -28,6 +29,12 @@ export function AdmissionsAI({ activities }: Props) {
     e.preventDefault();
     setLoading(true);
     try {
+      // Try ChatGPT first, fallback to mock if no API key
+      const res = await evaluateProfileWithChatGPT(inputs, activities);
+      setResult(res);
+    } catch (error) {
+      console.error("AI evaluation error:", error);
+      // Fallback to mock evaluation
       const res = await evaluateProfile(inputs, activities);
       setResult(res);
     } finally {
@@ -41,18 +48,17 @@ export function AdmissionsAI({ activities }: Props) {
   };
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <header>
-        <h2 className="text-sm font-semibold tracking-tight">
-          AI admissions view
+        <h2 className="text-lg font-bold tracking-tight text-ink">
+          🎓 AI Admissions Evaluation
         </h2>
-        <p className="text-xs text-ink-soft">
-          Get a rough sense of where you stand and what to improve. This is a
-          planning tool, not an official decision.
+        <p className="text-sm text-ink-soft mt-1">
+          Powered by ChatGPT. Get a realistic assessment of your profile and actionable next steps.
         </p>
       </header>
       <form
-        className="space-y-2 rounded-xl border border-border bg-surface-elevated p-3 text-xs shadow-subtle"
+        className="space-y-3 rounded-2xl border-2 border-accent/20 bg-gradient-to-br from-white to-accent-soft/30 p-4 shadow-subtle-lg"
         onSubmit={handleEvaluate}
       >
         <div className="grid gap-2 grid-cols-2">
@@ -129,9 +135,10 @@ export function AdmissionsAI({ activities }: Props) {
           </button>
           <button
             type="submit"
-            className="rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-white hover:bg-blue-700"
+            disabled={loading}
+            className="rounded-full bg-gradient-to-r from-accent to-accent-dark px-6 py-2 text-sm font-semibold text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Thinking…" : "Estimate chances & next steps"}
+            {loading ? "🤖 Analyzing your profile..." : "🚀 Get AI Evaluation"}
           </button>
         </div>
         <p className="text-[10px] text-ink-soft">
@@ -141,55 +148,72 @@ export function AdmissionsAI({ activities }: Props) {
       </form>
 
       {result && (
-        <div className="fade-in space-y-2 rounded-xl border border-border bg-surface-elevated p-3 text-xs shadow-subtle">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <div className="text-[11px] font-semibold text-ink-soft">
-                Competitiveness snapshot
+        <div className="fade-in space-y-4 rounded-2xl border-2 border-accent/30 bg-white p-5 shadow-subtle-lg">
+          <div className="flex items-start justify-between gap-4 pb-3 border-b-2 border-accent/10">
+            <div className="flex-1">
+              <div className="text-xs font-semibold text-ink-soft mb-1">
+                Competitiveness Assessment
               </div>
-              <div className="text-sm font-semibold">
+              <div className={`text-2xl font-bold ${
+                result.level === "Reach" ? "text-accent-dark" :
+                result.level === "Match" ? "text-blue-600" :
+                result.level === "Safety" ? "text-success" :
+                "text-ink-soft"
+              }`}>
                 {result.level === "Unclear"
-                  ? "Needs more information"
-                  : `${result.level} profile for many targets`}
+                  ? "Needs More Information"
+                  : `${result.level} Candidate`}
               </div>
             </div>
-            <span className="rounded-full bg-surface px-2 py-1 text-[11px] text-ink-soft">
-              Guide, not a verdict
+            <span className="rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent-dark whitespace-nowrap">
+              AI Guide
             </span>
           </div>
-          <p className="text-[11px] text-ink-soft">{result.summary}</p>
+          <p className="text-sm text-ink leading-relaxed bg-accent-soft/20 p-3 rounded-lg">{result.summary}</p>
+          
           {result.strengths.length > 0 && (
-            <div>
-              <div className="text-[11px] font-semibold text-ink">
-                Strengths
+            <div className="bg-green-50 border-l-4 border-success p-3 rounded-r-lg">
+              <div className="text-sm font-bold text-success mb-2 flex items-center gap-2">
+                ✅ Strengths
               </div>
-              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[11px] text-ink-soft">
+              <ul className="space-y-1.5">
                 {result.strengths.map((s) => (
-                  <li key={s}>{s}</li>
+                  <li key={s} className="text-sm text-ink-soft flex items-start gap-2">
+                    <span className="text-success mt-0.5">•</span>
+                    <span>{s}</span>
+                  </li>
                 ))}
               </ul>
             </div>
           )}
+          
           {result.weaknesses.length > 0 && (
-            <div>
-              <div className="text-[11px] font-semibold text-ink">
-                Gaps & risks
+            <div className="bg-orange-50 border-l-4 border-warning p-3 rounded-r-lg">
+              <div className="text-sm font-bold text-warning mb-2 flex items-center gap-2">
+                ⚠️ Areas to Improve
               </div>
-              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[11px] text-ink-soft">
+              <ul className="space-y-1.5">
                 {result.weaknesses.map((w) => (
-                  <li key={w}>{w}</li>
+                  <li key={w} className="text-sm text-ink-soft flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>{w}</span>
+                  </li>
                 ))}
               </ul>
             </div>
           )}
+          
           {result.suggestions.length > 0 && (
-            <div>
-              <div className="text-[11px] font-semibold text-ink">
-                Specific next moves
+            <div className="bg-blue-50 border-l-4 border-accent p-3 rounded-r-lg">
+              <div className="text-sm font-bold text-accent mb-2 flex items-center gap-2">
+                🎯 Action Steps
               </div>
-              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[11px] text-ink-soft">
+              <ul className="space-y-1.5">
                 {result.suggestions.map((s) => (
-                  <li key={s}>{s}</li>
+                  <li key={s} className="text-sm text-ink flex items-start gap-2">
+                    <span className="text-accent mt-0.5">→</span>
+                    <span className="font-medium">{s}</span>
+                  </li>
                 ))}
               </ul>
             </div>

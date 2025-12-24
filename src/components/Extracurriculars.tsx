@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Activity, ActivityCategory } from "../types";
 import { improveActivityDescription } from "../ai/mockAi";
+import { ExtracurricularsDB } from "./ExtracurricularsDB";
 
 interface Props {
   activities: Activity[];
@@ -62,17 +63,17 @@ export function Extracurriculars({ activities, onChange }: Props) {
     <section className="flex-1 space-y-3">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight">
-            Extracurricular portfolio
+          <h2 className="text-lg font-bold tracking-tight text-ink">
+            📚 Extracurricular Portfolio
           </h2>
-          <p className="text-xs text-ink-soft">
+          <p className="text-sm text-ink-soft mt-1">
             Capture your key activities in application‑ready language. AI
             editing is completely optional.
           </p>
         </div>
         <button
           type="button"
-          className="rounded-full bg-ink text-xs font-medium text-white px-3 py-1.5 hover:bg-slate-900 transition-colors"
+          className="rounded-full bg-gradient-to-r from-accent to-accent-dark text-sm font-semibold text-white px-5 py-2 shadow-lg hover:shadow-xl transition-all"
           onClick={() =>
             setEditing({
               id: crypto.randomUUID(),
@@ -88,12 +89,12 @@ export function Extracurriculars({ activities, onChange }: Props) {
             })
           }
         >
-          + Add activity
+          + Add Activity
         </button>
       </header>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="inline-flex items-center gap-1 rounded-full bg-surface-elevated px-1 py-1 text-[11px] shadow-subtle">
+        <div className="inline-flex items-center gap-1 rounded-xl bg-white border-2 border-accent/20 px-1 py-1 shadow-subtle">
           {(["cards", "ranked", "timeline"] as ViewMode[]).map((mode) => (
             <button
               key={mode}
@@ -115,10 +116,16 @@ export function Extracurriculars({ activities, onChange }: Props) {
       </div>
 
       {activities.length === 0 && !editing && (
-        <div className="rounded-xl border border-dashed border-border bg-surface-elevated px-4 py-6 text-xs text-ink-soft text-center">
+        <div className="rounded-xl border-2 border-dashed border-accent/30 bg-gradient-to-br from-white to-accent-soft/20 px-4 py-6 text-sm text-ink-soft text-center">
           Start by adding 2–3 activities that genuinely matter to you—clubs,
           competitions, projects, work, or volunteering. You can refine the
           wording later.
+        </div>
+      )}
+
+      {!editing && (
+        <div className="rounded-xl border-2 border-accent/20 bg-gradient-to-br from-white to-accent-soft/10 p-4 mb-4">
+          <ExtracurricularsDB onAddActivity={handleSave} />
         </div>
       )}
 
