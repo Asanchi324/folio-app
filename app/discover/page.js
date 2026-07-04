@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { COMPETITIONS, CATEGORIES } from '@/lib/competitions';
 import { track } from '@/lib/analytics';
+import { usePortfolio } from '@/lib/store';
+import { deadlineFor, formatDeadline, nextOccurrence, daysUntil, urgency } from '@/lib/deadlines';
 
 const TYPES = ['All', 'olympiad', 'competition', 'research', 'program', 'scholarship'];
 const COSTS = ['All', 'free', 'paid', 'stipend'];
@@ -25,10 +27,35 @@ export default function DiscoverPage() {
   const [cat, setCat] = useState('All');
   const [type, setType] = useState('All');
   const [cost, setCost] = useState('All');
+  const [p, update] = usePortfolio();
 
   useEffect(() => {
     track('discover_view');
   }, []);
+
+  const trackedIds = useMemo(
+    () => new Set((p.trackedDeadlines || []).map((t) => t.id)),
+    [p.trackedDeadlines]
+  );
+
+  function toggleTracked(c) {
+    const hint = deadlineFor(c.id);
+    if (!hint) return;
+    update((prev) => {
+      const cur = prev.trackedDeadlines || [];
+      if (cur.some((t) => t.id === c.id)) {
+        return { ...prev, trackedDeadlines: cur.filter((t) => t.id !== c.id) };
+      }
+      track('deadline_tracked', { id: c.id, name: c.name });
+      return {
+        ...prev,
+        trackedDeadlines: [
+          ...cur,
+          { id: c.id, name: c.name, label: hint.label, month: hint.month, addedAt: Date.now() },
+        ],
+      };
+    });
+  }
 
   const list = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -86,7 +113,7 @@ export default function DiscoverPage() {
 
       <div style={{ display: 'grid', gap: 14, marginTop: 22, gridTemplateColumns: 'repeat(auto-fill, minmax(320px,1fr))' }}>
         {list.map((c) => (
-          <CompCard key={c.id} c={c} />
+          <CompCard key={c.id} c={c} tracked={trackedIds.has(c.id)} onTrack={toggleTracked} />
         ))}
       </div>
 
@@ -95,8 +122,10 @@ export default function DiscoverPage() {
   );
 }
 
-function CompCard({ c }) {
+function CompCard({ c, tracked, onTrack }) {
   const cost = COST_META[c.cost];
+  const hint = deadlineFor(c.id);
+  const days = hint ? daysUntil(nextOccurrence(hint.month)) : null;
   return (
     <div className="card card-pad" style={{ padding: 20, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'flex-start' }}>
@@ -113,10 +142,25 @@ function CompCard({ c }) {
         <span className="pill pill-muted" style={{ fontSize: 11.5, textTransform: 'capitalize' }}>{c.level}</span>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--line)' }}>
-        <div style={{ fontSize: 12.5 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--line)', gap: 10 }}>
+        <div style={{ fontSize: 12.5, minWidth: 0 }}>
           <div className="muted">Timing</div>
           <div style={{ fontWeight: 600 }}>{c.season}</div>
+          {hint && (
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
+              <span className={`pill ${urgency(days)}`} style={{ fontSize: 10.5 }}>
+                {hint.label}: {formatDeadline(hint.month)} · in {days}d
+              </span>
+              <button
+                onClick={() => onTrack(c)}
+                className={`pill ${tracked ? 'band-safety' : 'pill-muted'}`}
+                style={{ fontSize: 10.5, border: 'none', cursor: 'pointer' }}
+                title={tracked ? 'Tracked in “My deadlines”' : 'Add to my deadlines'}
+              >
+                {tracked ? '✓ Tracking' : '+ Track deadline'}
+              </button>
+            </div>
+          )}
         </div>
         {c.link ? (
           <a
