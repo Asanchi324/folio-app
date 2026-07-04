@@ -11,6 +11,7 @@ import MentorCard from '@/components/MentorCard';
 import CommentsCard from '@/components/CommentsCard';
 import EssayCoach from '@/components/EssayCoach';
 import CounselorChat from '@/components/CounselorChat';
+import ShareCard from '@/components/ShareCard';
 
 const LEVELS = ['school', 'regional', 'state', 'national', 'international'];
 
@@ -69,6 +70,7 @@ export default function PortfolioPage() {
           <CounselorChat portfolio={p} />
           <FeedbackCard p={p} update={update} />
           <CommentsCard meta={meta} />
+          <ShareCard p={p} meta={meta} />
           <MentorCard meta={meta} />
         </div>
       </div>

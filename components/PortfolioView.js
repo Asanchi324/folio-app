@@ -19,9 +19,11 @@ const DEFAULT_OPTS = {
   narrative: false, // essays are private by default
 };
 
-export default function PortfolioView({ p, options }) {
+export default function PortfolioView({ p, options, precomputed }) {
   const opts = { ...DEFAULT_OPTS, ...(options || {}) };
-  const { strength, pillars } = profileBreakdown(p || {});
+  // Share snapshots carry the strength computed at publish time (the snapshot
+  // may omit sections, which would skew a live recompute).
+  const { strength, pillars } = precomputed || profileBreakdown(p || {});
   const acts = p?.activities || [];
   const honors = p?.honors || [];
   const t = p?.testing || {};
