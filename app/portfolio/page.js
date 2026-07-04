@@ -8,6 +8,7 @@ import { profileBreakdown, completeness } from '@/lib/profile';
 import { track } from '@/lib/analytics';
 import Ring from '@/components/Ring';
 import MentorCard from '@/components/MentorCard';
+import CommentsCard from '@/components/CommentsCard';
 
 const LEVELS = ['school', 'regional', 'state', 'national', 'international'];
 
@@ -64,6 +65,7 @@ export default function PortfolioPage() {
         <div className="pf-side">
           <StrengthCard breakdown={breakdown} complete={complete} />
           <FeedbackCard p={p} update={update} />
+          <CommentsCard meta={meta} />
           <MentorCard meta={meta} />
         </div>
       </div>
