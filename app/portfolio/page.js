@@ -7,12 +7,13 @@ import { usePortfolio, newId } from '@/lib/store';
 import { profileBreakdown, completeness } from '@/lib/profile';
 import { track } from '@/lib/analytics';
 import Ring from '@/components/Ring';
+import MentorCard from '@/components/MentorCard';
 
 const LEVELS = ['school', 'regional', 'state', 'national', 'international'];
 
 export default function PortfolioPage() {
   const router = useRouter();
-  const [p, update, ready] = usePortfolio();
+  const [p, update, ready, meta] = usePortfolio();
 
   // First-time visitors go through the onboarding survey first.
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function PortfolioPage() {
         <div className="pf-side">
           <StrengthCard breakdown={breakdown} complete={complete} />
           <FeedbackCard p={p} update={update} />
+          <MentorCard meta={meta} />
         </div>
       </div>
 

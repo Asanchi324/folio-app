@@ -1,12 +1,176 @@
-// Folio — Firestore security rules.
-// Paste into Firebase console → Firestore Database → Rules.
-// Each user can read/write only their own portfolio document.
+// Folio — Firestore security rules (B2C + B2B model).
+// Paste into Firebase console → Firestore Database → Rules → Publish.
+//
+// ┌─────────────────────────────────────────────────────────────────────┐
+// │ OWNER ACTION REQUIRED: put YOUR Google account email(s) into the    │
+// │ isFounder() list below. Founders can set plans/seats and see all    │
+// │ orgs — this is the manual "billing" path until payments exist.      │
+// │ Keep it in sync with the FOLIO_ADMIN_EMAILS env var on Vercel.      │
+// └─────────────────────────────────────────────────────────────────────┘
+//
+// Access matrix (enforced here, mirrored in the UI):
+//   student   → own portfolio/user doc; sees & resolves own comments
+//   counselor → read-only portfolios + comments for students of THEIR org
+//   orgAdmin  → same as counselor + manages the org doc and members
+//   founder   → everything above + sets plan/seats (manual sales)
+//   public    → shares/{shareId} snapshots only (unguessable random ids)
+//
+// Plans ('free'|'pro' on users, 'free'|'business' on orgs) are the paid
+// gates, so clients may NEVER write them: users/orgs create must start at
+// 'free' and updates must keep plan unchanged unless a founder does it.
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /portfolios/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    // ---------- helpers ----------
+    function signedIn() { return request.auth != null; }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Founder admins — EDIT THIS LIST (must match FOLIO_ADMIN_EMAILS env).
+    function isFounder() {
+      return signedIn() &&
+        request.auth.token.email in ['djdjdj.9413@gmail.com'];
     }
+
+    function orgDoc(orgId) {
+      return get(/databases/$(database)/documents/orgs/$(orgId)).data;
+    }
+    function isMember(orgId) {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/orgs/$(orgId)/members/$(request.auth.uid));
+    }
+    function memberRole(orgId) {
+      return get(/databases/$(database)/documents/orgs/$(orgId)/members/$(request.auth.uid)).data.role;
+    }
+    // Staff = counselor or orgAdmin of that org.
+    function isOrgStaff(orgId) {
+      return isMember(orgId) && memberRole(orgId) in ['counselor', 'orgAdmin'];
+    }
+    function isOrgAdmin(orgId) {
+      return signedIn() &&
+        (orgDoc(orgId).ownerUid == request.auth.uid ||
+         (isMember(orgId) && memberRole(orgId) == 'orgAdmin'));
+    }
+
+    // ---------- users/{uid} — platform profile ----------
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isFounder();
+      // First sign-in bootstrap: role student is fine, but plan MUST be free.
+      allow create: if isSelf(uid) && request.resource.data.plan == 'free';
+      // Self-updates may touch anything EXCEPT plan (paid gate). Role changes
+      // by self are allowed — role alone grants no paid features, access is
+      // always membership-checked. Founders can change everything.
+      allow update: if isFounder() ||
+        (isSelf(uid) && request.resource.data.plan == resource.data.plan);
+      allow delete: if isFounder();
+    }
+
+    // ---------- orgs ----------
+    match /orgs/{orgId} {
+      // Members see their org (name, codes for admins UI, plan). Owners too
+      // (covers the moment right after creation). Founders see all (console).
+      allow read: if isFounder() || isMember(orgId) ||
+        (signedIn() && resource.data.ownerUid == request.auth.uid);
+      // Self-serve workspace creation — must start on the free plan.
+      allow create: if isFounder() ||
+        (signedIn() &&
+          request.resource.data.ownerUid == request.auth.uid &&
+          request.resource.data.plan == 'free');
+      // Admins manage the org but can NOT bump plan/seats (founder = billing).
+      allow update: if isFounder() ||
+        (isOrgAdmin(orgId) &&
+          request.resource.data.plan == resource.data.plan &&
+          request.resource.data.seats == resource.data.seats &&
+          request.resource.data.ownerUid == resource.data.ownerUid);
+      allow delete: if isFounder();
+
+      // ---------- membership ----------
+      match /members/{memberUid} {
+        // A member sees their own membership; staff see the whole roster.
+        allow read: if isSelf(memberUid) || isOrgStaff(orgId) || isFounder();
+        // Joining is self-service but code-verified: the new member doc must
+        // carry the org's CURRENT invite code for the role it claims. This is
+        // what lets /join/{code} work without Cloud Functions.
+        allow create: if isFounder() || isOrgAdmin(orgId) ||
+          (isSelf(memberUid) &&
+            request.resource.data.joinedAt is number &&
+            (
+              (request.resource.data.role == 'student' &&
+                request.resource.data.joinCode == orgDoc(orgId).joinCode) ||
+              (request.resource.data.role == 'counselor' &&
+                request.resource.data.joinCode == orgDoc(orgId).counselorCode)
+            ));
+        // Members can always leave; admins can remove anyone.
+        allow delete: if isSelf(memberUid) || isOrgAdmin(orgId) || isFounder();
+        allow update: if isOrgAdmin(orgId) || isFounder();
+      }
+    }
+
+    // ---------- joinCodes/{CODE} — invite-code lookup ----------
+    // Read requires being signed in AND knowing the exact code (doc id) — the
+    // collection can't be listed, so codes stay effectively secret.
+    // Note: create only requires createdBy == self; a forged code doc cannot
+    // grant access (member create above checks the code against the ORG doc),
+    // it could only pollute the namespace. Acceptable for a rules-only flow.
+    match /joinCodes/{code} {
+      allow get: if signedIn();
+      allow list: if isFounder();
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update: if false;
+      allow delete: if isFounder() ||
+        (signedIn() && resource.data.createdBy == request.auth.uid) ||
+        isOrgAdmin(resource.data.orgId);
+    }
+
+    // ---------- portfolios/{uid} ----------
+    match /portfolios/{uid} {
+      // Owner always; org staff read the portfolios of students linked to
+      // their org (the student links/unlinks the orgId themselves — that IS
+      // the consent switch). NO public read here, ever — sharing goes through
+      // the curated shares/{shareId} snapshots instead.
+      allow read: if isSelf(uid) || isFounder() ||
+        (resource.data.orgId != null && isOrgStaff(resource.data.orgId));
+      allow write: if isSelf(uid);
+
+      // ---------- counselor comments ----------
+      match /comments/{commentId} {
+        function portfolioOrgId() {
+          return get(/databases/$(database)/documents/portfolios/$(uid)).data.orgId;
+        }
+        allow read: if isSelf(uid) ||
+          (portfolioOrgId() != null && isOrgStaff(portfolioOrgId()));
+        // Only org staff comment, and only under their own name.
+        allow create: if portfolioOrgId() != null &&
+          isOrgStaff(portfolioOrgId()) &&
+          request.resource.data.authorUid == request.auth.uid;
+        // The student may toggle `resolved` (and nothing else); the author may
+        // edit their own comment.
+        allow update: if (signedIn() && request.auth.uid == resource.data.authorUid) ||
+          (isSelf(uid) &&
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resolved']));
+        allow delete: if signedIn() && request.auth.uid == resource.data.authorUid;
+      }
+
+      // ---------- AI counselor chat history (private to the student) ----------
+      match /chat/{msgId} {
+        allow read, write: if isSelf(uid);
+      }
+    }
+
+    // ---------- shares/{shareId} — public curated snapshots ----------
+    // Doc ids are long random strings generated client-side; knowing the id IS
+    // the capability. Content is a snapshot the student explicitly curated.
+    match /shares/{shareId} {
+      allow get: if true;
+      allow list: if false; // no enumeration
+      allow create, update: if signedIn() &&
+        request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ---------- server-only namespaces (future durable cache/limits) ----------
+    match /rate_limits/{doc} { allow read, write: if false; }
+    match /ai_cache/{doc} { allow read, write: if false; }
   }
 }

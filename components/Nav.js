@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useUser, signOut } from '@/lib/auth';
+import { signOut } from '@/lib/auth';
+import { useAccount } from '@/lib/account';
 import { isFirebaseConfigured } from '@/lib/firebase';
 
 const LINKS = [
@@ -16,9 +17,13 @@ export default function Nav() {
   const path = usePathname();
   const isLanding = path === '/';
   const onPortfolio = path.startsWith('/portfolio');
-  const { user } = useUser();
+  const { user, profile } = useAccount();
   const authEnabled = isFirebaseConfigured();
   const [open, setOpen] = useState(false);
+
+  // Counselors/org admins get their dashboard as the first nav item.
+  const isStaff = profile?.role === 'counselor' || profile?.role === 'orgAdmin';
+  const links = isStaff ? [{ href: '/counselor', label: 'Dashboard' }, ...LINKS] : LINKS;
 
   // Close the mobile menu whenever the route changes.
   useEffect(() => {
@@ -41,7 +46,7 @@ export default function Nav() {
         <div className="nav-right">
           {/* section links — inline on desktop, inside the burger on mobile */}
           <nav className="nav-links" aria-label="Primary">
-            {LINKS.map((l) => {
+            {links.map((l) => {
               const active = path.startsWith(l.href);
               return (
                 <Link
@@ -92,7 +97,7 @@ export default function Nav() {
 
       {/* mobile dropdown menu */}
       <div className={`nav-menu${open ? ' open' : ''}`}>
-        {LINKS.map((l) => {
+        {links.map((l) => {
           const active = path.startsWith(l.href);
           return (
             <Link
@@ -158,7 +163,7 @@ export default function Nav() {
           backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
           transition:max-height .32s cubic-bezier(.4,.1,.2,1), opacity .25s ease;
         }
-        .nav-menu.open{max-height:340px; opacity:1; border-top:1px solid var(--line);}
+        .nav-menu.open{max-height:420px; opacity:1; border-top:1px solid var(--line);}
         .nav-menu-link{
           display:flex; align-items:center; justify-content:space-between; width:100%;
           padding:16px 24px; font-size:17px; font-weight:600; color:var(--ink);
@@ -173,6 +178,7 @@ export default function Nav() {
         .nav-menu.open .nav-menu-link:nth-child(2){transition-delay:.09s;}
         .nav-menu.open .nav-menu-link:nth-child(3){transition-delay:.14s;}
         .nav-menu.open .nav-menu-link:nth-child(4){transition-delay:.19s;}
+        .nav-menu.open .nav-menu-link:nth-child(5){transition-delay:.24s;}
 
         @media (max-width:760px){
           .nav-links{display:none;}
