@@ -315,3 +315,85 @@ textarea:focus {
     transform: none;
   }
 }
+
+/* ---------- landing animations ---------- */
+/* Scroll reveal (driven by components/Reveal.js) */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero entrance + ambience */
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes glowDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-30px, 18px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes chipFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes growBar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.hero-rise {
+  animation: heroRise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hero-glow {
+  animation: glowDrift 14s ease-in-out infinite;
+}
+.chip-float {
+  animation: chipFloat 5s ease-in-out infinite;
+}
+.bar-animate {
+  transform-origin: left;
+  animation: growBar 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Reduced motion: show everything instantly, stop ambient movement. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero-rise,
+  .hero-glow,
+  .chip-float,
+  .bar-animate,
+  .fade-in {
+    animation: none !important;
+  }
+}

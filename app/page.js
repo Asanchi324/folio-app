@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import Reveal from '@/components/Reveal';
+import PricingCards from '@/components/Pricing';
 
 export default function Landing() {
   return (
@@ -8,7 +10,9 @@ export default function Landing() {
       <Features />
       <HowItWorks />
       <ChancePreview />
+      <ForSchools />
       <DiscoverPreview />
+      <Pricing />
       <CTA />
       <Footer />
     </>
@@ -19,46 +23,45 @@ export default function Landing() {
 function Hero() {
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* ambient glow — drifts slowly, disabled for reduced motion */}
       <div
         aria-hidden
+        className="hero-glow"
         style={{
           position: 'absolute',
-          inset: 0,
+          inset: '-20% -10%',
           background:
-            'radial-gradient(900px 420px at 78% -8%, rgba(69,133,217,0.16), transparent 60%), radial-gradient(760px 460px at 6% 4%, rgba(69,133,217,0.10), transparent 55%)',
+            'radial-gradient(900px 420px at 78% -8%, rgba(69,133,217,0.18), transparent 60%), radial-gradient(760px 460px at 6% 4%, rgba(69,133,217,0.10), transparent 55%), radial-gradient(520px 320px at 92% 60%, rgba(192,138,45,0.10), transparent 60%)',
+          pointerEvents: 'none',
         }}
       />
-      <div
-        className="wrap"
-        style={{ position: 'relative', padding: '78px 24px 70px' }}
-      >
+      <div className="wrap" style={{ position: 'relative', padding: '76px 24px 70px' }}>
         <div style={{ maxWidth: 760 }}>
-          <span className="pill pill-gold" style={{ marginBottom: 22 }}>
+          <span className="pill pill-gold hero-rise" style={{ marginBottom: 22 }}>
             For students applying abroad
           </span>
           <h1
+            className="hero-rise"
             style={{
-              fontSize: 'clamp(40px, 6vw, 68px)',
+              fontSize: 'clamp(38px, 6vw, 68px)',
               lineHeight: 1.02,
               letterSpacing: '-0.025em',
+              animationDelay: '0.05s',
             }}
           >
-            Build the portfolio that
-            <br />
+            Build the portfolio that{' '}
             <span style={{ color: 'var(--primary)' }}>actually gets you in.</span>
           </h1>
           <p
-            className="muted"
-            style={{ fontSize: 20, lineHeight: 1.55, marginTop: 24, maxWidth: 620 }}
+            className="muted hero-rise"
+            style={{ fontSize: 'clamp(16.5px, 2.4vw, 20px)', lineHeight: 1.55, marginTop: 24, maxWidth: 620, animationDelay: '0.12s' }}
           >
             Folio turns your grades, tests, activities and awards into a
             Common&nbsp;App–grade portfolio — then gives you honest AI feedback,
             real admission odds, and the exact olympiads and competitions to do
             next.
           </p>
-          <div
-            style={{ display: 'flex', gap: 12, marginTop: 34, flexWrap: 'wrap' }}
-          >
+          <div className="hero-rise" style={{ display: 'flex', gap: 12, marginTop: 34, flexWrap: 'wrap', animationDelay: '0.19s' }}>
             <Link href="/start" className="btn btn-primary">
               Create my portfolio — free
             </Link>
@@ -66,8 +69,11 @@ function Hero() {
               See my chances
             </Link>
           </div>
-          <p style={{ marginTop: 16, fontSize: 13.5, color: 'var(--faint)' }}>
-            No sign-up. Your portfolio saves to this device.
+          <p className="hero-rise" style={{ marginTop: 16, fontSize: 13.5, color: 'var(--faint)', animationDelay: '0.26s' }}>
+            Free forever for the essentials. No card, no sign-up to start.{' '}
+            <Link href="#schools" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+              A school or counselor? →
+            </Link>
           </p>
         </div>
 
@@ -78,16 +84,33 @@ function Hero() {
 }
 
 function HeroCard() {
+  const odds = [
+    ['MIT', 6, 'band-hard-reach'],
+    ['UC Berkeley', 24, 'band-reach'],
+    ['U Michigan', 48, 'band-target'],
+    ['ASU', 91, 'band-safety'],
+  ];
   return (
     <div
-      className="card fade-in"
+      className="card hero-rise"
       style={{
         marginTop: 56,
         padding: 0,
         overflow: 'hidden',
         boxShadow: 'var(--shadow-lg)',
+        position: 'relative',
+        animationDelay: '0.3s',
       }}
     >
+      {/* floating premium chip */}
+      <span
+        aria-hidden
+        className="pill pill-gold chip-float"
+        style={{ position: 'absolute', top: -12, right: 22, boxShadow: 'var(--shadow)', zIndex: 2 }}
+      >
+        ✨ no glaze — honest odds
+      </span>
+
       <div
         style={{
           display: 'flex',
@@ -106,73 +129,38 @@ function HeroCard() {
         </span>
       </div>
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0,1.3fr) minmax(0,1fr)',
-          gap: 0,
-        }}
+        style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.3fr) minmax(0,1fr)', gap: 0 }}
         className="hero-grid"
       >
         <div style={{ padding: 28, borderRight: '1px solid var(--line)' }}>
-          <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}>
-            AI feedback
-          </div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}>AI feedback</div>
           <p style={{ marginTop: 10, fontSize: 16, lineHeight: 1.5 }}>
             “Strong STEM core, but your activities read as
             <em> membership, not leadership</em>. Turn the robotics club into a
             measurable project and target a national olympiad to convert a good
             profile into a competitive one.”
           </p>
-          <div
-            style={{ display: 'flex', gap: 8, marginTop: 18, flexWrap: 'wrap' }}
-          >
+          <div style={{ display: 'flex', gap: 8, marginTop: 18, flexWrap: 'wrap' }}>
             <span className="pill band-reach">Raise SAT → 1500+</span>
             <span className="pill band-target">Lead a project</span>
             <span className="pill pill-gold">Enter USACO</span>
           </div>
         </div>
         <div style={{ padding: 28, background: 'var(--surface-2)' }}>
-          <div
-            style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}
-          >
-            Admission odds
-          </div>
-          {[
-            ['MIT', 6, 'band-hard-reach'],
-            ['UC Berkeley', 24, 'band-reach'],
-            ['U Michigan', 48, 'band-target'],
-            ['ASU', 91, 'band-safety'],
-          ].map(([name, pct, band]) => (
+          <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}>Admission odds</div>
+          {odds.map(([name, pct, band], i) => (
             <div
               key={name}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                marginTop: 14,
-              }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 14 }}
             >
-              <span style={{ fontSize: 14.5, fontWeight: 600, width: 96 }}>
-                {name}
-              </span>
-              <div
-                style={{
-                  flex: 1,
-                  height: 8,
-                  borderRadius: 999,
-                  background: 'var(--line)',
-                  overflow: 'hidden',
-                }}
-              >
+              <span style={{ fontSize: 14.5, fontWeight: 600, width: 96 }}>{name}</span>
+              <div style={{ flex: 1, height: 8, borderRadius: 999, background: 'var(--line)', overflow: 'hidden' }}>
                 <div
-                  className={`barfill ${band}`}
-                  style={{ width: `${pct}%`, height: '100%' }}
+                  className={`barfill bar-animate ${band}`}
+                  style={{ width: `${pct}%`, height: '100%', animationDelay: `${0.55 + i * 0.14}s` }}
                 />
               </div>
-              <span style={{ fontSize: 13.5, fontWeight: 700, width: 38, textAlign: 'right' }}>
-                {pct}%
-              </span>
+              <span style={{ fontSize: 13.5, fontWeight: 700, width: 38, textAlign: 'right' }}>{pct}%</span>
             </div>
           ))}
         </div>
@@ -190,9 +178,7 @@ function HeroCard() {
 
 function Dot({ c }) {
   return (
-    <span
-      style={{ width: 11, height: 11, borderRadius: 999, background: c, display: 'inline-block' }}
-    />
+    <span style={{ width: 11, height: 11, borderRadius: 999, background: c, display: 'inline-block' }} />
   );
 }
 
@@ -239,36 +225,40 @@ function Features() {
     {
       icon: '🧭',
       title: 'Personalised next moves',
-      body: 'Specific olympiads, research programs and score targets — ranked by how much they’ll actually move your odds.',
+      body: 'Specific olympiads, research programs and score targets — plus deadline tracking so you never miss a window.',
     },
   ];
   return (
     <section className="section">
       <div className="wrap">
-        <Header
-          eyebrow="What Folio does"
-          title="Everything between “good student” and “admitted”."
-          sub="Most applicants have the raw material. Folio is the layer that turns it into an application that reads as exceptional."
-        />
+        <Reveal>
+          <Header
+            eyebrow="What Folio does"
+            title="Everything between “good student” and “admitted”."
+            sub="Most applicants have the raw material. Folio is the layer that turns it into an application that reads as exceptional."
+          />
+        </Reveal>
         <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(248px, 1fr))',
-            gap: 18,
-            marginTop: 44,
-          }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(248px, 1fr))', gap: 18, marginTop: 44 }}
         >
-          {items.map((it) => (
-            <div key={it.title} className="card card-pad">
-              <div style={{ fontSize: 26 }}>{it.icon}</div>
-              <h3 style={{ fontSize: 20, marginTop: 14 }}>{it.title}</h3>
-              <p className="muted" style={{ marginTop: 8, fontSize: 14.5, lineHeight: 1.55 }}>
-                {it.body}
-              </p>
-            </div>
+          {items.map((it, i) => (
+            <Reveal key={it.title} delay={i * 90}>
+              <div className="card card-pad feature-card" style={{ height: '100%' }}>
+                <div style={{ fontSize: 26 }}>{it.icon}</div>
+                <h3 style={{ fontSize: 20, marginTop: 14 }}>{it.title}</h3>
+                <p className="muted" style={{ marginTop: 8, fontSize: 14.5, lineHeight: 1.55 }}>
+                  {it.body}
+                </p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
+      <style>{`
+        .feature-card{transition:transform .2s ease, box-shadow .2s ease;}
+        .feature-card:hover{transform:translateY(-4px); box-shadow:var(--shadow);}
+        @media (prefers-reduced-motion: reduce){.feature-card:hover{transform:none;}}
+      `}</style>
     </section>
   );
 }
@@ -278,23 +268,20 @@ function HowItWorks() {
   const steps = [
     ['Fill in your portfolio', 'Grades, SAT/IELTS, activities and awards — guided, section by section.'],
     ['Get AI feedback', 'An honest read on your strengths, gaps and the highest-impact things to fix.'],
-    ['See your real chances', 'Live odds across 25+ universities that update as your profile grows.'],
+    ['See your real chances', 'Live odds across 100+ universities that update as your profile grows.'],
     ['Do the right things next', 'Pick from a curated database of olympiads, competitions and programs.'],
   ];
   return (
     <section className="section" style={{ background: 'var(--surface)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
       <div className="wrap">
-        <Header eyebrow="How it works" title="Four steps from blank page to a sharper application." />
+        <Reveal>
+          <Header eyebrow="How it works" title="Four steps from blank page to a sharper application." />
+        </Reveal>
         <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: 22,
-            marginTop: 44,
-          }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 22, marginTop: 44 }}
         >
           {steps.map(([t, b], i) => (
-            <div key={t}>
+            <Reveal key={t} delay={i * 90}>
               <div
                 style={{
                   width: 44,
@@ -316,7 +303,7 @@ function HowItWorks() {
               <p className="muted" style={{ marginTop: 7, fontSize: 14.5, lineHeight: 1.55 }}>
                 {b}
               </p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -328,16 +315,8 @@ function HowItWorks() {
 function ChancePreview() {
   return (
     <section className="section">
-      <div
-        className="wrap"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
-          gap: 48,
-          alignItems: 'center',
-        }}
-      >
-        <div>
+      <div className="wrap chance-grid">
+        <Reveal>
           <span className="eyebrow">No glaze, ever</span>
           <h2 style={{ fontSize: 'clamp(28px,3.6vw,40px)', marginTop: 14 }}>
             Odds you can actually trust.
@@ -359,33 +338,135 @@ function ChancePreview() {
               </li>
             ))}
           </ul>
-        </div>
-        <div className="card card-pad" style={{ boxShadow: 'var(--shadow)' }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>
-            Same strong applicant, four schools
-          </div>
-          {[
-            ['Harvard', 5, 'Hard reach', 'band-hard-reach'],
-            ['Carnegie Mellon', 19, 'Reach', 'band-reach'],
-            ['U Michigan', 46, 'Target', 'band-target'],
-            ['Georgia Tech', 63, 'Safety', 'band-safety'],
-          ].map(([n, p, label, band]) => (
-            <div key={n} style={{ marginTop: 18 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 600, fontSize: 15.5 }}>{n}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span className={`pill ${band}`}>{label}</span>
-                  <span style={{ fontFamily: 'var(--display)', fontWeight: 600, fontSize: 18 }}>{p}%</span>
-                </span>
-              </div>
-              <div style={{ height: 8, borderRadius: 999, background: 'var(--line)', marginTop: 8, overflow: 'hidden' }}>
-                <div className={`barfill ${band}`} style={{ width: `${p}%`, height: '100%' }} />
-              </div>
+        </Reveal>
+        <Reveal delay={120}>
+          <div className="card card-pad" style={{ boxShadow: 'var(--shadow)' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>
+              Same strong applicant, four schools
             </div>
-          ))}
-          <style>{`.barfill.band-hard-reach{background:var(--bad)}.barfill.band-reach{background:var(--warn)}.barfill.band-target{background:var(--primary)}.barfill.band-safety{background:var(--good)}`}</style>
-        </div>
+            {[
+              ['Harvard', 5, 'Hard reach', 'band-hard-reach'],
+              ['Carnegie Mellon', 19, 'Reach', 'band-reach'],
+              ['U Michigan', 46, 'Target', 'band-target'],
+              ['Georgia Tech', 63, 'Safety', 'band-safety'],
+            ].map(([n, p, label, band], i) => (
+              <div key={n} style={{ marginTop: 18 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <span style={{ fontWeight: 600, fontSize: 15.5 }}>{n}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span className={`pill ${band}`}>{label}</span>
+                    <span style={{ fontFamily: 'var(--display)', fontWeight: 600, fontSize: 18 }}>{p}%</span>
+                  </span>
+                </div>
+                <div style={{ height: 8, borderRadius: 999, background: 'var(--line)', marginTop: 8, overflow: 'hidden' }}>
+                  <div className={`barfill bar-animate ${band}`} style={{ width: `${p}%`, height: '100%', animationDelay: `${i * 0.12}s` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
       </div>
+      <style>{`
+        .chance-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:48px; align-items:center;}
+        .barfill.band-hard-reach{background:var(--bad)}.barfill.band-reach{background:var(--warn)}
+        .barfill.band-target{background:var(--primary)}.barfill.band-safety{background:var(--good)}
+        @media (max-width:860px){.chance-grid{grid-template-columns:1fr; gap:28px;}}
+      `}</style>
+    </section>
+  );
+}
+
+/* ---------------------- FOR SCHOOLS & COUNSELORS ---------------------- */
+function ForSchools() {
+  const roster = [
+    ['Aisha K.', 74, ['No essay draft'], 'var(--good)'],
+    ['Timur B.', 52, ['No SAT/ACT', 'Membership, not leadership'], 'var(--primary)'],
+    ['Dana S.', 31, ['No GPA', 'No honors'], 'var(--warn)'],
+  ];
+  return (
+    <section id="schools" className="section" style={{ background: 'var(--ink)', color: '#fff' }}>
+      <div className="wrap schools-grid">
+        <Reveal>
+          <span className="eyebrow" style={{ color: 'var(--accent)' }}>For schools & counselors</span>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(28px,3.6vw,40px)', marginTop: 14 }}>
+            Your whole cohort, one honest dashboard.
+          </h2>
+          <p style={{ marginTop: 16, fontSize: 16.5, lineHeight: 1.6, color: 'rgba(255,255,255,0.75)' }}>
+            Stop chasing students for spreadsheets. See every portfolio, its
+            strength and its gaps in real time — and walk into each meeting
+            already knowing what to discuss.
+          </p>
+          <ul style={{ marginTop: 20, paddingLeft: 0, listStyle: 'none', display: 'grid', gap: 12 }}>
+            {[
+              'Roster with attention flags: no GPA, no essay, weak leadership',
+              'Read-only portfolios + comments students see in their builder',
+              'Suggested next steps per student, generated from their gaps',
+              'White-label: your brand on portfolios and PDFs (Business)',
+            ].map((t) => (
+              <li key={t} style={{ display: 'flex', gap: 10, fontSize: 15, color: 'rgba(255,255,255,0.9)' }}>
+                <span style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</span>
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+          <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
+            <Link href="/counselor/new" className="btn btn-gold">
+              Create a workspace — free
+            </Link>
+            <Link href="/upgrade" className="btn" style={{ border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }}>
+              See Business plan
+            </Link>
+          </div>
+        </Reveal>
+
+        {/* mini dashboard mockup */}
+        <Reveal delay={140}>
+          <div className="card" style={{ padding: 18, background: 'var(--surface)', color: 'var(--ink)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontWeight: 700, fontSize: 14.5 }}>Students (12)</span>
+              <span className="pill pill-muted" style={{ fontSize: 11 }}>Needs attention first</span>
+            </div>
+            {roster.map(([name, strength, flags, color]) => (
+              <div key={name} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 0', borderTop: '1px solid var(--line)' }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 999,
+                    border: `4px solid ${color}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    fontWeight: 800,
+                    flexShrink: 0,
+                  }}
+                >
+                  {strength}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 13.5 }}>{name}</div>
+                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 4 }}>
+                    {flags.map((f) => (
+                      <span key={f} className="pill band-reach" style={{ fontSize: 10 }}>{f}</span>
+                    ))}
+                    {flags.length === 0 && <span className="pill band-safety" style={{ fontSize: 10 }}>On track</span>}
+                  </div>
+                </div>
+                <span style={{ color: 'var(--faint)' }}>›</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 10, background: 'var(--accent-tint)', fontSize: 12.5, lineHeight: 1.5 }}>
+              💬 “Dana: let’s get your GPA in before Friday’s meeting — then we
+              pick your first olympiad.”
+            </div>
+          </div>
+        </Reveal>
+      </div>
+      <style>{`
+        .schools-grid{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr); gap:48px; align-items:center;}
+        @media (max-width:860px){.schools-grid{grid-template-columns:1fr; gap:32px;}}
+      `}</style>
     </section>
   );
 }
@@ -396,37 +477,71 @@ function DiscoverPreview() {
   return (
     <section className="section" style={{ background: 'var(--primary)', color: '#fff' }}>
       <div className="wrap" style={{ textAlign: 'center' }}>
-        <span className="eyebrow" style={{ color: 'var(--accent)' }}>
-          The opportunities database
-        </span>
-        <h2 style={{ color: '#fff', fontSize: 'clamp(28px,3.8vw,42px)', marginTop: 14, maxWidth: 720, marginInline: 'auto' }}>
-          Stop wondering what to do this summer.
-        </h2>
-        <p style={{ marginTop: 16, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.78)', maxWidth: 620, marginInline: 'auto' }}>
-          A curated library of olympiads, research programs, competitions and
-          scholarships — filterable by field, level and cost. The same pool the
-          AI recommends from.
-        </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 28, maxWidth: 680, marginInline: 'auto' }}>
-          {tags.map((t) => (
-            <span
-              key={t}
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                padding: '8px 15px',
-                borderRadius: 999,
-                background: 'rgba(255,255,255,0.10)',
-                border: '1px solid rgba(255,255,255,0.18)',
-              }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-        <Link href="/discover" className="btn btn-gold" style={{ marginTop: 32 }}>
-          Browse the database
-        </Link>
+        <Reveal>
+          <span className="eyebrow" style={{ color: '#f3d9a4' }}>The opportunities database</span>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(28px,3.8vw,42px)', marginTop: 14, maxWidth: 720, marginInline: 'auto' }}>
+            Stop wondering what to do this summer.
+          </h2>
+          <p style={{ marginTop: 16, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.78)', maxWidth: 620, marginInline: 'auto' }}>
+            A curated library of olympiads, research programs, competitions and
+            scholarships — with deadline tracking, so the window never closes on
+            you quietly.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 28, maxWidth: 680, marginInline: 'auto' }}>
+            {tags.map((t) => (
+              <span
+                key={t}
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: '8px 15px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.10)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <Link href="/discover" className="btn btn-gold" style={{ marginTop: 32 }}>
+            Browse the database
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ PRICING ------------------------------ */
+function Pricing() {
+  return (
+    <section className="section" id="pricing">
+      <div className="wrap">
+        <Reveal>
+          <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
+            <span className="eyebrow">Pricing</span>
+            <h2 style={{ fontSize: 'clamp(28px,3.8vw,42px)', marginTop: 14 }}>
+              Start free. Upgrade when it earns it.
+            </h2>
+            <p className="muted" style={{ marginTop: 14, fontSize: 16.5, lineHeight: 1.6 }}>
+              The builder, honest odds and AI review are free — no card, no trial
+              clock. Pay only for depth: your personal AI counselor, essay coach,
+              and the tools schools run cohorts on.
+            </p>
+          </div>
+        </Reveal>
+        <Reveal delay={120}>
+          <PricingCards />
+        </Reveal>
+        <Reveal delay={200}>
+          <p className="muted" style={{ textAlign: 'center', marginTop: 22, fontSize: 13.5 }}>
+            Prices are launch placeholders. Questions?{' '}
+            <a href="mailto:hello@folio.app" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+              hello@folio.app
+            </a>
+          </p>
+        </Reveal>
       </div>
     </section>
   );
@@ -435,27 +550,28 @@ function DiscoverPreview() {
 /* ------------------------------ CTA ------------------------------ */
 function CTA() {
   return (
-    <section className="section">
+    <section className="section" style={{ paddingTop: 0 }}>
       <div className="wrap">
-        <div
-          className="card"
-          style={{
-            padding: '56px 40px',
-            textAlign: 'center',
-            background:
-              'linear-gradient(180deg, var(--surface), var(--surface-2))',
-          }}
-        >
-          <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', maxWidth: 640, marginInline: 'auto' }}>
-            Your application is a story. Let’s make it a strong one.
-          </h2>
-          <p className="muted" style={{ marginTop: 16, fontSize: 17 }}>
-            Start free — it takes about ten minutes to see your first results.
-          </p>
-          <Link href="/start" className="btn btn-primary" style={{ marginTop: 28 }}>
-            Build my portfolio
-          </Link>
-        </div>
+        <Reveal>
+          <div
+            className="card"
+            style={{
+              padding: 'clamp(36px, 6vw, 56px) clamp(20px, 5vw, 40px)',
+              textAlign: 'center',
+              background: 'linear-gradient(180deg, var(--surface), var(--surface-2))',
+            }}
+          >
+            <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', maxWidth: 640, marginInline: 'auto' }}>
+              Your application is a story. Let’s make it a strong one.
+            </h2>
+            <p className="muted" style={{ marginTop: 16, fontSize: 17 }}>
+              Start free — it takes about ten minutes to see your first results.
+            </p>
+            <Link href="/start" className="btn btn-primary" style={{ marginTop: 28 }}>
+              Build my portfolio
+            </Link>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -469,6 +585,14 @@ function Footer() {
         style={{ padding: '34px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}
       >
         <span style={{ fontFamily: 'var(--display)', fontSize: 19, fontWeight: 600 }}>Folio</span>
+        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Link href="/counselor/new" style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 600 }}>
+            For schools
+          </Link>
+          <Link href="/upgrade" style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 600 }}>
+            Pricing
+          </Link>
+        </div>
         <span style={{ fontSize: 13.5, color: 'var(--faint)' }}>
           Estimates are guidance, not guarantees. Always verify deadlines and requirements with the source.
         </span>
