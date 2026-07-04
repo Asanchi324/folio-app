@@ -6,12 +6,10 @@ import { generate } from '@/lib/ai';
 import { enforce } from '@/lib/ratelimit';
 import { profileBreakdown } from '@/lib/profile';
 import { selectCompetitions } from '@/lib/competitions';
+import { resolveAccess } from '@/lib/plan-server';
+import { aiLimitsFor } from '@/lib/plans';
 
 export const runtime = 'nodejs';
-
-// A full-portfolio review is a heavier call than a single-entry polish, so the
-// caps are tighter.
-const LIMITS = { burst: { limit: 4, windowMs: 60 * 1000 }, daily: { limit: 20 } };
 
 const SYSTEM = `You are Folio's admissions strategist — a sharp, experienced college counselor for international students applying to top global universities.
 
@@ -68,7 +66,11 @@ Return JSON with EXACTLY this shape:
 }
 
 export async function POST(request) {
-  const limited = await enforce(request, 'feedback', LIMITS);
+  // The full review stays free (it IS the funnel); Pro lifts the caps.
+  const access = await resolveAccess(request);
+  const limited = await enforce(request, 'feedback', aiLimitsFor('feedback', access.plan), {
+    id: access.uid || undefined,
+  });
   if (limited) {
     return NextResponse.json(limited.body, {
       status: limited.status,

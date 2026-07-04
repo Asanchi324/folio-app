@@ -4,12 +4,10 @@
 import { NextResponse } from 'next/server';
 import { generate } from '@/lib/ai';
 import { enforce } from '@/lib/ratelimit';
+import { resolveAccess } from '@/lib/plan-server';
+import { aiLimitsFor } from '@/lib/plans';
 
 export const runtime = 'nodejs';
-
-// Cheap-ish and called repeatedly while polishing entries — allow a decent
-// daily cap but stop rapid-fire hammering within a minute.
-const LIMITS = { burst: { limit: 8, windowMs: 60 * 1000 }, daily: { limit: 40 } };
 
 const SYSTEM = `You are an expert college-application editor. You rewrite an activity/honor description so it reads powerfully on the Common App.
 
@@ -21,7 +19,12 @@ Hard rules:
 - Output STRICT JSON only.`;
 
 export async function POST(request) {
-  const limited = await enforce(request, 'enhance', LIMITS);
+  // Polishing stays free for everyone; Pro just gets roomier limits. Signed-in
+  // users are keyed by uid so their allowance follows the account, not the IP.
+  const access = await resolveAccess(request);
+  const limited = await enforce(request, 'enhance', aiLimitsFor('enhance', access.plan), {
+    id: access.uid || undefined,
+  });
   if (limited) {
     return NextResponse.json(limited.body, {
       status: limited.status,
