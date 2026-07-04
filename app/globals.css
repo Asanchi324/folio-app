@@ -1,0 +1,317 @@
+/* ============================================================
+   Folio — design system
+   Editorial-academic look: warm paper, deep indigo, gold accent.
+   ============================================================ */
+
+:root {
+  /* palette */
+  --bg: #f6f4ee;
+  --surface: #ffffff;
+  --surface-2: #fbfaf6;
+  --ink: #19182b;
+  --muted: #6c6a7a;
+  --faint: #9795a3;
+  --line: #e7e3d8;
+  --line-strong: #d8d3c4;
+
+  --primary: #4585d9; /* Folio brand blue */
+  --primary-600: #3570c2;
+  --primary-tint: #e9f1fb;
+  --accent: #c08a2d; /* gold — reserved for Premium */
+  --accent-tint: #f6ecd6;
+
+  --good: #2f9e6b;
+  --good-tint: #e3f4ec;
+  --warn: #d98321;
+  --warn-tint: #fbeede;
+  --bad: #c8455c;
+  --bad-tint: #fbe6ea;
+
+  /* type — Days One (brand display, matches the logo), Poppins for dense UI
+     headings, Inter for body */
+  --display: 'Days One', 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --display-ui: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+
+  /* shape */
+  --r-sm: 8px;
+  --r: 14px;
+  --r-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(25, 24, 43, 0.05), 0 1px 3px rgba(25, 24, 43, 0.04);
+  --shadow: 0 6px 22px rgba(25, 24, 43, 0.08);
+  --shadow-lg: 0 18px 50px rgba(25, 24, 43, 0.14);
+
+  --maxw: 1120px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2 {
+  font-family: var(--display);
+  font-weight: 400; /* Days One is a single, inherently heavy weight */
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+h3,
+h4 {
+  font-family: var(--display-ui);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+::selection {
+  background: var(--accent-tint);
+}
+
+/* ---------- layout helpers ---------- */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 88px 0;
+}
+
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--primary-600);
+  box-shadow: var(--shadow);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.btn-ghost:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+.btn-gold {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-gold:hover {
+  filter: brightness(1.05);
+}
+.btn-sm {
+  padding: 8px 15px;
+  font-size: 13.5px;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.card-pad {
+  padding: 26px;
+}
+
+/* ---------- badges / pills ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--primary-tint);
+  color: var(--primary);
+  letter-spacing: 0.01em;
+}
+.pill-gold {
+  background: var(--accent-tint);
+  color: #8a611a;
+}
+.pill-muted {
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+/* band colors */
+.band-safety {
+  background: var(--good-tint);
+  color: #1c6b48;
+}
+.band-target {
+  background: var(--primary-tint);
+  color: var(--primary);
+}
+.band-reach {
+  background: var(--warn-tint);
+  color: #9a5a13;
+}
+.band-hard-reach {
+  background: var(--bad-tint);
+  color: #99293c;
+}
+
+/* ---------- forms ---------- */
+label.field {
+  display: block;
+  margin-bottom: 16px;
+}
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.field-hint {
+  font-size: 12px;
+  color: var(--faint);
+  font-weight: 400;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+textarea {
+  resize: vertical;
+  min-height: 84px;
+  line-height: 1.5;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-tint);
+}
+.row {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .row-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .row-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ---------- misc ---------- */
+.divider {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  margin: 0;
+}
+.kbd {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fade-in {
+  animation: fadeIn 0.4s ease both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,12 @@
+// Folio — Firestore security rules.
+// Paste into Firebase console → Firestore Database → Rules.
+// Each user can read/write only their own portfolio document.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /portfolios/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
