@@ -9,6 +9,8 @@ import { track } from '@/lib/analytics';
 import Ring from '@/components/Ring';
 import MentorCard from '@/components/MentorCard';
 import CommentsCard from '@/components/CommentsCard';
+import EssayCoach from '@/components/EssayCoach';
+import CounselorChat from '@/components/CounselorChat';
 
 const LEVELS = ['school', 'regional', 'state', 'national', 'international'];
 
@@ -64,6 +66,7 @@ export default function PortfolioPage() {
         {/* ---------------- RIGHT: dashboard ---------------- */}
         <div className="pf-side">
           <StrengthCard breakdown={breakdown} complete={complete} />
+          <CounselorChat portfolio={p} />
           <FeedbackCard p={p} update={update} />
           <CommentsCard meta={meta} />
           <MentorCard meta={meta} />
@@ -386,6 +389,7 @@ function Narrative({ p, update }) {
           placeholder="Draft or outline your main essay here. The AI uses it to judge how clear and compelling your story is."
         />
       </Field>
+      <EssayCoach essay={n.personalStatement} />
     </Section>
   );
 }
