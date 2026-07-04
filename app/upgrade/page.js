@@ -5,23 +5,18 @@
 // lead to a "write to us" contact until a payment provider is chosen.
 // Plans are granted manually via the founder console (/admin/orgs).
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import PricingCards from '@/components/Pricing';
 import { useAccount } from '@/lib/account';
 
 export default function UpgradePage() {
-  return (
-    <Suspense>
-      <Upgrade />
-    </Suspense>
-  );
-}
-
-function Upgrade() {
   const { profile } = useAccount();
-  const params = useSearchParams();
-  const wanted = params.get('plan');
+  // Read ?plan= without useSearchParams to keep the page fully static
+  // (no Suspense boundary needed).
+  const [wanted, setWanted] = useState(null);
+  useEffect(() => {
+    setWanted(new URLSearchParams(window.location.search).get('plan'));
+  }, []);
 
   return (
     <div className="wrap" style={{ padding: '48px 24px 100px' }}>
