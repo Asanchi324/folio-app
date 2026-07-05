@@ -1,118 +1,200 @@
-# Отчёт по большому апгрейду Folio (бриф FABLE_BRIEF.md)
+# Folio — Owner's Manual
 
-Дата: 2026-07-05. Все разделы брифа A–K + I выполнены (детали и оговорки ниже).
-`npm run build` — чисто; localStorage-only режим (без Firebase env) работает как раньше.
+_Обновлено: 2026-07-05 (production-ready pass: Stripe-биллинг, Business Workspace, новый лендинг)._
 
----
-
-## Clean-pass (второй проход, 2026-07-05)
-
-**Security-фиксы в `firestore.rules` — ОБЯЗАТЕЛЬНО перепубликуй правила:**
-- `shares`: закрыта дыра перехвата — раньше любой залогиненный мог перезаписать чужую share-ссылку, подставив свой `ownerUid`. Теперь update разрешён только владельцу и владельца менять нельзя.
-- `users`: закрыта самоэскалация роли — `role: counselor/orgAdmin` можно записать себе только если в том же батче существует реальное членство с той же ролью (`getAfter`). Обычные клиентские флоу (создание орга, вступление по коду) работают как раньше.
-- `orgs`: org-админ теперь может менять только `name`/`type` (раньше — всё, кроме plan/seats/owner, включая инвайт-коды).
-- `portfolios`: стафф орга может **отвязать** удалённого ученика (обнулить orgId/orgName/counselorId — и ничего больше), чтобы UI ученика не показывал «connected» после удаления из ростера.
-- Новая коллекция `billing_events` (аудит платежей): пишет только вебхук через service account, читает founder.
-
-**Логика:**
-- `leaveOrg` сбрасывает `role → student` (раньше «призрачный» counselor оставался в навигации).
-- `removeMember` сначала отвязывает портфолио, потом удаляет членство.
-- Nav показывает «Dashboard» только при роли **и** реальном orgId.
-- `/portfolio` больше не выбрасывает залогиненного юзера в онбординг, пока облачная копия не загрузилась (новый флаг `synced` в `usePortfolio`).
-- `/upgrade` знает про Business-план орга (использует `useEffectivePlan`).
-- `Reveal` (scroll-анимации лендинга) получил failsafe: если IntersectionObserver не сработал (headless/встроенные браузеры), контент всё равно показывается — раньше секции могли остаться невидимыми.
-
-**Онбординг `/start` — развилка аудитории:**
-- Первый вопрос: «студент или школа/консультант?» (диплинк `/start?type=business`).
-- Бизнес-ветка: имя воркспейса + тип → размер когорты → цели → Google-вход → воркспейс создан → `/counselor`. Ответы (`size`, `goals`) сохраняются на орг-доке — видно интент при продаже Business.
-- Студенческая ветка — прежний опросник.
-
-**Платежи — онлайн-чекаут готов (см. раздел «Как включить платежи»).**
-
-**Лендинг:** полоса цифр (реальные счётчики университетов/возможностей), новые иконки фич, FAQ, многоколоночный футер, CTA для школ ведут в `/start?type=business`; убраны «placeholder»-подписи из цен.
-
-### Как включить платежи (онлайн, автоактивация)
-
-1. Заведи продукт(ы) у провайдера с hosted-checkout: **Lemon Squeezy** (проще всего, работает с КЗ) или Stripe Payment Link / Paddle / Polar.
-2. Vercel env:
-   - `NEXT_PUBLIC_CHECKOUT_PRO_URL` — ссылка чекаута Pro ($9/mo);
-   - `NEXT_PUBLIC_CHECKOUT_BUSINESS_URL` — ссылка чекаута Business (опц.);
-   - `FIREBASE_SERVICE_ACCOUNT_JSON` — JSON сервисного аккаунта одной строкой (Firebase Console → Project settings → Service accounts → Generate new private key);
-   - `LEMONSQUEEZY_WEBHOOK_SECRET` (или `STRIPE_WEBHOOK_SECRET`).
-3. У провайдера добавь вебхук → `https://foli0.vercel.app/api/webhooks/billing`, события: `order_created`, `subscription_created/resumed/unpaused/expired` (LS) или `checkout.session.completed` (Stripe).
-4. Готово: `/upgrade` начнёт открывать чекаут с предзаполненным email; после оплаты вебхук находит юзера по email и ставит `plan: pro` (Business — флипает орг покупателя). Несматченные оплаты попадают в `billing_events` со статусом `unmatched` — активируешь руками в `/admin/orgs`.
-5. Пока env не заданы — `/upgrade` показывает прежний ручной флоу (mailto + Kaspi), ничего не ломается.
+Folio — платформа приёмных портфолио: студенты собирают Common App-style
+портфолио с честным AI-фидбеком и реальными шансами, школы и консультанты
+ведут когорты в отдельном Business Workspace. Прод: **https://foli0.vercel.app**
 
 ---
 
-## Что сделано (по разделам брифа)
+## 1. Архитектура
 
-**A. Хардненинг**
-- A1 (rate-limit) был готов; лимиты теперь план-зависимые (`lib/plans.js → AI_LIMITS`) и ключуются по uid для залогиненных (по IP для анонимов). Лимит 0 = фича выключена.
-- A2: `lib/store.js` — Firestore-first при логине: живая подписка (onSnapshot), облако = источник истины, localStorage = кэш; записи `merge:true` (линк-поля не затираются); миграция локальных данных в пустое облако и guard от затирания сохранены.
+- **Next.js 16 (App Router, JS, без Tailwind)** — деплой на Vercel (`deploy.sh`).
+- **Firebase Auth (Google) + Firestore** — без env-ключей приложение деградирует
+  в localStorage-режим (портфолио работает, аккаунтов/B2B нет).
+- **AI-цепочка** `lib/ai.js`: **Groq → OpenRouter → Gemini** (пустые ключи
+  пропускаются; Gemini держать последним — AQ-ключи аккаунта ограничены).
+- **Биллинг: Stripe** (подписки) — checkout, портал, webhook; планы в Firestore
+  переключаются автоматически. Без Stripe-env всё деградирует в «напишите нам».
+- **Server-side без Admin SDK**: `lib/plan-server.js` (проверка idToken +
+  чтение планов как-пользователь), `lib/firestore-admin.js` (JWT сервис-аккаунта
+  через node:crypto → Firestore REST, только для webhook).
 
-**J. Тарифы и гейтинг**
-- `lib/plans.js` — единственный источник правды: 3 плана, фичефлаги, лимиты, цены-плейсхолдеры ($0 / $9 / от $6 за место — **поменяй перед запуском в одном файле**).
-- Серверная проверка планов **без Admin SDK**: клиент шлёт Firebase ID-токен → `lib/plan-server.js` верифицирует его через Identity Toolkit REST и читает `users/{uid}` / `orgs/{orgId}` через Firestore REST **от имени пользователя** (правила применяются). Fail-closed к free.
-- Ученик в Business-орге наследует Pro. Клиентские замки — только UX; сервер решает сам.
-- Биллинга нет намеренно: `/upgrade` — заглушка с mailto; планы выставляются руками в `/admin/orgs`.
+### Роли и планы
 
-**B+H. Роли/организации + правила**
-- Модель: `users/{uid}` (role, plan, orgId) · `orgs/{orgId}` (joinCode для учеников **и отдельный** counselorCode для менторов, plan, seats) · `orgs/{orgId}/members/{uid}` · `joinCodes/{CODE}` (резолв кода → орг) · `portfolios/{uid}` (+orgId, orgName, shareId) · `portfolios/{uid}/comments` · `portfolios/{uid}/chat` · `shares/{shareId}`.
-- Подключение: `/counselor/new` (самосервис, орг всегда free), `/join/{code}` (экран согласия), ввод кода в карточке «Your mentor» в портфолио. Ученик видит, кто имеет доступ, и **отключается в 1 клик**.
-- `firestore.rules` переписаны: план/seats меняет только founder; вступление по коду проверяется через `get()` на орг-док; counselor читает только портфолио учеников своего орга; публичного чтения `portfolios` нет — публичны только курируемые `shares`.
+| Сущность | Поле | Значения |
+|---|---|---|
+| `users/{uid}` | `plan` | `free` \| `pro` |
+| `users/{uid}` | `role` | `student` \| `counselor` \| `orgAdmin` |
+| `users/{uid}` | `founder` | `true` у основателя (авто) |
+| `orgs/{orgId}` | `plan` | `free` (setup, до 3 студентов) \| `business` (20) \| `businessPlus` (75) |
 
-**C. Дашборды**
-- `/counselor`: ростер с кольцом strength, completeness, флагами («No GPA», «Membership, not leadership»…), 1–2 «talking points» на встречу, сортировка «needs attention», коды приглашений, CSV (Business; на free — замок с апселлом).
-- `/counselor/student/[uid]`: read-only портфолио, reference-odds (MIT/UMich), сохранённый AI-ревью ученика, комментарии по секциям.
-- `/admin`: агрегаты когорты, команда, коды, seats, Business-апселл. `/admin/orgs` — founder-консоль.
+Эффективный план студента: свой `pro` **или** Pro-по-наследству, пока он
+подключён к оплаченному workspace (`lib/plans.js → effectiveStudentPlan`).
 
-**D. Share** — снапшоты `shares/{shareId}` (эссе приватны по умолчанию, чекбоксы), автообновление при правках, страница `/p/{id}` с OG-метой, футер «Made with Folio · Build yours free» (Pro — без бейджа, Business — «Presented by <школа>»).
+### Цены (`lib/plans.js` — единственный источник правды)
 
-**E. PDF** — `/portfolio/print`: print-CSS + `window.print()`, Common App-вид, ноль зависимостей. Free — сноска «Made with Folio», Pro — чистый, Business — брендированный. (Вотермарк гейтится на клиенте — это косметика, обходится только правкой DOM самим пользователем; сознательный компромисс.)
+- Student: **Free $0**, **Pro $9/мес**
+- Workspace: **Business $149/мес (до 20 студентов)**, **Business Plus $299/мес (до 75)**
+- Free Pilot и Enterprise удалены. Неоплаченный workspace = режим настройки
+  (до 3 студентов, чтобы попробовать процесс до оплаты).
 
-**F. AI-фичи** — `/api/essay` (строгий JSON: структура-оценки, show-don't-tell с цитатами, line edits, before/after, без выдумывания фактов) и `/api/counselor` (стратег-чат с компактной сводкой профиля, историей 6 реплик). Free: 1 разбор + 3 сообщения в день; Pro: 12 и 80. Всё за серверным гейтом; 429 отдаёт `upgrade:true` → UI показывает золотой апселл.
+### Основатель (авто-грант)
 
-**G. Лендинг** — анимированный hero (глоу, поэтапный вход, растущие бары шансов, плавающий чип), секция «For schools & counselors» с мини-мокапом ростера, блок Pricing из `lib/plans.js`, scroll-reveal. Все анимации отключаются при `prefers-reduced-motion`. Проверено вживую на 390×844 и 1280×800 — оверфлоу нет, консоль чистая.
-
-**K. Дедлайны** — `lib/deadlines.js`: приблизительные месяцы для ~30 главных возможностей (точных дат нет нигде — всюду «≈ месяц · verify with source»); кнопка «Track deadline» в /discover; карточка «My deadlines» с бэйджами «in N d» (красный ≤14 дней), recurring — 9-е классы видят следующий цикл. Розетка доставки: `/api/cron/reminders` (501 + чеклист, см. ниже).
-
-**I. CONTENT.md** — канал-приоритеты (Telegram → консультанты → Reels → SEO), 4-недельный план постов, B2B-питч, воронка GA4.
+`djdjdj.9413@gmail.com` захардкожен в `lib/plans.js → FOUNDER_EMAILS` и в
+`firestore.rules → isFounder()`. При первом входе аккаунт автоматически
+получает `plan: pro`, `founder: true` и workspace **Folio HQ** на плане
+Business (`lib/account.js → ensureFounderGrant`). Ничего руками делать не надо.
+`FOLIO_ADMIN_EMAILS` (env) может расширить список — тогда добавь тот же email
+и в rules.
 
 ---
 
-## Ручные шаги владельца (обязательные)
+## 2. Маршруты
 
-1. **Firestore Rules.** Firebase Console → Firestore → Rules → вставить содержимое `firestore.rules` → Publish. **Внутри `isFounder()` уже стоит `djdjdj.9413@gmail.com`** — проверь/дополни список своих Google-адресов.
-2. **Env на Vercel** (Settings → Environment Variables), плюс локально в `.env.local`:
-   - `FOLIO_ADMIN_EMAILS=djdjdj.9413@gmail.com` — те же адреса, что в rules (открывает `/admin/orgs`).
-   - Уже настроенные ключи (GROQ/OPENROUTER/GEMINI/FIREBASE/GA) — не забудь продублировать на Vercel, если ещё нет.
-3. **Проверка после деплоя:** зайти под своим аккаунтом → `/admin/orgs` должен открыться; создать тестовый орг на `/counselor/new`, зайти учеником по коду со второго аккаунта, убедиться что портфолио видно в ростере.
+**Публичные:** `/` (лендинг: #product #schools #pricing #faq), `/start`
+(онбординг: студент/бизнес), `/login`, `/upgrade` (тарифы + checkout),
+`/p/{shareId}` (публичное портфолио), `/join/{CODE}`, robots.txt, sitemap.xml.
 
-## Ручные шаги (опциональные)
+**Студент:** `/portfolio` (билдер), `/portfolio/print` (PDF), `/universities`,
+`/discover`. Лендинг сознательно НЕ ссылается на /universities и /discover —
+воронка идёт через /start.
 
-- **Upstash Redis** (durable rate-limit между инстансами): upstash.com → бесплатный Redis → `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`. Без него лимиты in-memory (норм на старте).
-- **Индексы Firestore:** текущие запросы простые; единственный составной кейс — `users where email ==` в founder-консоли (одиночное поле, индекс не нужен). Если консоль когда-то попросит индекс — Firebase сам даст ссылку «создать».
-- **Доставка напоминаний о дедлайнах** (когда будет время):
-  1) Vercel Cron: в `vercel.json` → `{"crons":[{"path":"/api/cron/reminders","schedule":"0 9 * * *"}]}` (1 job — бесплатно на Hobby);
-  2) `CRON_SECRET` (Vercel генерирует), `RESEND_API_KEY` (resend.com free tier) **или** Telegram-бот (`TELEGRAM_BOT_TOKEN` — для СНГ лучше);
-  3) сервисный аккаунт Firebase (`FIREBASE_SERVICE_ACCOUNT_JSON`) — cron без пользователя может читать все `trackedDeadlines` только через Admin SDK. Роут-заглушка уже описывает, что дописать.
-- **Платёжка (когда пойдут деньги):** для мира — Paddle (merchant of record, меньше бюрократии, чем Stripe, для КЗ-юрлица); для СНГ-карт — локальный провайдер (Kaspi Pay / CloudPayments). До тех пор: продажа руками → план в `/admin/orgs`. Код к платёжке готов: серверные гейты уже читают `plan` из Firestore, останется писать `plan` из вебхука.
-- **Цены:** правь только `lib/plans.js` (`price.label`, лимиты, seats).
+**Business Workspace `/business`** (staff: counselor/orgAdmin):
+- `/business` — Overview: KPI, «needs attention», deadline radar, чек-лист настройки
+- `/business/students` — ростер: поиск, сортировки, флаги, next steps, CSV (платно)
+- `/business/counselors` — команда + mentor-код, удаление
+- `/business/analytics` — распределение силы, частые пробелы, grade mix, engagement
+- `/business/billing` — подписка: checkout / Stripe portal
+- `/business/settings` — имя, тип, white-label brand (платно), коды
+- `/counselor/student/{uid}` — карточка студента (осталась)
+- `/counselor` и `/admin` — legacy-редиректы на `/business`
 
-## Как «передавать» продукт клиенту (продажа Business)
+**Founder:** `/admin/orgs` — консоль: ручные планы (Free/Business/Plus/seats),
+grant Pro по email. Нужна на случай Kaspi-оплат и саппорта.
 
-1. Клиент создаёт workspace `/counselor/new` (free-пилот: 3 ученика, полный дашборд).
-2. Ты в `/admin/orgs`: его орг → **Business**, seats → по договорённости.
-3. Он шлёт ученикам ссылку `/join/FOLIO-XXXX`. Менторам — код MENTOR-XXXX.
-4. Отдельному ученику Pro продаёшь так же: `/admin/orgs` → «Grant student Pro» по email (он должен хоть раз войти).
+**API:** `/api/enhance`, `/api/feedback` (free AI), `/api/essay`,
+`/api/counselor` (premium, серверный гейт планов), `/api/billing/checkout`,
+`/api/billing/portal`, `/api/webhooks/billing` (Stripe), `/api/admin/me`,
+`/api/cron/reminders`.
 
-## Что осталось / осознанные компромиссы
+---
 
-- **Тесты на `lib/chances.js` не добавлял** — логика шансов не менялась (бриф: покрывать при изменении).
-- Вотермарк PDF и бейдж share гейтятся на клиенте (косметика); все AI-фичи — строго на сервере.
-- `joinCodes` может создать любой залогиненный (форжить чужой код нельзя — вступление сверяется с орг-доком; возможен только мусор в неймспейсе).
-- Кэш AI по-прежнему in-memory (вынос в durable — опционально, как и было).
-- Секция «For schools» на лендинге и founder-консоль на английском, как весь продукт; русская локализация — отдельная фаза (см. ROADMAP Phase 2).
-- Email `hello@folio.app` в /upgrade и CONTENT.md — плейсхолдер, замени на реальный.
-- SEO-страницы `/discover/[id]` — следующий кандидат в бэклог (упомянуто в CONTENT.md).
+## 3. Биллинг (Stripe) — как включить
+
+1. **Stripe → Products**: создай 3 recurring-цены — Pro $9/mo, Business
+   $149/mo, Business Plus $299/mo. Скопируй `price_…` id.
+2. **Webhook**: Developers → Webhooks → Add endpoint
+   `https://foli0.vercel.app/api/webhooks/billing`, события:
+   `checkout.session.completed`, `customer.subscription.updated`,
+   `customer.subscription.deleted`, `invoice.payment_failed`. Скопируй `whsec_…`.
+3. **Billing Portal**: Settings → Billing → Customer portal → включи смену
+   плана между Business и Business Plus, отмену и инвойсы.
+4. **Firebase сервис-аккаунт**: Console → Project settings → Service accounts →
+   Generate key → JSON в одну строку.
+5. **Env на Vercel** (`vercel env add … production`, потом `./deploy.sh`):
+   `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`,
+   `STRIPE_PRICE_BUSINESS`, `STRIPE_PRICE_BUSINESS_PLUS`,
+   `FIREBASE_SERVICE_ACCOUNT_JSON`, `NEXT_PUBLIC_SITE_URL=https://foli0.vercel.app`.
+
+### Как это работает
+
+- `/api/billing/checkout` создаёт Checkout Session с `uid` и `plan` в metadata
+  (session + subscription) — матчинг оплаты точный, не по email.
+- Webhook: grant/revoke планов. **Business/Plus**: обновляет org владельца, а
+  если org нет — **создаёт workspace автоматически** (org + membership + оба
+  invite-кода + back-link на users), покупатель после оплаты попадает в готовый
+  `/business?welcome=1`. **Pro**: `users/{uid}.plan`.
+- Upgrade/downgrade Business↔Plus — через Stripe Portal (proration), webhook
+  ловит `customer.subscription.updated` по price id. Cancel → `plan: free`.
+- Кэш планов на сервере — 60 сек: после оплаты доступ включается в течение минуты.
+- Оплаты «мимо» (не тем email, без аккаунта) попадают в `billing_events`
+  со статусом `unmatched` — активируй руками в `/admin/orgs`.
+- Без Stripe-env: API отвечает 501, UI показывает concierge-фоллбек
+  (mailto hello@folio.app, Kaspi).
+
+---
+
+## 4. Firestore Rules — ОБЯЗАТЕЛЬНО ПЕРЕОПУБЛИКОВАТЬ
+
+`firestore.rules` изменён (новые защиты) → Firebase Console → Firestore →
+Rules → вставить целиком → **Publish**. Без этого B2B и биллинг-поля
+работают неправильно.
+
+Что enforced:
+- `plan` на users/orgs клиент не пишет никогда (создание только `free`);
+  планы меняют webhook (сервис-аккаунт) и founder.
+- **Биллинг-поля** (`stripeCustomerId`, `stripeSubscriptionId`,
+  `planUpdatedAt`, `founder`) клиенту недоступны на запись — иначе можно было
+  бы открыть чужой billing-portal.
+- Роли: staff-роль должна подтверждаться реальным membership (getAfter).
+- orgAdmin может менять только `name`, `type`, `brandName`.
+- Shares: угон share-id невозможен (ownerUid не переносится).
+- `billing_events` — читает только founder, пишет только сервер.
+
+---
+
+## 5. ENV — полный список
+
+| Переменная | Что | Обязательно |
+|---|---|---|
+| `NEXT_PUBLIC_FIREBASE_API_KEY/AUTH_DOMAIN/PROJECT_ID/APP_ID` | Firebase web app | для аккаунтов/B2B |
+| `GROQ_API_KEY` | основной AI | хотя бы один AI-ключ |
+| `OPENROUTER_API_KEY`, `GEMINI_API_KEY(S)` | фоллбеки AI | нет |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | биллинг | для онлайн-оплат |
+| `STRIPE_PRICE_PRO/_BUSINESS/_BUSINESS_PLUS` | цены | для онлайн-оплат |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | webhook пишет планы | для онлайн-оплат |
+| `NEXT_PUBLIC_SITE_URL` | канонический URL (Stripe redirect, OG, sitemap) | желательно |
+| `FOLIO_ADMIN_EMAILS` | доп. админы (основатель уже в коде) | нет |
+| `NEXT_PUBLIC_GA_ID` | GA4 | нет |
+| `UPSTASH_REDIS_REST_URL/TOKEN` | глобальный rate-limit | нет |
+
+Прод-env руками: `vercel env add NAME production` → `./deploy.sh`
+(алиас foli0.vercel.app перепривязывается скриптом).
+
+---
+
+## 6. Что изменилось в этом релизе
+
+1. **Лендинг переработан полностью**: центральный hero с градиентным
+   заголовком и продукт-мокапом, marquee университетов, bento-грид продукта,
+   секция «no-glaze», Business-секция, новый pricing, тёмный CTA. Прямых ссылок
+   на Discover/Universities на лендинге больше нет (воронка — /start), у nav на
+   лендинге якоря Product / For schools / Pricing.
+2. **Pricing**: переключатель аудиторий, 2 карточки на аудиторию, градиентная
+   рамка featured-плана. Планы: Free / Pro $9; Business $149 (20) /
+   Business Plus $299 (75). Free Pilot и Enterprise удалены.
+3. **Stripe end-to-end**: checkout, портал, webhook (grant/revoke/switch),
+   автосоздание workspace после покупки, авто-Pro всем студентам оплаченных
+   workspace, деградация без env.
+4. **Business Workspace** `/business` c 6 разделами (см. §2), auto-redirect из
+   `/counselor` и `/admin`. B2B-ценность: cohort analytics, engagement,
+   deadline radar по всей когорте, CSV, white-label `brandName`, чек-лист
+   онбординга.
+5. **Founder auto-grant** — кодом, без ручных правок Firestore.
+6. **Безопасность**: биллинг-поля закрыты в rules; webhook проверяет подпись
+   Stripe с 5-минутным окном против replay; серверный кэш планов 60 сек.
+7. **SEO/полировка**: metadataBase + OG, robots.txt, sitemap.xml, страница 404,
+   theme-color; удалён мёртвый код (Lemon Squeezy-ветка, hosted-checkout URLs,
+   старый org-admin дашборд).
+
+## 7. Регулярные операции
+
+- **Продажа руками (Kaspi)**: `/admin/orgs` → Business/Plus/seats или Grant Pro.
+- **Смена цен**: `lib/plans.js` (+ новые Price в Stripe + env).
+- **Новый founder-email**: `lib/plans.js FOUNDER_EMAILS` + `firestore.rules
+  isFounder()` + publish rules.
+- **Мониторинг оплат**: коллекция `billing_events` (applied / unmatched /
+  payment_failed) — читается под founder-аккаунтом.
+- **AI сломался на проде, локально работает**: `vercel env ls production` и
+  `vercel alias ls | grep foli0`.
+
+## 8. Известные ограничения (осознанные)
+
+- Email/Telegram-доставка дедлайн-напоминаний — заготовка (`/api/cron/reminders`),
+  in-app бейджи работают.
+- Лимит counselor-мест не enforced в rules (soft, в UI-копии Plus «unlimited»).
+- `/counselor/student/{uid}` остался в старом визуальном стиле воркспейса —
+  функционален, редизайн по желанию.
+- Rate-limit в памяти на инстанс, пока не подключён Upstash.

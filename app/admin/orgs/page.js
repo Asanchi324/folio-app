@@ -112,19 +112,23 @@ export default function FounderOrgsPage() {
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15.5 }}>
                   {o.name}{' '}
-                  <span className={`pill ${o.plan === 'business' ? 'pill-gold' : 'pill-muted'}`} style={{ fontSize: 11 }}>
-                    {o.plan}
+                  <span className={`pill ${o.plan === 'business' || o.plan === 'businessPlus' ? 'pill-gold' : 'pill-muted'}`} style={{ fontSize: 11 }}>
+                    {o.plan === 'businessPlus' ? 'business plus' : o.plan}
                   </span>
                 </div>
                 <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>
                   {o.type} · seats {o.seats} · student code <b>{o.joinCode}</b> · mentor code <b>{o.counselorCode}</b>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {o.plan === 'business' ? (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {o.plan !== 'free' && (
                   <button className="btn btn-ghost btn-sm" onClick={() => setOrgPlan(o, 'free')}>↓ Free</button>
-                ) : (
-                  <button className="btn btn-gold btn-sm" onClick={() => setOrgPlan(o, 'business')}>↑ Business</button>
+                )}
+                {o.plan !== 'business' && (
+                  <button className="btn btn-gold btn-sm" onClick={() => setOrgPlan(o, 'business')}>Business</button>
+                )}
+                {o.plan !== 'businessPlus' && (
+                  <button className="btn btn-gold btn-sm" onClick={() => setOrgPlan(o, 'businessPlus')}>Plus</button>
                 )}
                 <button className="btn btn-ghost btn-sm" onClick={() => setSeats(o)}>Seats</button>
               </div>

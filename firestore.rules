@@ -15,9 +15,10 @@
 //   founder   → everything above + sets plan/seats (manual sales)
 //   public    → shares/{shareId} snapshots only (unguessable random ids)
 //
-// Plans ('free'|'pro' on users, 'free'|'business' on orgs) are the paid
-// gates, so clients may NEVER write them: users/orgs create must start at
-// 'free' and updates must keep plan unchanged unless a founder does it.
+// Plans ('free'|'pro' on users, 'free'|'business'|'businessPlus' on orgs) are
+// the paid gates, so clients may NEVER write them: users/orgs create must
+// start at 'free' and updates must keep plan unchanged. Plans are flipped only
+// by the Stripe webhook (service account — bypasses rules) or a founder.
 
 rules_version = '2';
 service cloud.firestore {
@@ -62,18 +63,32 @@ service cloud.firestore {
         (request.resource.data.orgId != null &&
           getAfter(/databases/$(database)/documents/orgs/$(request.resource.data.orgId)/members/$(request.auth.uid)).data.role == request.resource.data.role);
     }
+    // Billing fields are written ONLY by the Stripe webhook (service account,
+    // bypasses rules) or a founder — a client faking stripeCustomerId could
+    // otherwise open someone else's billing portal.
+    function noBillingFieldsOnCreate() {
+      return !request.resource.data.keys().hasAny(
+        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder']);
+    }
+    function billingFieldsUntouched() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(
+        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder']);
+    }
     match /users/{uid} {
       allow read: if isSelf(uid) || isFounder();
-      // First sign-in bootstrap: plan MUST be free, role must be legitimate.
+      // First sign-in bootstrap: plan MUST be free, role must be legitimate,
+      // no billing fields.
       allow create: if isSelf(uid) &&
         request.resource.data.plan == 'free' &&
+        noBillingFieldsOnCreate() &&
         roleWriteOk();
-      // Self-updates may touch anything EXCEPT plan (paid gate), and a role
-      // claim must match an actual org membership — no self-promotion to
-      // counselor/orgAdmin without one. Founders can change everything.
+      // Self-updates may touch anything EXCEPT plan/billing (paid gates), and
+      // a role claim must match an actual org membership — no self-promotion
+      // to counselor/orgAdmin without one. Founders can change everything.
       allow update: if isFounder() ||
         (isSelf(uid) &&
           request.resource.data.plan == resource.data.plan &&
+          billingFieldsUntouched() &&
           (request.resource.data.role == resource.data.role || roleWriteOk()));
       allow delete: if isFounder();
     }
@@ -84,17 +99,20 @@ service cloud.firestore {
       // (covers the moment right after creation). Founders see all (console).
       allow read: if isFounder() || isMember(orgId) ||
         (signedIn() && resource.data.ownerUid == request.auth.uid);
-      // Self-serve workspace creation — must start on the free plan.
+      // Self-serve workspace creation — must start on the free plan, and can
+      // never smuggle billing fields in (Stripe writes those via the webhook).
       allow create: if isFounder() ||
         (signedIn() &&
           request.resource.data.ownerUid == request.auth.uid &&
-          request.resource.data.plan == 'free');
+          request.resource.data.plan == 'free' &&
+          !request.resource.data.keys().hasAny(
+            ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt']));
       // Admins manage the org but can ONLY touch cosmetic fields — plan/seats
-      // are billing (founder-only), codes + ownerUid stay stable.
+      // are billing (webhook/founder-only), codes + ownerUid stay stable.
       allow update: if isFounder() ||
         (isOrgAdmin(orgId) &&
           request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['name', 'type']));
+            .hasOnly(['name', 'type', 'brandName']));
       allow delete: if isFounder();
 
       // ---------- membership ----------

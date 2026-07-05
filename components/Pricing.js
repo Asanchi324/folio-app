@@ -1,119 +1,254 @@
 'use client';
 
-// Pricing cards — rendered on the landing page and /upgrade. Reads everything
-// from lib/plans.js so prices/features are edited in one place. Gold accent
-// marks the paid tiers (the product-wide "premium" color).
+// Pricing — rendered on the landing page and /upgrade. One audience toggle
+// (students ↔ schools), two focused cards per audience. Reads everything from
+// lib/plans.js; `onSelect(planId)` lets /upgrade start checkout directly,
+// otherwise CTAs link into the funnel.
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PLANS } from '@/lib/plans';
 
-export default function PricingCards({ currentPlan = null, orgPlan = null }) {
-  const cards = [
+const CHECKS = {
+  free: [
+    ['Portfolio builder', 'Common App–style sections, guided'],
+    ['Honest admission odds', '100+ universities, no glaze'],
+    ['AI review & polish', 'daily allowance'],
+    ['Opportunities database', 'olympiads, programs, deadlines'],
+    ['Public share link', 'with a small Folio badge'],
+  ],
+  pro: [
+    ['Everything in Free', 'with generous limits'],
+    ['AI essay coach', 'structure, show-don’t-tell, rewrites'],
+    ['AI counselor chat', 'strategy, school list, next steps'],
+    ['Clean exports', 'PDF & share link without the badge'],
+    ['Priority AI limits', 'up to 12 essay reviews a day'],
+  ],
+  business: [
+    ['Up to 20 students', 'each gets full Pro while connected'],
+    ['Business Workspace', 'roster, gaps, attention flags'],
+    ['Cohort analytics', 'distributions, engagement, CSV export'],
+    ['Comments in the builder', 'feedback students actually see'],
+    ['White-label', 'your brand on portfolios & PDFs'],
+    ['Counselor AI assistant', 'meeting plans, comment drafts'],
+  ],
+  businessPlus: [
+    ['Up to 75 students', 'whole-cohort scale'],
+    ['Everything in Business', 'workspace, analytics, white-label'],
+    ['Unlimited counselor seats', 'split the cohort across your team'],
+    ['Priority support', 'plus an onboarding call'],
+    ['Early access', 'new cohort tools first'],
+  ],
+};
+
+export default function PricingCards({
+  currentPlan = null,
+  orgPlan = null,
+  audience: initialAudience = 'student',
+  onSelect = null,
+}) {
+  const [audience, setAudience] = useState(initialAudience);
+  // /upgrade reads ?plan= after mount — follow the audience it resolves to.
+  useEffect(() => {
+    setAudience(initialAudience);
+  }, [initialAudience]);
+
+  const studentCards = [
     {
       plan: PLANS.free,
+      checks: CHECKS.free,
       cta:
         currentPlan === null
           ? { label: 'Start free', href: '/start' }
-          : { label: 'Your current plan', disabled: currentPlan === 'free' && orgPlan !== 'business', href: '/portfolio' },
-      highlight: false,
+          : { label: currentPlan === 'free' ? 'Your current plan' : 'Included in Pro', disabled: true },
+      featured: false,
     },
     {
       plan: PLANS.pro,
+      checks: CHECKS.pro,
+      badge: 'Most popular',
       cta:
         currentPlan === 'pro'
           ? { label: 'Your current plan', disabled: true }
-          : { label: 'Upgrade to Pro', href: '/upgrade?plan=pro' },
-      highlight: true,
-      badge: 'Most popular',
-    },
-    {
-      plan: PLANS.business,
-      cta:
-        orgPlan === 'business'
-          ? { label: 'Your workspace plan', disabled: true }
-          : { label: 'Create a workspace', href: '/start?type=business' },
-      secondary: { label: 'Upgrade a workspace', href: '/upgrade?plan=business' },
-      highlight: false,
-      gold: true,
+          : { label: 'Get Pro', plan: 'pro', href: '/upgrade?plan=pro' },
+      featured: true,
     },
   ];
 
+  const orgCards = [
+    {
+      plan: PLANS.business,
+      checks: CHECKS.business,
+      badge: 'Most schools start here',
+      cta:
+        orgPlan === 'business'
+          ? { label: 'Your workspace plan', disabled: true }
+          : { label: 'Get Business', plan: 'business', href: '/upgrade?plan=business' },
+      featured: true,
+    },
+    {
+      plan: PLANS.businessPlus,
+      checks: CHECKS.businessPlus,
+      cta:
+        orgPlan === 'businessPlus'
+          ? { label: 'Your workspace plan', disabled: true }
+          : { label: 'Get Business Plus', plan: 'businessPlus', href: '/upgrade?plan=businessPlus' },
+      featured: false,
+    },
+  ];
+
+  const cards = audience === 'student' ? studentCards : orgCards;
+
   return (
-    <div className="pricing-grid">
-      {cards.map(({ plan, cta, secondary, highlight, badge, gold }) => (
-        <div
-          key={plan.id}
-          className={`card pricing-card${highlight ? ' pricing-popular' : ''}`}
-        >
-          {badge && <span className="pricing-badge">{badge}</span>}
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <h3 style={{ fontSize: 21, color: gold || highlight ? 'var(--accent)' : 'var(--ink)' }}>
-              {plan.name}
-            </h3>
-            {plan.id !== 'free' && <span aria-hidden style={{ fontSize: 16 }}>{gold ? '🏛' : '✨'}</span>}
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <span style={{ fontFamily: 'var(--display)', fontSize: 34, letterSpacing: '-0.02em' }}>
-              {plan.price.label}
-            </span>
-          </div>
-          <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>{plan.price.note}</p>
-          <p style={{ fontSize: 14.5, marginTop: 14, lineHeight: 1.5, minHeight: 44 }}>{plan.tagline}</p>
+    <div className="pr-wrap">
+      {/* audience toggle */}
+      <div className="pr-toggle" role="tablist" aria-label="Pricing audience">
+        {[
+          ['student', 'For students'],
+          ['org', 'For schools & counselors'],
+        ].map(([v, label]) => (
+          <button
+            key={v}
+            role="tab"
+            aria-selected={audience === v}
+            className={`pr-tab${audience === v ? ' on' : ''}`}
+            onClick={() => setAudience(v)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
-          <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0', display: 'grid', gap: 9, flex: 1 }}>
-            {plan.bullets.map((b) => (
-              <li key={b} style={{ display: 'flex', gap: 9, fontSize: 13.5, lineHeight: 1.45 }}>
-                <span style={{ color: plan.id === 'free' ? 'var(--good)' : 'var(--accent)', fontWeight: 800 }}>✓</span>
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
+      <div className="pr-grid" key={audience}>
+        {cards.map(({ plan, checks, cta, badge, featured }) => (
+          <div key={plan.id} className={`pr-card${featured ? ' featured' : ''} fade-in`}>
+            {badge && <span className="pr-badge">{badge}</span>}
+            <div className="pr-head">
+              <h3 style={{ fontSize: 18, letterSpacing: '-0.01em' }}>{plan.name}</h3>
+              <p className="muted" style={{ fontSize: 13.5, marginTop: 4, lineHeight: 1.5 }}>{plan.tagline}</p>
+            </div>
+            <div className="pr-price">
+              <span className="pr-amount">{plan.price.label}</span>
+              <span className="pr-period">
+                {plan.price.period}
+                <br />
+                <span className="pr-note">{plan.price.note}</span>
+              </span>
+            </div>
 
-          <div style={{ display: 'grid', gap: 8, marginTop: 22 }}>
-            {cta.disabled ? (
-              <span className="btn btn-ghost" style={{ opacity: 0.6, cursor: 'default' }}>{cta.label}</span>
-            ) : cta.href?.startsWith('mailto:') ? (
-              <a href={cta.href} className={highlight || gold ? 'btn btn-gold' : 'btn btn-primary'}>{cta.label}</a>
-            ) : (
-              <Link href={cta.href} className={highlight || gold ? 'btn btn-gold' : 'btn btn-primary'}>
-                {cta.label}
-              </Link>
-            )}
-            {secondary && (
-              secondary.href.startsWith('/') ? (
-                <Link href={secondary.href} className="btn btn-ghost btn-sm">{secondary.label}</Link>
-              ) : (
-                <a href={secondary.href} className="btn btn-ghost btn-sm">{secondary.label}</a>
-              )
-            )}
+            <div className="pr-cta">
+              <PlanCta cta={cta} featured={featured} onSelect={onSelect} />
+            </div>
+
+            <ul className="pr-checks">
+              {checks.map(([title, sub]) => (
+                <li key={title}>
+                  <span className="pr-tick" aria-hidden>✓</span>
+                  <span>
+                    <b>{title}</b>
+                    {sub && <span className="pr-sub"> — {sub}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       <style>{`
-        .pricing-grid{
-          display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
-          gap:18px; margin-top:44px; align-items:stretch;
+        .pr-wrap{margin-top:40px;}
+        .pr-toggle{
+          display:flex; gap:4px; padding:4px; border-radius:999px;
+          background:var(--surface); border:1px solid var(--line);
+          width:max-content; max-width:100%; margin:0 auto 30px;
+          box-shadow:var(--shadow-sm);
         }
-        .pricing-card{
-          position:relative; padding:26px; display:flex; flex-direction:column;
+        .pr-tab{
+          border:none; background:transparent; cursor:pointer;
+          font-family:var(--sans); font-size:14px; font-weight:600;
+          color:var(--muted); padding:9px 20px; border-radius:999px;
+          transition:background .18s ease, color .18s ease; white-space:nowrap;
+        }
+        .pr-tab.on{background:var(--ink); color:#fff;}
+        .pr-grid{
+          display:grid; grid-template-columns:repeat(2, minmax(0,1fr));
+          gap:20px; max-width:860px; margin:0 auto; align-items:stretch;
+        }
+        .pr-card{
+          position:relative; display:flex; flex-direction:column;
+          background:var(--surface); border:1px solid var(--line);
+          border-radius:var(--r-lg); padding:30px 28px;
           transition:transform .18s ease, box-shadow .18s ease;
         }
-        .pricing-card:hover{transform:translateY(-3px); box-shadow:var(--shadow);}
-        .pricing-popular{
-          border-color:var(--accent);
-          box-shadow:0 10px 34px rgba(192,138,45,0.16);
+        .pr-card:hover{transform:translateY(-3px); box-shadow:var(--shadow);}
+        .pr-card.featured{
+          border-color:transparent;
+          background:
+            linear-gradient(var(--surface), var(--surface)) padding-box,
+            linear-gradient(135deg, var(--accent), #e3b341 45%, var(--primary)) border-box;
+          border:1.5px solid transparent;
+          box-shadow:0 14px 44px rgba(192,138,45,0.16);
         }
-        .pricing-badge{
-          position:absolute; top:-12px; left:50%; transform:translateX(-50%);
-          background:var(--accent); color:#fff; font-size:11.5px; font-weight:700;
-          letter-spacing:0.06em; text-transform:uppercase; padding:4px 14px;
+        .pr-badge{
+          position:absolute; top:-13px; left:26px;
+          background:var(--ink); color:#fff; font-size:11px; font-weight:700;
+          letter-spacing:0.06em; text-transform:uppercase; padding:5px 13px;
           border-radius:999px; white-space:nowrap;
         }
-        @media (max-width:900px){
-          .pricing-grid{grid-template-columns:1fr; max-width:440px; margin-inline:auto;}
+        .pr-head{min-height:74px;}
+        .pr-price{display:flex; align-items:center; gap:10px; margin-top:16px;}
+        .pr-amount{
+          font-family:var(--display); font-size:46px; letter-spacing:-0.03em;
+          line-height:1;
+        }
+        .pr-period{font-size:13px; color:var(--muted); font-weight:600; line-height:1.35;}
+        .pr-note{font-weight:500; color:var(--faint); font-size:12px;}
+        .pr-cta{margin-top:20px;}
+        .pr-cta .btn{width:100%;}
+        .pr-checks{
+          list-style:none; padding:20px 0 0; margin:18px 0 0;
+          border-top:1px solid var(--line); display:grid; gap:11px; flex:1;
+        }
+        .pr-checks li{display:flex; gap:10px; font-size:13.5px; line-height:1.5;}
+        .pr-checks b{font-weight:650;}
+        .pr-sub{color:var(--muted);}
+        .pr-tick{
+          width:18px; height:18px; border-radius:999px; flex-shrink:0;
+          background:var(--good-tint); color:var(--good);
+          display:flex; align-items:center; justify-content:center;
+          font-size:11px; font-weight:800; margin-top:2px;
+        }
+        .pr-card.featured .pr-tick{background:var(--accent-tint); color:#8a611a;}
+        @media (max-width:760px){
+          .pr-grid{grid-template-columns:1fr; max-width:430px;}
+          .pr-head{min-height:0;}
+          .pr-toggle{width:100%;}
+          .pr-tab{flex:1; text-align:center; padding:9px 10px;}
         }
       `}</style>
     </div>
+  );
+}
+
+function PlanCta({ cta, featured, onSelect }) {
+  const cls = featured ? 'btn btn-gold' : 'btn btn-ghost';
+  if (cta.disabled) {
+    return (
+      <span className="btn btn-ghost" style={{ opacity: 0.55, cursor: 'default' }}>
+        {cta.label}
+      </span>
+    );
+  }
+  if (onSelect && cta.plan) {
+    return (
+      <button className={cls} onClick={() => onSelect(cta.plan)}>
+        {cta.label}
+      </button>
+    );
+  }
+  return (
+    <Link href={cta.href} className={cls}>
+      {cta.label}
+    </Link>
   );
 }

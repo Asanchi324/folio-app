@@ -38,7 +38,7 @@ export default function JoinPage() {
     try {
       await joinOrg(user, codeDoc);
       track('org_joined', { role: codeDoc.role });
-      router.push(codeDoc.role === 'student' ? '/portfolio?joined=1' : '/counselor');
+      router.push(codeDoc.role === 'student' ? '/portfolio?joined=1' : '/business');
     } catch (e) {
       setErr(
         /permission|insufficient/i.test(e?.message || '')
@@ -85,7 +85,7 @@ export default function JoinPage() {
           <>
             <div style={{ fontSize: 30 }}>✅</div>
             <h1 style={{ fontSize: 24, marginTop: 12 }}>You’re already connected</h1>
-            <Link href={codeDoc.role === 'student' ? '/portfolio' : '/counselor'} className="btn btn-primary" style={{ marginTop: 18 }}>
+            <Link href={codeDoc.role === 'student' ? '/portfolio' : '/business'} className="btn btn-primary" style={{ marginTop: 18 }}>
               Continue →
             </Link>
           </>

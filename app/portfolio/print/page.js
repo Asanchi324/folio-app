@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePortfolio } from '@/lib/store';
 import { useEffectivePlan } from '@/lib/account';
-import { planHas } from '@/lib/plans';
+import { planHas, isOrgPaidPlan } from '@/lib/plans';
 import { profileBreakdown } from '@/lib/profile';
 import { track } from '@/lib/analytics';
 
@@ -29,7 +29,7 @@ export default function PrintPage() {
 
   const { strength } = profileBreakdown(p);
   const cleanPdf = planHas(plan, 'cleanPdf');
-  const brand = org?.plan === 'business' ? org?.name : null;
+  const brand = isOrgPaidPlan(org?.plan) ? org?.brandName || org?.name : null;
   const t = p.testing || {};
   const a = p.academics || {};
   const acts = (p.activities || []).slice(0, 10);

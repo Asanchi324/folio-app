@@ -13,6 +13,14 @@ const LINKS = [
   { href: '/discover', label: 'Discover' },
 ];
 
+// Marketing anchors shown to signed-out visitors on the landing page — the
+// landing itself never deep-links into the app (visitors go through /start).
+const LANDING_LINKS = [
+  { href: '/#product', label: 'Product' },
+  { href: '/#schools', label: 'For schools' },
+  { href: '/#pricing', label: 'Pricing' },
+];
+
 export default function Nav() {
   const path = usePathname();
   const isLanding = path === '/';
@@ -21,12 +29,17 @@ export default function Nav() {
   const authEnabled = isFirebaseConfigured();
   const [open, setOpen] = useState(false);
 
-  // Counselors/org admins get their dashboard as the first nav item. Requires
+  // Counselors/org admins get their workspace as the first nav item. Requires
   // an actual org link — a stale staff role with no workspace shows nothing.
   const isStaff =
     Boolean(profile?.orgId) &&
     (profile?.role === 'counselor' || profile?.role === 'orgAdmin');
-  const links = isStaff ? [{ href: '/counselor', label: 'Dashboard' }, ...LINKS] : LINKS;
+  const links =
+    isLanding && !user
+      ? LANDING_LINKS
+      : isStaff
+        ? [{ href: '/business', label: 'Workspace' }, ...LINKS]
+        : LINKS;
 
   // Close the mobile menu whenever the route changes.
   useEffect(() => {

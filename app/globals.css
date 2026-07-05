@@ -382,6 +382,44 @@ textarea:focus {
   animation: growBar 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
+/* Gradient display text — the landing's accent treatment. */
+.grad-text {
+  background: linear-gradient(100deg, var(--primary) 10%, #7aa7e8 45%, var(--accent) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Subtle dot grid backdrop (hero, CTA). */
+.dotgrid {
+  background-image: radial-gradient(rgba(25, 24, 43, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 30%, #000 35%, transparent 75%);
+  mask-image: radial-gradient(ellipse 75% 70% at 50% 30%, #000 35%, transparent 75%);
+}
+
+/* Infinite marquee (university names strip). */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee-track {
+  display: flex;
+  gap: 56px;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+  will-change: transform;
+}
+
 /* Reduced motion: show everything instantly, stop ambient movement. */
 @media (prefers-reduced-motion: reduce) {
   .reveal {
@@ -395,5 +433,10 @@ textarea:focus {
   .bar-animate,
   .fade-in {
     animation: none !important;
+  }
+  .marquee-track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
   }
 }

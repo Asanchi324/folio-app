@@ -6,10 +6,31 @@ import Nav from '@/components/Nav';
 // in .env.local. Left unset, analytics is simply not loaded.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://foli0.vercel.app';
+
 export const metadata = {
-  title: 'Folio — build a portfolio that gets you admitted',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Folio — build a portfolio that gets you admitted',
+    template: '%s | Folio',
+  },
   description:
     'Folio helps university applicants build a Common App–style academic portfolio, get honest AI feedback, see real admission chances, and discover the competitions and olympiads that will actually move the needle.',
+  openGraph: {
+    siteName: 'Folio',
+    type: 'website',
+    title: 'Folio — build a portfolio that gets you admitted',
+    description:
+      'Honest admissions intelligence: Common App–style portfolio, AI feedback with no glaze, real admission odds, and a Business Workspace for schools and counselors.',
+  },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true },
+};
+
+export const viewport = {
+  themeColor: '#f6f4ee',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }) {

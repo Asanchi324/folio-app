@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useEffectivePlan } from '@/lib/account';
 import { publishShare, unpublishShare, DEFAULT_SHARE_OPTIONS } from '@/lib/share';
-import { planHas } from '@/lib/plans';
+import { planHas, isOrgPaidPlan } from '@/lib/plans';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 
@@ -27,7 +27,7 @@ export default function ShareCard({ p, meta }) {
   }, [meta?.shareOptions]);
 
   const cleanShare = planHas(plan, 'cleanShare');
-  const brand = org?.plan === 'business' ? org?.name : null;
+  const brand = isOrgPaidPlan(org?.plan) ? org?.brandName || org?.name : null;
   const extras = { badge: !cleanShare, brand };
 
   // Auto-refresh the snapshot (debounced) while sharing is on.

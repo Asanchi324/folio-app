@@ -13,7 +13,8 @@ import { track } from '@/lib/analytics';
 // First-run onboarding. Forks by audience on step 0:
 //   student → the portfolio survey (pre-fills the builder), then /portfolio
 //   business (school / counselor) → a short workspace survey, Google sign-in,
-//   workspace created → /counselor. Deep-linkable: /start?type=business.
+//   workspace created → /business (the Business Workspace). Deep-linkable:
+//   /start?type=business.
 
 const GRADES = [
   { v: '9', label: 'Grade 9', note: 'Lots of runway' },
@@ -307,9 +308,9 @@ function BusinessSurvey({ router, onSwitch }) {
   // Already in a workspace → nothing to onboard.
   if (ready && profile?.orgId) {
     return (
-      <Frame step={1} total={1} title="You already have a workspace" sub="Your dashboard is ready.">
-        <Link href="/counselor" className="btn btn-primary" style={{ width: '100%' }}>
-          Open my dashboard →
+      <Frame step={1} total={1} title="You already have a workspace" sub="Your workspace is ready.">
+        <Link href="/business" className="btn btn-primary" style={{ width: '100%' }}>
+          Open my workspace →
         </Link>
       </Frame>
     );
@@ -350,7 +351,7 @@ function BusinessSurvey({ router, onSwitch }) {
     },
     {
       title: 'How many students?',
-      sub: 'Free pilot covers 3 connected students — Business scales to your whole cohort.',
+      sub: 'You can trial the workflow with 3 students — Business scales to 20, Business Plus to 75.',
       valid: () => true,
       body: (
         <div style={{ display: 'grid', gap: 10 }}>
@@ -403,7 +404,7 @@ function BusinessSurvey({ router, onSwitch }) {
       }
       await createOrg(form, u);
       track('org_created', { type: form.type, size: form.size, via: 'onboarding' });
-      router.push('/counselor?welcome=1');
+      router.push('/business?created=1');
     } catch (e) {
       setErr(e?.message || 'Could not create the workspace.');
       setBusy(false);
@@ -430,7 +431,7 @@ function BusinessSurvey({ router, onSwitch }) {
               </button>
             ) : (
               <button className="btn btn-primary" disabled={busy || !ready} onClick={finish}>
-                {busy ? 'Creating…' : user ? 'Create my workspace — free' : 'Sign in & create — free'}
+                {busy ? 'Creating…' : user ? 'Create my workspace' : 'Sign in & create my workspace'}
               </button>
             )}
           </div>

@@ -1,8 +1,8 @@
 'use client';
 
-// Self-serve workspace creation for counselors & schools. Creates the org on
-// the FREE plan (pilot: up to 3 students) — Business is activated manually by
-// the founder (see /admin/orgs and REPORT.md).
+// Self-serve workspace creation for counselors & schools. Creates the org in
+// setup mode (up to 3 students to trial the workflow) — Business activates
+// automatically after checkout in /business/billing.
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -27,7 +27,7 @@ export default function NewOrgPage() {
     try {
       await createOrg({ name, type }, user);
       track('org_created', { type });
-      router.push('/counselor?welcome=1');
+      router.push('/business?created=1');
     } catch (e) {
       setErr(e?.message || 'Could not create the workspace.');
       setBusy(false);
@@ -64,7 +64,7 @@ export default function NewOrgPage() {
         <p className="muted" style={{ lineHeight: 1.6 }}>
           You already belong to a workspace.
         </p>
-        <Link href="/counselor" className="btn btn-primary" style={{ marginTop: 18 }}>
+        <Link href="/business" className="btn btn-primary" style={{ marginTop: 18 }}>
           Open my dashboard →
         </Link>
       </Shell>
@@ -118,11 +118,12 @@ export default function NewOrgPage() {
       {err && <p style={{ color: 'var(--bad)', fontSize: 13.5, marginTop: 14 }}>{err}</p>}
 
       <button className="btn btn-primary" onClick={submit} disabled={busy || !ready} style={{ marginTop: 22, width: '100%' }}>
-        {busy ? 'Creating…' : 'Create workspace — free'}
+        {busy ? 'Creating…' : 'Create workspace'}
       </button>
       <p className="muted" style={{ fontSize: 12.5, marginTop: 12, textAlign: 'center', lineHeight: 1.5 }}>
-        Free pilot: up to 3 connected students, full dashboard. Need more seats,
-        white-label and cohort analytics? <Link href="/upgrade" style={{ color: 'var(--accent)', fontWeight: 600 }}>See Business →</Link>
+        Set up first, subscribe when ready: you can trial the workflow with up
+        to 3 students before activating{' '}
+        <Link href="/upgrade?plan=business" style={{ color: 'var(--accent)', fontWeight: 600 }}>Business →</Link>
       </p>
     </Shell>
   );
