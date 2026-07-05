@@ -1,18 +1,25 @@
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
 import PricingCards from '@/components/Pricing';
+import { UNIVERSITIES } from '@/lib/universities';
+import { COMPETITIONS } from '@/lib/competitions';
+
+// Landing — server component, fully static. Two audiences, one page:
+// students (primary funnel → /start) and schools/counselors (→ /start?type=business).
 
 export default function Landing() {
   return (
     <>
       <Hero />
       <LogosStrip />
+      <StatsBand />
       <Features />
       <HowItWorks />
       <ChancePreview />
-      <ForSchools />
       <DiscoverPreview />
+      <ForSchools />
       <Pricing />
+      <FAQ />
       <CTA />
       <Footer />
     </>
@@ -31,14 +38,14 @@ function Hero() {
           position: 'absolute',
           inset: '-20% -10%',
           background:
-            'radial-gradient(900px 420px at 78% -8%, rgba(69,133,217,0.18), transparent 60%), radial-gradient(760px 460px at 6% 4%, rgba(69,133,217,0.10), transparent 55%), radial-gradient(520px 320px at 92% 60%, rgba(192,138,45,0.10), transparent 60%)',
+            'radial-gradient(900px 420px at 78% -8%, rgba(69,133,217,0.16), transparent 60%), radial-gradient(760px 460px at 6% 4%, rgba(69,133,217,0.09), transparent 55%), radial-gradient(520px 320px at 92% 60%, rgba(192,138,45,0.09), transparent 60%)',
           pointerEvents: 'none',
         }}
       />
-      <div className="wrap" style={{ position: 'relative', padding: '76px 24px 70px' }}>
-        <div style={{ maxWidth: 760 }}>
+      <div className="wrap" style={{ position: 'relative', padding: '84px 24px 72px' }}>
+        <div style={{ maxWidth: 780 }}>
           <span className="pill pill-gold hero-rise" style={{ marginBottom: 22 }}>
-            For students applying abroad
+            Honest admissions intelligence
           </span>
           <h1
             className="hero-rise"
@@ -65,15 +72,12 @@ function Hero() {
             <Link href="/start" className="btn btn-primary">
               Create my portfolio — free
             </Link>
-            <Link href="/universities" className="btn btn-ghost">
-              See my chances
+            <Link href="/start?type=business" className="btn btn-ghost">
+              I’m a school / counselor
             </Link>
           </div>
           <p className="hero-rise" style={{ marginTop: 16, fontSize: 13.5, color: 'var(--faint)', animationDelay: '0.26s' }}>
-            Free forever for the essentials. No card, no sign-up to start.{' '}
-            <Link href="#schools" style={{ color: 'var(--primary)', fontWeight: 600 }}>
-              A school or counselor? →
-            </Link>
+            Free forever for the essentials. No card, no sign-up to start.
           </p>
         </div>
 
@@ -108,7 +112,7 @@ function HeroCard() {
         className="pill pill-gold chip-float"
         style={{ position: 'absolute', top: -12, right: 22, boxShadow: 'var(--shadow)', zIndex: 2 }}
       >
-        ✨ no glaze — honest odds
+        No glaze — honest odds
       </span>
 
       <div
@@ -204,32 +208,62 @@ function LogosStrip() {
   );
 }
 
+/* --------------------------- STATS --------------------------- */
+function StatsBand() {
+  const stats = [
+    [`${UNIVERSITIES.length}+`, 'universities with live odds'],
+    [`${COMPETITIONS.length}+`, 'olympiads, programs & scholarships'],
+    ['3', 'AI tools: review, essay coach, counselor'],
+    ['$0', 'to build your full portfolio'],
+  ];
+  return (
+    <section style={{ padding: '46px 0' }}>
+      <div className="wrap">
+        <Reveal>
+          <div className="stats-band">
+            {stats.map(([n, label]) => (
+              <div key={label} style={{ textAlign: 'center', padding: '6px 10px' }}>
+                <div style={{ fontFamily: 'var(--display)', fontSize: 'clamp(28px,3.4vw,38px)', color: 'var(--primary)' }}>{n}</div>
+                <div className="muted" style={{ fontSize: 13.5, marginTop: 4, lineHeight: 1.4 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+      <style>{`
+        .stats-band{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+        @media (max-width:760px){.stats-band{grid-template-columns:repeat(2,1fr); gap:20px;}}
+      `}</style>
+    </section>
+  );
+}
+
 /* --------------------------- FEATURES --------------------------- */
 function Features() {
   const items = [
     {
-      icon: '📝',
+      glyph: '¶',
       title: 'A real Common App–style portfolio',
       body: 'Structured sections for academics, testing, 10 activities and 5 honors — the exact shape top universities read.',
     },
     {
-      icon: '✨',
+      glyph: '✎',
       title: 'AI rewrites every entry',
       body: '“Started a club” becomes a line that shows scope, skills and measurable impact — without inventing anything.',
     },
     {
-      icon: '🎯',
+      glyph: '%',
       title: 'Honest admission odds',
       body: 'Per-university chances grounded in your real profile. Harvard caps low even for strong applicants — because it should.',
     },
     {
-      icon: '🧭',
+      glyph: '→',
       title: 'Personalised next moves',
       body: 'Specific olympiads, research programs and score targets — plus deadline tracking so you never miss a window.',
     },
   ];
   return (
-    <section className="section">
+    <section className="section" style={{ paddingTop: 42 }}>
       <div className="wrap">
         <Reveal>
           <Header
@@ -244,8 +278,24 @@ function Features() {
           {items.map((it, i) => (
             <Reveal key={it.title} delay={i * 90}>
               <div className="card card-pad feature-card" style={{ height: '100%' }}>
-                <div style={{ fontSize: 26 }}>{it.icon}</div>
-                <h3 style={{ fontSize: 20, marginTop: 14 }}>{it.title}</h3>
+                <div
+                  aria-hidden
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: 'var(--primary-tint)',
+                    color: 'var(--primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'var(--display)',
+                    fontSize: 22,
+                  }}
+                >
+                  {it.glyph}
+                </div>
+                <h3 style={{ fontSize: 20, marginTop: 16 }}>{it.title}</h3>
                 <p className="muted" style={{ marginTop: 8, fontSize: 14.5, lineHeight: 1.55 }}>
                   {it.body}
                 </p>
@@ -338,6 +388,9 @@ function ChancePreview() {
               </li>
             ))}
           </ul>
+          <Link href="/universities" className="btn btn-ghost" style={{ marginTop: 26 }}>
+            See my chances →
+          </Link>
         </Reveal>
         <Reveal delay={120}>
           <div className="card card-pad" style={{ boxShadow: 'var(--shadow)' }}>
@@ -376,6 +429,48 @@ function ChancePreview() {
   );
 }
 
+/* ----------------------- DISCOVER PREVIEW ----------------------- */
+function DiscoverPreview() {
+  const tags = ['IMO', 'USACO', 'Regeneron ISEF', 'John Locke Essay', 'RSI', 'Wharton Investment', 'Diamond Challenge', 'YYGS'];
+  return (
+    <section className="section" style={{ background: 'var(--primary)', color: '#fff' }}>
+      <div className="wrap" style={{ textAlign: 'center' }}>
+        <Reveal>
+          <span className="eyebrow" style={{ color: '#f3d9a4' }}>The opportunities database</span>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(28px,3.8vw,42px)', marginTop: 14, maxWidth: 720, marginInline: 'auto' }}>
+            Stop wondering what to do this summer.
+          </h2>
+          <p style={{ marginTop: 16, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.78)', maxWidth: 620, marginInline: 'auto' }}>
+            A curated library of olympiads, research programs, competitions and
+            scholarships — with deadline tracking, so the window never closes on
+            you quietly.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 28, maxWidth: 680, marginInline: 'auto' }}>
+            {tags.map((t) => (
+              <span
+                key={t}
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: '8px 15px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.10)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <Link href="/discover" className="btn btn-gold" style={{ marginTop: 32 }}>
+            Browse the database
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------------- FOR SCHOOLS & COUNSELORS ---------------------- */
 function ForSchools() {
   const roster = [
@@ -410,10 +505,10 @@ function ForSchools() {
             ))}
           </ul>
           <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
-            <Link href="/counselor/new" className="btn btn-gold">
+            <Link href="/start?type=business" className="btn btn-gold">
               Create a workspace — free
             </Link>
-            <Link href="/upgrade" className="btn" style={{ border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }}>
+            <Link href="/upgrade?plan=business" className="btn" style={{ border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }}>
               See Business plan
             </Link>
           </div>
@@ -471,48 +566,6 @@ function ForSchools() {
   );
 }
 
-/* ----------------------- DISCOVER PREVIEW ----------------------- */
-function DiscoverPreview() {
-  const tags = ['IMO', 'USACO', 'Regeneron ISEF', 'John Locke Essay', 'RSI', 'Wharton Investment', 'Diamond Challenge', 'YYGS'];
-  return (
-    <section className="section" style={{ background: 'var(--primary)', color: '#fff' }}>
-      <div className="wrap" style={{ textAlign: 'center' }}>
-        <Reveal>
-          <span className="eyebrow" style={{ color: '#f3d9a4' }}>The opportunities database</span>
-          <h2 style={{ color: '#fff', fontSize: 'clamp(28px,3.8vw,42px)', marginTop: 14, maxWidth: 720, marginInline: 'auto' }}>
-            Stop wondering what to do this summer.
-          </h2>
-          <p style={{ marginTop: 16, fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.78)', maxWidth: 620, marginInline: 'auto' }}>
-            A curated library of olympiads, research programs, competitions and
-            scholarships — with deadline tracking, so the window never closes on
-            you quietly.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 28, maxWidth: 680, marginInline: 'auto' }}>
-            {tags.map((t) => (
-              <span
-                key={t}
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  padding: '8px 15px',
-                  borderRadius: 999,
-                  background: 'rgba(255,255,255,0.10)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                }}
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-          <Link href="/discover" className="btn btn-gold" style={{ marginTop: 32 }}>
-            Browse the database
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 /* ------------------------------ PRICING ------------------------------ */
 function Pricing() {
   return (
@@ -536,13 +589,75 @@ function Pricing() {
         </Reveal>
         <Reveal delay={200}>
           <p className="muted" style={{ textAlign: 'center', marginTop: 22, fontSize: 13.5 }}>
-            Prices are launch placeholders. Questions?{' '}
+            Questions, school pilots, local payment methods?{' '}
             <a href="mailto:hello@folio.app" style={{ color: 'var(--primary)', fontWeight: 600 }}>
               hello@folio.app
             </a>
           </p>
         </Reveal>
       </div>
+    </section>
+  );
+}
+
+/* ------------------------------ FAQ ------------------------------ */
+function FAQ() {
+  const items = [
+    [
+      'Is Folio really free?',
+      'Yes. The portfolio builder, admission chances for every university, AI review and the opportunities database are free with no time limit and no card. Pro adds the AI essay coach, the counselor chat and clean exports — you only pay for depth.',
+    ],
+    [
+      'Where do the admission odds come from?',
+      'Each estimate starts from the university’s published acceptance rate, then adjusts for how your GPA, test scores and profile strength compare to its typical admitted student. The number is capped where reality caps it — nobody gets told 60% at Harvard.',
+    ],
+    [
+      'Can my counselor or school see my portfolio?',
+      'Only if you connect to their workspace with an invite code — and you can disconnect in one click, which removes their access immediately. Nothing is public unless you create a share link yourself.',
+    ],
+    [
+      'How do schools and counselors use Folio?',
+      'You create a free workspace, students join with your code, and you see the whole roster: strength, completeness, attention flags and suggested talking points. The free pilot covers 3 students; Business unlocks your full cohort, CSV export and white-label.',
+    ],
+    [
+      'How do payments work?',
+      'Card checkout activates your plan automatically within a couple of minutes. In Kazakhstan and the CIS we also accept local methods (Kaspi) — write to hello@folio.app and we activate the plan the same day.',
+    ],
+  ];
+  return (
+    <section className="section" style={{ paddingTop: 0 }}>
+      <div className="wrap" style={{ maxWidth: 760 }}>
+        <Reveal>
+          <div style={{ textAlign: 'center' }}>
+            <span className="eyebrow">FAQ</span>
+            <h2 style={{ fontSize: 'clamp(26px,3.4vw,36px)', marginTop: 14 }}>Fair questions.</h2>
+          </div>
+        </Reveal>
+        <Reveal delay={100}>
+          <div style={{ marginTop: 32, display: 'grid', gap: 10 }}>
+            {items.map(([q, a]) => (
+              <details key={q} className="faq-item card">
+                <summary>
+                  {q}
+                  <span aria-hidden className="faq-chevron">▾</span>
+                </summary>
+                <p className="muted" style={{ fontSize: 14.5, lineHeight: 1.6, padding: '0 20px 18px' }}>{a}</p>
+              </details>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+      <style>{`
+        .faq-item{overflow:hidden;}
+        .faq-item summary{
+          list-style:none; cursor:pointer; display:flex; align-items:center;
+          justify-content:space-between; gap:14px; padding:16px 20px;
+          font-weight:600; font-size:15.5px;
+        }
+        .faq-item summary::-webkit-details-marker{display:none;}
+        .faq-chevron{color:var(--faint); transition:transform .2s ease;}
+        .faq-item[open] .faq-chevron{transform:rotate(180deg);}
+      `}</style>
     </section>
   );
 }
@@ -567,9 +682,14 @@ function CTA() {
             <p className="muted" style={{ marginTop: 16, fontSize: 17 }}>
               Start free — it takes about ten minutes to see your first results.
             </p>
-            <Link href="/start" className="btn btn-primary" style={{ marginTop: 28 }}>
-              Build my portfolio
-            </Link>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 28, flexWrap: 'wrap' }}>
+              <Link href="/start" className="btn btn-primary">
+                Build my portfolio
+              </Link>
+              <Link href="/start?type=business" className="btn btn-ghost">
+                For schools & counselors
+              </Link>
+            </div>
           </div>
         </Reveal>
       </div>
@@ -577,26 +697,73 @@ function CTA() {
   );
 }
 
+/* ------------------------------ FOOTER ------------------------------ */
 function Footer() {
+  const cols = [
+    {
+      title: 'Product',
+      links: [
+        ['Portfolio builder', '/start'],
+        ['Admission chances', '/universities'],
+        ['Opportunities', '/discover'],
+        ['Pricing', '/upgrade'],
+      ],
+    },
+    {
+      title: 'For schools',
+      links: [
+        ['Create a workspace', '/start?type=business'],
+        ['Business plan', '/upgrade?plan=business'],
+        ['Counselor dashboard', '/counselor'],
+      ],
+    },
+    {
+      title: 'Account',
+      links: [
+        ['Sign in', '/login'],
+        ['My portfolio', '/portfolio'],
+      ],
+    },
+  ];
   return (
     <footer style={{ borderTop: '1px solid var(--line)', background: 'var(--surface)' }}>
-      <div
-        className="wrap"
-        style={{ padding: '34px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}
-      >
-        <span style={{ fontFamily: 'var(--display)', fontSize: 19, fontWeight: 600 }}>Folio</span>
-        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'center' }}>
-          <Link href="/counselor/new" style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 600 }}>
-            For schools
-          </Link>
-          <Link href="/upgrade" style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 600 }}>
-            Pricing
-          </Link>
+      <div className="wrap footer-grid" style={{ padding: '46px 24px 20px' }}>
+        <div>
+          <span style={{ fontFamily: 'var(--display)', fontSize: 21, fontWeight: 600 }}>Folio</span>
+          <p className="muted" style={{ fontSize: 13.5, marginTop: 10, lineHeight: 1.6, maxWidth: 260 }}>
+            Honest admissions intelligence for students applying abroad — and the
+            counselors who guide them.
+          </p>
+          <a href="mailto:hello@folio.app" style={{ display: 'inline-block', marginTop: 12, fontSize: 13.5, color: 'var(--primary)', fontWeight: 600 }}>
+            hello@folio.app
+          </a>
         </div>
-        <span style={{ fontSize: 13.5, color: 'var(--faint)' }}>
+        {cols.map((c) => (
+          <div key={c.title}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--faint)' }}>
+              {c.title}
+            </div>
+            <div style={{ display: 'grid', gap: 9, marginTop: 12 }}>
+              {c.links.map(([label, href]) => (
+                <Link key={href + label} href={href} style={{ fontSize: 14, color: 'var(--muted)', fontWeight: 500 }}>
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="wrap" style={{ padding: '16px 24px 30px', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 12.5, color: 'var(--faint)' }}>© {new Date().getFullYear()} Folio</span>
+        <span style={{ fontSize: 12.5, color: 'var(--faint)', maxWidth: 560 }}>
           Estimates are guidance, not guarantees. Always verify deadlines and requirements with the source.
         </span>
       </div>
+      <style>{`
+        .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:28px;}
+        @media (max-width:760px){.footer-grid{grid-template-columns:1fr 1fr;}}
+        @media (max-width:480px){.footer-grid{grid-template-columns:1fr;}}
+      `}</style>
     </footer>
   );
 }

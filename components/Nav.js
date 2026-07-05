@@ -21,8 +21,11 @@ export default function Nav() {
   const authEnabled = isFirebaseConfigured();
   const [open, setOpen] = useState(false);
 
-  // Counselors/org admins get their dashboard as the first nav item.
-  const isStaff = profile?.role === 'counselor' || profile?.role === 'orgAdmin';
+  // Counselors/org admins get their dashboard as the first nav item. Requires
+  // an actual org link — a stale staff role with no workspace shows nothing.
+  const isStaff =
+    Boolean(profile?.orgId) &&
+    (profile?.role === 'counselor' || profile?.role === 'orgAdmin');
   const links = isStaff ? [{ href: '/counselor', label: 'Dashboard' }, ...LINKS] : LINKS;
 
   // Close the mobile menu whenever the route changes.

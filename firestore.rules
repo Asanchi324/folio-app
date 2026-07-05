@@ -54,15 +54,27 @@ service cloud.firestore {
     }
 
     // ---------- users/{uid} — platform profile ----------
+    // A self-written staff role must be backed by a real membership with that
+    // same role in the org the doc points at (checked with getAfter so the
+    // join/create-org batches — member doc + user doc in one commit — pass).
+    function roleWriteOk() {
+      return request.resource.data.role == 'student' ||
+        (request.resource.data.orgId != null &&
+          getAfter(/databases/$(database)/documents/orgs/$(request.resource.data.orgId)/members/$(request.auth.uid)).data.role == request.resource.data.role);
+    }
     match /users/{uid} {
       allow read: if isSelf(uid) || isFounder();
-      // First sign-in bootstrap: role student is fine, but plan MUST be free.
-      allow create: if isSelf(uid) && request.resource.data.plan == 'free';
-      // Self-updates may touch anything EXCEPT plan (paid gate). Role changes
-      // by self are allowed — role alone grants no paid features, access is
-      // always membership-checked. Founders can change everything.
+      // First sign-in bootstrap: plan MUST be free, role must be legitimate.
+      allow create: if isSelf(uid) &&
+        request.resource.data.plan == 'free' &&
+        roleWriteOk();
+      // Self-updates may touch anything EXCEPT plan (paid gate), and a role
+      // claim must match an actual org membership — no self-promotion to
+      // counselor/orgAdmin without one. Founders can change everything.
       allow update: if isFounder() ||
-        (isSelf(uid) && request.resource.data.plan == resource.data.plan);
+        (isSelf(uid) &&
+          request.resource.data.plan == resource.data.plan &&
+          (request.resource.data.role == resource.data.role || roleWriteOk()));
       allow delete: if isFounder();
     }
 
@@ -77,12 +89,12 @@ service cloud.firestore {
         (signedIn() &&
           request.resource.data.ownerUid == request.auth.uid &&
           request.resource.data.plan == 'free');
-      // Admins manage the org but can NOT bump plan/seats (founder = billing).
+      // Admins manage the org but can ONLY touch cosmetic fields — plan/seats
+      // are billing (founder-only), codes + ownerUid stay stable.
       allow update: if isFounder() ||
         (isOrgAdmin(orgId) &&
-          request.resource.data.plan == resource.data.plan &&
-          request.resource.data.seats == resource.data.seats &&
-          request.resource.data.ownerUid == resource.data.ownerUid);
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['name', 'type']));
       allow delete: if isFounder();
 
       // ---------- membership ----------
@@ -132,6 +144,14 @@ service cloud.firestore {
       allow read: if isSelf(uid) || isFounder() ||
         (resource.data.orgId != null && isOrgStaff(resource.data.orgId));
       allow write: if isSelf(uid);
+      // Org staff may UNLINK a removed student (clear the org fields, nothing
+      // else) so the roster and the student's UI stay consistent after a
+      // removal. They still can't modify portfolio content.
+      allow update: if isSelf(uid) ||
+        (resource.data.orgId != null && isOrgStaff(resource.data.orgId) &&
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['orgId', 'orgName', 'counselorId']) &&
+          request.resource.data.orgId == null);
 
       // ---------- counselor comments ----------
       match /comments/{commentId} {
@@ -164,12 +184,24 @@ service cloud.firestore {
     match /shares/{shareId} {
       allow get: if true;
       allow list: if false; // no enumeration
-      allow create, update: if signedIn() &&
+      allow create: if signedIn() &&
         request.resource.data.ownerUid == request.auth.uid;
+      // Only the existing owner may update, and ownership can never move —
+      // otherwise anyone who knows a shareId could hijack it by writing
+      // their own uid into ownerUid.
+      allow update: if signedIn() &&
+        resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.ownerUid == resource.data.ownerUid;
       allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
 
-    // ---------- server-only namespaces (future durable cache/limits) ----------
+    // ---------- server-only namespaces (webhook audit, durable cache/limits) ----------
+    // billing_events is written by the payment webhook via service account
+    // (bypasses rules); founders may read it for the audit trail.
+    match /billing_events/{doc} {
+      allow read: if isFounder();
+      allow write: if false;
+    }
     match /rate_limits/{doc} { allow read, write: if false; }
     match /ai_cache/{doc} { allow read, write: if false; }
   }

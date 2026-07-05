@@ -7,9 +7,6 @@
 import Link from 'next/link';
 import { PLANS } from '@/lib/plans';
 
-const UPGRADE_MAIL =
-  'mailto:hello@folio.app?subject=Folio%20upgrade&body=Hi!%20I%27d%20like%20to%20upgrade%20my%20Folio%20plan.';
-
 export default function PricingCards({ currentPlan = null, orgPlan = null }) {
   const cards = [
     {
@@ -34,8 +31,8 @@ export default function PricingCards({ currentPlan = null, orgPlan = null }) {
       cta:
         orgPlan === 'business'
           ? { label: 'Your workspace plan', disabled: true }
-          : { label: 'Create a workspace', href: '/counselor/new' },
-      secondary: { label: 'Talk to us', href: UPGRADE_MAIL },
+          : { label: 'Create a workspace', href: '/start?type=business' },
+      secondary: { label: 'Upgrade a workspace', href: '/upgrade?plan=business' },
       highlight: false,
       gold: true,
     },
@@ -83,7 +80,11 @@ export default function PricingCards({ currentPlan = null, orgPlan = null }) {
               </Link>
             )}
             {secondary && (
-              <a href={secondary.href} className="btn btn-ghost btn-sm">{secondary.label}</a>
+              secondary.href.startsWith('/') ? (
+                <Link href={secondary.href} className="btn btn-ghost btn-sm">{secondary.label}</Link>
+              ) : (
+                <a href={secondary.href} className="btn btn-ghost btn-sm">{secondary.label}</a>
+              )
             )}
           </div>
         </div>

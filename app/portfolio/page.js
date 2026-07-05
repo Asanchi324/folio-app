@@ -18,12 +18,14 @@ const LEVELS = ['school', 'regional', 'state', 'national', 'international'];
 
 export default function PortfolioPage() {
   const router = useRouter();
-  const [p, update, ready, meta] = usePortfolio();
+  const [p, update, ready, meta, synced] = usePortfolio();
 
-  // First-time visitors go through the onboarding survey first.
+  // First-time visitors go through the onboarding survey first. Waits for the
+  // cloud copy (synced) so a signed-in user on a fresh device isn't bounced to
+  // onboarding while their real portfolio is still loading.
   useEffect(() => {
-    if (ready && !p.onboarded && !p.fullName) router.replace('/start');
-  }, [ready, p.onboarded, p.fullName, router]);
+    if (ready && synced && !p.onboarded && !p.fullName) router.replace('/start');
+  }, [ready, synced, p.onboarded, p.fullName, router]);
 
   useEffect(() => {
     track('portfolio_view');
