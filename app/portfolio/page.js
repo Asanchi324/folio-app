@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePortfolio, newId } from '@/lib/store';
 import { profileBreakdown, completeness } from '@/lib/profile';
+import { reviewSnapshot, reviewSignature } from '@/lib/review-input';
 import { track } from '@/lib/analytics';
 import Ring from '@/components/Ring';
 import MentorCard from '@/components/MentorCard';
@@ -445,14 +446,17 @@ function FeedbackCard({ p, update }) {
     setBusy(true);
     setErr('');
     try {
+      // Send only the current-state slice — never the whole portfolio, which
+      // carries the previous review and would prime the model with advice about
+      // items the student has since edited or deleted.
       const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ portfolio: p }),
+        body: JSON.stringify({ portfolio: reviewSnapshot(p), fresh: Boolean(fb) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed');
-      update({ savedFeedback: { ...data.feedback, at: Date.now(), sig: feedbackSignature(p) } });
+      update({ savedFeedback: { ...data.feedback, at: Date.now(), sig: reviewSignature(p) } });
       track('feedback_view', { tier: data.feedback?.overallTier || 'unknown' });
     } catch (e) {
       setErr(e.message);
@@ -465,7 +469,7 @@ function FeedbackCard({ p, update }) {
   // signatures entirely). We DON'T render stale content — a review of an old
   // portfolio can describe activities the student already deleted — so we hide
   // it and show a refresh prompt instead.
-  const stale = fb ? !fb.sig || fb.sig !== feedbackSignature(p) : false;
+  const stale = fb ? !fb.sig || fb.sig !== reviewSignature(p) : false;
   const showReview = fb && !stale;
 
   return (
@@ -494,7 +498,13 @@ function FeedbackCard({ p, update }) {
 }
 
 function Feedback({ fb, busy, err, onRerun }) {
-  const tierColor = { exceptional: 'var(--good)', strong: 'var(--primary)', competitive: 'var(--warn)', developing: 'var(--bad)' }[(fb.overallTier || '').toLowerCase()] || 'var(--primary)';
+  // The review can be long — keep the summary (tier, headline, strengths, gaps)
+  // always visible and collapse the detailed plan behind "Show more" so the
+  // card doesn't dominate the sidebar.
+  const [expanded, setExpanded] = useState(false);
+  const hasDetail =
+    (Array.isArray(fb.recommendations) && fb.recommendations.length > 0) ||
+    (Array.isArray(fb.nextSemester) && fb.nextSemester.length > 0);
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -506,7 +516,18 @@ function Feedback({ fb, busy, err, onRerun }) {
       <Block title="Strengths" color="var(--good)" items={fb.strengths} />
       <Block title="Gaps" color="var(--bad)" items={fb.gaps} />
 
-      {Array.isArray(fb.recommendations) && fb.recommendations.length > 0 && (
+      {hasDetail && (
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={() => setExpanded((v) => !v)}
+          style={{ marginTop: 16, width: '100%' }}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Show less ▲' : 'Show recommendations & next steps ▾'}
+        </button>
+      )}
+
+      {expanded && Array.isArray(fb.recommendations) && fb.recommendations.length > 0 && (
         <div style={{ marginTop: 18 }}>
           <SubTitle>Recommendations</SubTitle>
           <div style={{ display: 'grid', gap: 10, marginTop: 8 }}>
@@ -552,7 +573,7 @@ function Feedback({ fb, busy, err, onRerun }) {
         </div>
       )}
 
-      {Array.isArray(fb.nextSemester) && fb.nextSemester.length > 0 && (
+      {expanded && Array.isArray(fb.nextSemester) && fb.nextSemester.length > 0 && (
         <div style={{ marginTop: 18 }}>
           <SubTitle>Do next</SubTitle>
           <ol style={{ margin: '8px 0 0', paddingLeft: 18, display: 'grid', gap: 6 }}>
@@ -563,9 +584,11 @@ function Feedback({ fb, busy, err, onRerun }) {
         </div>
       )}
 
-      <Link href="/discover" className="btn btn-ghost btn-sm" style={{ marginTop: 18, width: '100%' }}>
-        Find these in the database →
-      </Link>
+      {expanded && (
+        <Link href="/discover" className="btn btn-ghost btn-sm" style={{ marginTop: 18, width: '100%' }}>
+          Find these in the database →
+        </Link>
+      )}
       {err && <p style={{ color: 'var(--bad)', fontSize: 13, marginTop: 10 }}>{err}</p>}
     </div>
   );
@@ -598,25 +621,6 @@ function SubTitle({ children }) {
 
 function prioBand(p) {
   return { high: 'band-reach', medium: 'band-target', low: 'band-safety' }[(p || '').toLowerCase()] || 'pill-muted';
-}
-
-// Stable fingerprint of the inputs the AI review depends on. If the portfolio
-// changes (an activity edited or removed), this changes — so a saved review can
-// be flagged out of date instead of silently showing advice about content the
-// student already deleted.
-function feedbackSignature(p) {
-  const pick = {
-    major: p.intendedMajor || '',
-    academics: p.academics || {},
-    testing: p.testing || {},
-    activities: (p.activities || []).map((a) => `${a.position}|${a.organization}|${a.description}`),
-    honors: (p.honors || []).map((h) => `${h.title}|${h.level}`),
-    narrative: p.narrative || {},
-  };
-  const str = JSON.stringify(pick);
-  let h = 5381;
-  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
-  return h.toString(36);
 }
 
 function Spinner() {

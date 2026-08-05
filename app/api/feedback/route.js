@@ -6,6 +6,7 @@ import { generate } from '@/lib/ai';
 import { enforce } from '@/lib/ratelimit';
 import { profileBreakdown } from '@/lib/profile';
 import { selectCompetitions } from '@/lib/competitions';
+import { reviewSnapshot } from '@/lib/review-input';
 import { resolveAccess } from '@/lib/plan-server';
 import { aiLimitsFor } from '@/lib/plans';
 
@@ -19,6 +20,8 @@ Rules:
 - When recommending competitions, prefer ones from the provided catalog and reference them by name.
 - For Extracurriculars and Honors, give the student real choice: 2–3 concrete, varied ideas (different competitions, projects or roles) inside that area's items list, not a single suggestion.
 - Calibrate to reality: a strong profile is still a reach at single-digit-acceptance schools.
+- The portfolio in the prompt is the COMPLETE and CURRENT profile, and your only source of truth. If an activity, award, score or essay is not listed there, it does not exist — never mention, assume or "remember" one. Do not carry over anything from any earlier review.
+- Judge only what is present: an empty or missing section means that section is EMPTY, and the honest advice is to build it — not to comment on content you imagine was there.
 - Group recommendations by area: emit AT MOST ONE block per area (Testing, Academics, Extracurriculars, Honors, Narrative). NEVER output two blocks for the same area — consolidate every point for that area into its "items" list. Skip areas that genuinely need no action.
 - Output STRICT JSON only, matching the requested schema. No markdown, no commentary outside JSON.`;
 
@@ -31,8 +34,23 @@ function buildPrompt(portfolio, breakdown) {
     )
     .join('\n');
 
-  return `STUDENT PORTFOLIO (JSON):
+  // Explicit counts + "nothing else exists" framing. Without them a model will
+  // happily reason about a 4th activity when only 3 are listed.
+  const inventory = [
+    `Extracurriculars listed: ${portfolio.activities.length}`,
+    `Honors listed: ${portfolio.honors.length}`,
+    `AP/IB scores listed: ${portfolio.testing.apScores?.length || 0}`,
+  ].join(' | ');
+
+  return `STUDENT PORTFOLIO — CURRENT STATE, as of this request (JSON).
+This is the entire portfolio. Anything not listed here does not exist: the
+student has no other activities, awards or scores than the ones below, and any
+item you may have seen in an earlier review has been removed by the student.
+Review THIS profile only.
+
 ${JSON.stringify(portfolio, null, 2)}
+
+INVENTORY (counts are exact): ${inventory}
 
 COMPUTED PROFILE STRENGTH: ${breakdown.strength}/100
 PILLAR SCORES: ${breakdown.pillars.map((p) => `${p.label} ${p.score}/100`).join(', ')}
@@ -78,16 +96,21 @@ export async function POST(request) {
     });
   }
 
-  let portfolio;
+  let body;
   try {
-    portfolio = (await request.json())?.portfolio;
+    body = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  if (!portfolio) {
+  const raw = body?.portfolio;
+  if (!raw) {
     return NextResponse.json({ error: 'No portfolio provided' }, { status: 400 });
   }
 
+  // Strip to the current-state slice before anything else touches it. Old
+  // clients still POST the whole portfolio (previous review included) — this is
+  // what guarantees none of it reaches the model.
+  const portfolio = reviewSnapshot(raw);
   const breakdown = profileBreakdown(portfolio);
 
   try {
@@ -95,6 +118,9 @@ export async function POST(request) {
       system: SYSTEM,
       prompt: buildPrompt(portfolio, breakdown),
       json: true,
+      // An explicit re-run ("refresh my review") must actually re-generate,
+      // not replay the cached answer for the same profile.
+      cache: !body?.fresh,
     });
     let data;
     try {
