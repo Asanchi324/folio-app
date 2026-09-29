@@ -7,7 +7,10 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/business', '/counselor', '/api/', '/portfolio/print'],
+        disallow: [
+          '/admin', '/business', '/counselor', '/api/', '/portfolio', '/review', '/essay',
+          '/advisor', '/deadlines', '/share', '/settings', '/join/',
+        ],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

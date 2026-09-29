@@ -68,11 +68,13 @@ service cloud.firestore {
     // otherwise open someone else's billing portal.
     function noBillingFieldsOnCreate() {
       return !request.resource.data.keys().hasAny(
-        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder']);
+        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder',
+         'subscriptionStatus', 'currentPeriodEnd', 'cancelAtPeriodEnd']);
     }
     function billingFieldsUntouched() {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder']);
+        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder',
+         'subscriptionStatus', 'currentPeriodEnd', 'cancelAtPeriodEnd']);
     }
     match /users/{uid} {
       allow read: if isSelf(uid) || isFounder();
@@ -122,6 +124,9 @@ service cloud.firestore {
         // Joining is self-service but code-verified: the new member doc must
         // carry the org's CURRENT invite code for the role it claims. This is
         // what lets /join/{code} work without Cloud Functions.
+        // A third path: a counselor invited this student by email — the
+        // invite doc (invites/{orgId}_{email}) must exist for the signed-in
+        // user's verified email.
         allow create: if isFounder() || isOrgAdmin(orgId) ||
           (isSelf(memberUid) &&
             request.resource.data.joinedAt is number &&
@@ -129,7 +134,11 @@ service cloud.firestore {
               (request.resource.data.role == 'student' &&
                 request.resource.data.joinCode == orgDoc(orgId).joinCode) ||
               (request.resource.data.role == 'counselor' &&
-                request.resource.data.joinCode == orgDoc(orgId).counselorCode)
+                request.resource.data.joinCode == orgDoc(orgId).counselorCode) ||
+              (request.resource.data.role == 'student' &&
+                request.auth.token.email_verified == true &&
+                request.resource.data.inviteId == orgId + '_' + request.auth.token.email.lower() &&
+                exists(/databases/$(database)/documents/invites/$(request.resource.data.inviteId)))
             ));
         // Members can always leave; admins can remove anyone.
         allow delete: if isSelf(memberUid) || isOrgAdmin(orgId) || isFounder();
@@ -140,17 +149,43 @@ service cloud.firestore {
     // ---------- joinCodes/{CODE} — invite-code lookup ----------
     // Read requires being signed in AND knowing the exact code (doc id) — the
     // collection can't be listed, so codes stay effectively secret.
-    // Note: create only requires createdBy == self; a forged code doc cannot
-    // grant access (member create above checks the code against the ORG doc),
-    // it could only pollute the namespace. Acceptable for a rules-only flow.
+    // Only the org's owner (checked with getAfter so the create-org batch
+    // passes) or a founder may mint codes — nobody can squat code names or
+    // point a code at someone else's org.
     match /joinCodes/{code} {
       allow get: if signedIn();
       allow list: if isFounder();
-      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow create: if signedIn() &&
+        request.resource.data.createdBy == request.auth.uid &&
+        (isFounder() ||
+          getAfter(/databases/$(database)/documents/orgs/$(request.resource.data.orgId)).data.ownerUid == request.auth.uid);
       allow update: if false;
       allow delete: if isFounder() ||
         (signedIn() && resource.data.createdBy == request.auth.uid) ||
         isOrgAdmin(resource.data.orgId);
+    }
+
+    // ---------- invites/{orgId}_{email} — counselor adds a student by email ----------
+    // The invitee reads (and can decline = delete) invites addressed to their
+    // verified email; the org's staff create, list and revoke them. The doc id
+    // is pinned to orgId + lower-cased email so it can't be spoofed.
+    match /invites/{inviteId} {
+      function myEmail() {
+        return request.auth.token.email.lower();
+      }
+      function validInvite() {
+        return request.resource.data.email is string &&
+          request.resource.data.email == request.resource.data.email.lower() &&
+          inviteId == request.resource.data.orgId + '_' + request.resource.data.email &&
+          request.resource.data.invitedBy == request.auth.uid &&
+          isOrgStaff(request.resource.data.orgId);
+      }
+      allow read: if signedIn() &&
+        ((request.auth.token.email_verified == true && resource.data.email == myEmail()) ||
+          isOrgStaff(resource.data.orgId) || isFounder());
+      allow create, update: if signedIn() && validInvite();
+      allow delete: if signedIn() &&
+        (resource.data.email == myEmail() || isOrgStaff(resource.data.orgId) || isFounder());
     }
 
     // ---------- portfolios/{uid} ----------

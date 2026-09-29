@@ -49,9 +49,11 @@ export async function POST(request) {
 
   const origin = siteOrigin(request);
   const isOrgPlan = plan !== 'pro';
+  // {CHECKOUT_SESSION_ID} is filled in by Stripe; the return page posts it to
+  // /api/billing/confirm so the plan activates without waiting for the webhook.
   const successUrl = isOrgPlan
-    ? `${origin}/business?welcome=1&plan=${plan}`
-    : `${origin}/upgrade?success=1&plan=pro`;
+    ? `${origin}/business/billing?welcome=1&plan=${plan}&session_id={CHECKOUT_SESSION_ID}`
+    : `${origin}/upgrade?success=1&plan=pro&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/upgrade?plan=${plan}`;
 
   // Reuse the Stripe customer when we know it (plan switches, resubscribes) so

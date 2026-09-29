@@ -1,8 +1,7 @@
 'use client';
 
-// Share & export card (portfolio sidebar): public link toggle + PDF button.
-// While sharing is ON, the snapshot silently refreshes after edits so the
-// public page never goes stale.
+// Share & export: public link toggle + visibility options + PDF. While sharing
+// is on, the snapshot refreshes after edits so the public page never goes stale.
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -11,8 +10,11 @@ import { publishShare, unpublishShare, DEFAULT_SHARE_OPTIONS } from '@/lib/share
 import { planHas, isOrgPaidPlan } from '@/lib/plans';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
+import { useT } from '@/lib/i18n';
+import Icon from '@/components/Icon';
 
 export default function ShareCard({ p, meta }) {
+  const { t } = useT();
   const { user, plan, org } = useEffectivePlan();
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -21,7 +23,6 @@ export default function ShareCard({ p, meta }) {
   const shareId = meta?.shareId || null;
   const refreshTimer = useRef(null);
 
-  // Keep local options in sync when the doc loads.
   useEffect(() => {
     if (meta?.shareOptions) setOptions(meta.shareOptions);
   }, [meta?.shareOptions]);
@@ -30,7 +31,6 @@ export default function ShareCard({ p, meta }) {
   const brand = isOrgPaidPlan(org?.plan) ? org?.brandName || org?.name : null;
   const extras = { badge: !cleanShare, brand };
 
-  // Auto-refresh the snapshot (debounced) while sharing is on.
   useEffect(() => {
     if (!shareId || !user) return;
     clearTimeout(refreshTimer.current);
@@ -41,14 +41,12 @@ export default function ShareCard({ p, meta }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p, options, shareId, user, cleanShare, brand]);
 
-  if (!isFirebaseConfigured()) return null;
-
   const url = shareId && typeof window !== 'undefined' ? `${window.location.origin}/p/${shareId}` : '';
 
   async function toggle() {
     setErr('');
     if (!user) {
-      setErr('Sign in to create your public link.');
+      setErr(t('Sign in to create your public link.'));
       return;
     }
     setBusy(true);
@@ -61,109 +59,95 @@ export default function ShareCard({ p, meta }) {
         track('share_enabled');
       }
     } catch {
-      setErr('Could not update sharing — try again.');
+      setErr(t('Could not update sharing — try again.'));
     } finally {
       setBusy(false);
     }
   }
 
-  function setOpt(k, v) {
-    setOptions((o) => ({ ...o, [k]: v }));
-  }
+  const setOpt = (k, v) => setOptions((o) => ({ ...o, [k]: v }));
 
   return (
-    <div className="card card-pad">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 20 }}>🔗</span>
-        <h3 style={{ fontSize: 17, flex: 1 }}>Share & export</h3>
-      </div>
-
-      {/* public link */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14 }}>
-        <button
-          role="switch"
-          aria-checked={Boolean(shareId)}
-          onClick={toggle}
-          disabled={busy}
-          style={{
-            width: 42,
-            height: 24,
-            borderRadius: 999,
-            border: 'none',
-            cursor: 'pointer',
-            background: shareId ? 'var(--good)' : 'var(--line-strong)',
-            position: 'relative',
-            transition: 'background .2s',
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              position: 'absolute',
-              top: 3,
-              left: shareId ? 21 : 3,
-              width: 18,
-              height: 18,
-              borderRadius: 999,
-              background: '#fff',
-              transition: 'left .2s',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-            }}
-          />
-        </button>
-        <span style={{ fontSize: 14, fontWeight: 600 }}>
-          Public link {shareId ? 'is live' : 'off'}
-        </span>
-      </div>
-
-      {shareId && (
-        <div className="fade-in" style={{ marginTop: 12 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input readOnly value={url} style={{ fontSize: 12.5, color: 'var(--muted)' }} onFocus={(e) => e.target.select()} />
+    <div style={{ display: 'grid', gap: 18 }}>
+      {isFirebaseConfigured() && (
+        <section className="card card-pad">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 style={{ fontSize: 19 }}>{t('Public link')}</h2>
+              <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
+                {shareId ? t('Live — anyone with the link can view the parts you choose.') : t('Off. Nobody can see your portfolio.')}
+              </p>
+            </div>
             <button
-              className="btn btn-primary btn-sm"
-              onClick={() => {
-                navigator.clipboard?.writeText(url);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1500);
-                track('share_link_copied');
-              }}
+              role="switch"
+              aria-checked={Boolean(shareId)}
+              aria-label={t('Public link')}
+              onClick={toggle}
+              disabled={busy}
+              className={`switch${shareId ? ' on' : ''}`}
             >
-              {copied ? '✓' : 'Copy'}
+              <span />
             </button>
           </div>
 
-          <div style={{ display: 'grid', gap: 7, marginTop: 12 }}>
-            <Check label="Show test scores" on={options.testing !== false} set={(v) => setOpt('testing', v)} />
-            <Check label="Show strength score" on={options.strength !== false} set={(v) => setOpt('strength', v)} />
-            <Check label="Include spike & essay" on={options.narrative === true} set={(v) => setOpt('narrative', v)} />
-          </div>
-
-          {!cleanShare && (
-            <p className="muted" style={{ fontSize: 12, marginTop: 10, lineHeight: 1.5 }}>
-              Free links carry a small “Made with Folio” badge.{' '}
-              <Link href="/upgrade?plan=pro" style={{ color: 'var(--accent)', fontWeight: 600 }}>
-                Pro removes it →
-              </Link>
-            </p>
+          {shareId && (
+            <div className="fade-in" style={{ marginTop: 14 }}>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input readOnly value={url} style={{ fontSize: 14, color: 'var(--muted)' }} onFocus={(e) => e.target.select()} aria-label={t('Public link')} />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                    track('share_link_copied');
+                  }}
+                >
+                  {copied ? t('Copied') : t('Copy')}
+                </button>
+              </div>
+              <div style={{ display: 'grid', gap: 9, marginTop: 14 }}>
+                <Check label={t('Show test scores')} on={options.testing !== false} set={(v) => setOpt('testing', v)} />
+                <Check label={t('Show strength score')} on={options.strength !== false} set={(v) => setOpt('strength', v)} />
+                <Check label={t('Include spike and essay')} on={options.narrative === true} set={(v) => setOpt('narrative', v)} />
+              </div>
+              {!cleanShare && (
+                <p className="muted" style={{ fontSize: 13, marginTop: 12, lineHeight: 1.5 }}>
+                  {t('Free links carry a small “Made with Folio” badge.')}{' '}
+                  <Link href="/upgrade?plan=pro" className="link">{t('Pro removes it')}</Link>
+                </p>
+              )}
+            </div>
           )}
-        </div>
+          {!user && <p className="muted" style={{ fontSize: 13.5, marginTop: 10 }}>{t('Sign in to create your public link.')}</p>}
+          {err && <p className="error-text">{err}</p>}
+        </section>
       )}
 
-      {/* PDF */}
-      <Link href="/portfolio/print" className="btn btn-ghost btn-sm" style={{ marginTop: 16, width: '100%' }}>
-        📄 Download PDF (Common App preview)
-      </Link>
+      <section className="card card-pad">
+        <h2 style={{ fontSize: 19 }}>{t('PDF')}</h2>
+        <p className="muted" style={{ fontSize: 13.5, marginTop: 4, lineHeight: 1.5 }}>
+          {t('A clean, Common App–style summary for counselor meetings and scholarship applications.')}
+        </p>
+        <Link href="/portfolio/print" className="btn btn-ghost" style={{ marginTop: 14 }}>
+          <Icon name="download" size={16} /> {t('Open printable PDF')}
+        </Link>
+      </section>
 
-      {err && <p style={{ color: 'var(--bad)', fontSize: 13, marginTop: 10 }}>{err}</p>}
+      <style>{`
+        .switch{width:46px; height:26px; border-radius:999px; border:0; cursor:pointer; background:var(--line-strong); position:relative; flex-shrink:0; transition:background .2s;}
+        .switch span{position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:999px; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2);}
+        .switch.on{background:var(--good);}
+        .switch.on span{left:23px;}
+      `}</style>
     </div>
   );
 }
 
 function Check({ label, on, set }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, cursor: 'pointer', marginBottom: 0 }}>
-      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} style={{ width: 15, height: 15 }} />
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
+      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} style={{ width: 18, height: 18 }} />
       {label}
     </label>
   );

@@ -39,9 +39,15 @@ export async function POST(request) {
       );
     }
 
+    // Students return to Settings; workspace owners to workspace billing.
+    let body = {};
+    try {
+      body = await request.json();
+    } catch {}
+    const returnPath = body?.returnTo === 'settings' ? '/settings' : '/business/billing';
     const session = await stripePost('billing_portal/sessions', {
       customer: customerId,
-      return_url: `${siteOrigin(request)}/business/billing`,
+      return_url: `${siteOrigin(request)}${returnPath}`,
     });
     return NextResponse.json({ url: session.url });
   } catch (e) {

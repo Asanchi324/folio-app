@@ -2,6 +2,7 @@
 // one review per day, then the route itself says "upgrade" (server-side gate;
 // the client lock is just UX). Strict no-invented-facts JSON output.
 import { NextResponse } from 'next/server';
+import { aiLanguageName, isLang } from '@/lib/i18n-core';
 import { generate } from '@/lib/ai';
 import { enforce } from '@/lib/ratelimit';
 import { resolveAccess } from '@/lib/plan-server';
@@ -20,7 +21,7 @@ Hard rules:
 - Keep every suggestion concrete and actionable.
 - Output STRICT JSON only, matching the requested schema. No markdown.`;
 
-function buildPrompt({ essay, promptQuestion }) {
+function buildPrompt({ essay, promptQuestion, lang }) {
   return `${promptQuestion ? `ESSAY PROMPT/QUESTION: ${promptQuestion}\n\n` : ''}STUDENT'S ESSAY DRAFT:
 """
 ${essay}
@@ -47,7 +48,9 @@ Return JSON with EXACTLY this shape:
   },
   "nextDraftFocus": ["2-3 priorities for the next revision, ordered"]
 }
-Limit showDontTell to the 3 most important instances and lineEdits to 5.`;
+Limit showDontTell to the 3 most important instances and lineEdits to 5.
+
+LANGUAGE: write your explanations (verdict, assessment, issues, why, reason, whatChanged, nextDraftFocus) in ${aiLanguageName(lang)}. Quotes, suggested rewrites and the before/after paragraph stay in the language of the draft.`;
 }
 
 export async function POST(request) {
@@ -62,7 +65,7 @@ export async function POST(request) {
         ? limited.body
         : {
             error:
-              'That’s your free essay review for today. Pro includes up to 12 deep reviews a day.',
+              'You have used today’s free essay reviews. Pro includes up to 15 reviews a day.',
             upgrade: true,
           },
       { status: limited.status, headers: { 'Retry-After': String(limited.retryAfter) } }
@@ -93,7 +96,7 @@ export async function POST(request) {
   try {
     const text = await generate({
       system: SYSTEM,
-      prompt: buildPrompt({ essay, promptQuestion }),
+      prompt: buildPrompt({ essay, promptQuestion, lang: isLang(body?.lang) ? body.lang : 'en' }),
       json: true,
       cache: false, // essay drafts are personal — don't cross-serve
     });

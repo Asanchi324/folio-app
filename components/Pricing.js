@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PLANS } from '@/lib/plans';
+import { useT } from '@/lib/i18n';
 
 const CHECKS = {
   free: [
@@ -22,7 +23,7 @@ const CHECKS = {
     ['AI essay coach', 'structure, show-don’t-tell, rewrites'],
     ['AI counselor chat', 'strategy, school list, next steps'],
     ['Clean exports', 'PDF & share link without the badge'],
-    ['Priority AI limits', 'up to 12 essay reviews a day'],
+    ['Priority AI limits', 'up to 15 essay reviews a day'],
   ],
   business: [
     ['Up to 20 students', 'each gets full Pro while connected'],
@@ -47,6 +48,7 @@ export default function PricingCards({
   audience: initialAudience = 'student',
   onSelect = null,
 }) {
+  const { t } = useT();
   const [audience, setAudience] = useState(initialAudience);
   // /upgrade reads ?plan= after mount — follow the audience it resolves to.
   useEffect(() => {
@@ -102,10 +104,10 @@ export default function PricingCards({
   return (
     <div className="pr-wrap">
       {/* audience toggle */}
-      <div className="pr-toggle" role="tablist" aria-label="Pricing audience">
+      <div className="pr-toggle" role="tablist" aria-label={t('Pricing')}>
         {[
           ['student', 'For students'],
-          ['org', 'For schools & counselors'],
+          ['org', 'For schools and counselors'],
         ].map(([v, label]) => (
           <button
             key={v}
@@ -114,7 +116,7 @@ export default function PricingCards({
             className={`pr-tab${audience === v ? ' on' : ''}`}
             onClick={() => setAudience(v)}
           >
-            {label}
+            {t(label)}
           </button>
         ))}
       </div>
@@ -122,17 +124,17 @@ export default function PricingCards({
       <div className="pr-grid" key={audience}>
         {cards.map(({ plan, checks, cta, badge, featured }) => (
           <div key={plan.id} className={`pr-card${featured ? ' featured' : ''} fade-in`}>
-            {badge && <span className="pr-badge">{badge}</span>}
+            {badge && <span className="pr-badge">{t(badge)}</span>}
             <div className="pr-head">
               <h3 style={{ fontSize: 18, letterSpacing: '-0.01em' }}>{plan.name}</h3>
-              <p className="muted" style={{ fontSize: 13.5, marginTop: 4, lineHeight: 1.5 }}>{plan.tagline}</p>
+              <p className="muted" style={{ fontSize: 13.5, marginTop: 4, lineHeight: 1.5 }}>{t(plan.tagline)}</p>
             </div>
             <div className="pr-price">
               <span className="pr-amount">{plan.price.label}</span>
               <span className="pr-period">
-                {plan.price.period}
+                {t(plan.price.period)}
                 <br />
-                <span className="pr-note">{plan.price.note}</span>
+                <span className="pr-note">{t(plan.price.note)}</span>
               </span>
             </div>
 
@@ -145,8 +147,8 @@ export default function PricingCards({
                 <li key={title}>
                   <span className="pr-tick" aria-hidden>✓</span>
                   <span>
-                    <b>{title}</b>
-                    {sub && <span className="pr-sub"> — {sub}</span>}
+                    <b>{t(title)}</b>
+                    {sub && <span className="pr-sub"> — {t(sub)}</span>}
                   </span>
                 </li>
               ))}
@@ -158,16 +160,15 @@ export default function PricingCards({
       <style>{`
         .pr-wrap{margin-top:40px;}
         .pr-toggle{
-          display:flex; gap:4px; padding:4px; border-radius:999px;
+          display:flex; gap:4px; padding:4px; border-radius:var(--r);
           background:var(--surface); border:1px solid var(--line);
           width:max-content; max-width:100%; margin:0 auto 30px;
-          box-shadow:var(--shadow-sm);
         }
         .pr-tab{
           border:none; background:transparent; cursor:pointer;
           font-family:var(--sans); font-size:14px; font-weight:600;
-          color:var(--muted); padding:9px 20px; border-radius:999px;
-          transition:background .18s ease, color .18s ease; white-space:nowrap;
+          color:var(--muted); padding:8px 18px; border-radius:var(--r-sm);
+          transition:background .18s ease, color .18s ease;
         }
         .pr-tab.on{background:var(--ink); color:#fff;}
         .pr-grid{
@@ -180,20 +181,12 @@ export default function PricingCards({
           border-radius:var(--r-lg); padding:30px 28px;
           transition:transform .18s ease, box-shadow .18s ease;
         }
-        .pr-card:hover{transform:translateY(-3px); box-shadow:var(--shadow);}
-        .pr-card.featured{
-          border-color:transparent;
-          background:
-            linear-gradient(var(--surface), var(--surface)) padding-box,
-            linear-gradient(135deg, var(--accent), #e3b341 45%, var(--primary)) border-box;
-          border:1.5px solid transparent;
-          box-shadow:0 14px 44px rgba(192,138,45,0.16);
-        }
+        
+        .pr-card.featured{border:1.5px solid var(--ink);}
         .pr-badge{
           position:absolute; top:-13px; left:26px;
-          background:var(--ink); color:#fff; font-size:11px; font-weight:700;
-          letter-spacing:0.06em; text-transform:uppercase; padding:5px 13px;
-          border-radius:999px; white-space:nowrap;
+          background:var(--ink); color:#fff; font-size:12px; font-weight:600;
+          padding:3px 10px; border-radius:6px; white-space:nowrap;
         }
         .pr-head{min-height:74px;}
         .pr-price{display:flex; align-items:center; gap:10px; margin-top:16px;}
@@ -218,9 +211,9 @@ export default function PricingCards({
           display:flex; align-items:center; justify-content:center;
           font-size:11px; font-weight:800; margin-top:2px;
         }
-        .pr-card.featured .pr-tick{background:var(--accent-tint); color:#8a611a;}
+        
         @media (max-width:760px){
-          .pr-grid{grid-template-columns:1fr; max-width:430px;}
+          .pr-grid{grid-template-columns:minmax(0,1fr); max-width:430px;}
           .pr-head{min-height:0;}
           .pr-toggle{width:100%;}
           .pr-tab{flex:1; text-align:center; padding:9px 10px;}
@@ -231,24 +224,25 @@ export default function PricingCards({
 }
 
 function PlanCta({ cta, featured, onSelect }) {
+  const { t } = useT();
   const cls = featured ? 'btn btn-gold' : 'btn btn-ghost';
   if (cta.disabled) {
     return (
       <span className="btn btn-ghost" style={{ opacity: 0.55, cursor: 'default' }}>
-        {cta.label}
+        {t(cta.label)}
       </span>
     );
   }
   if (onSelect && cta.plan) {
     return (
       <button className={cls} onClick={() => onSelect(cta.plan)}>
-        {cta.label}
+        {t(cta.label)}
       </button>
     );
   }
   return (
     <Link href={cta.href} className={cls}>
-      {cta.label}
+      {t(cta.label)}
     </Link>
   );
 }

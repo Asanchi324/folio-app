@@ -4,11 +4,12 @@
 import { NextResponse } from 'next/server';
 import { generate } from '@/lib/ai';
 import { enforce } from '@/lib/ratelimit';
-import { profileBreakdown } from '@/lib/profile';
+import { profileBreakdown, gradeActivityHeuristic, gradeHonor } from '@/lib/profile';
 import { selectCompetitions } from '@/lib/competitions';
 import { reviewSnapshot } from '@/lib/review-input';
 import { resolveAccess } from '@/lib/plan-server';
 import { aiLimitsFor } from '@/lib/plans';
+import { aiLanguageName, isLang } from '@/lib/i18n-core';
 
 export const runtime = 'nodejs';
 
@@ -20,12 +21,18 @@ Rules:
 - When recommending competitions, prefer ones from the provided catalog and reference them by name.
 - For Extracurriculars and Honors, give the student real choice: 2–3 concrete, varied ideas (different competitions, projects or roles) inside that area's items list, not a single suggestion.
 - Calibrate to reality: a strong profile is still a reach at single-digit-acceptance schools.
+- Grade every extracurricular on the admissions tier rubric. Judge the EVIDENCE in the text, not the title: a "President" with no described outcome is not Tier 1. Rubric (score 0-100):
+  Tier 1 (85-100): rare distinction — national/international recognition, founded something with large measurable reach, published research, elite selective program.
+  Tier 2 (65-84): significant leadership or impact beyond school — regional/national results, sustained initiative with concrete numbers.
+  Tier 3 (40-64): solid commitment and some leadership inside school/community; limited evidence of impact.
+  Tier 4 (0-39): participation or membership; vague, no outcomes, or minimal time.
+  A vague one-line description can never exceed 40, whatever the role.
 - The portfolio in the prompt is the COMPLETE and CURRENT profile, and your only source of truth. If an activity, award, score or essay is not listed there, it does not exist — never mention, assume or "remember" one. Do not carry over anything from any earlier review.
 - Judge only what is present: an empty or missing section means that section is EMPTY, and the honest advice is to build it — not to comment on content you imagine was there.
 - Group recommendations by area: emit AT MOST ONE block per area (Testing, Academics, Extracurriculars, Honors, Narrative). NEVER output two blocks for the same area — consolidate every point for that area into its "items" list. Skip areas that genuinely need no action.
 - Output STRICT JSON only, matching the requested schema. No markdown, no commentary outside JSON.`;
 
-function buildPrompt(portfolio, breakdown) {
+function buildPrompt(portfolio, breakdown, lang) {
   // Only a relevant slice of the catalog goes into the prompt — keeps the
   // context small and on-topic even as the full catalog grows.
   const catalog = selectCompetitions(portfolio, 16)
@@ -51,6 +58,10 @@ Review THIS profile only.
 ${JSON.stringify(portfolio, null, 2)}
 
 INVENTORY (counts are exact): ${inventory}
+
+RUBRIC PRE-SCORES (deterministic keyword rubric — use as an anchor; adjust when the text clearly supports it):
+${portfolio.activities.map((a, i) => `  activity #${i}: ${gradeActivityHeuristic(a).score}/100`).join('\n') || '  (no activities)'}
+${portfolio.honors.map((h, i) => `  honor #${i}: ${gradeHonor(h).score}/100`).join('\n') || '  (no honors)'}
 
 COMPUTED PROFILE STRENGTH: ${breakdown.strength}/100
 PILLAR SCORES: ${breakdown.pillars.map((p) => `${p.label} ${p.score}/100`).join(', ')}
@@ -79,8 +90,14 @@ Return JSON with EXACTLY this shape:
       ]
     }
   ],
-  "nextSemester": ["3-5 specific things to do in the next 3-6 months, ordered by impact"]
-}`;
+  "nextSemester": ["3-5 specific things to do in the next 3-6 months, ordered by impact"],
+  "activityGrades": [
+    { "index": 0, "score": 0-100, "reason": "one sentence: what this activity proves (or fails to prove) to a reader", "improve": "one concrete way to move it up a tier" }
+  ]
+}
+"activityGrades" must contain exactly one entry per listed activity, in order (index 0 = first activity). Empty array if there are no activities.
+
+LANGUAGE: write every human-readable string value in ${aiLanguageName(lang)}. Keep JSON keys, the "area" and "priority" and "overallTier" values in English exactly as specified, and keep competition names as in the catalog.`;
 }
 
 export async function POST(request) {
@@ -112,11 +129,12 @@ export async function POST(request) {
   // what guarantees none of it reaches the model.
   const portfolio = reviewSnapshot(raw);
   const breakdown = profileBreakdown(portfolio);
+  const lang = isLang(body?.lang) ? body.lang : 'en';
 
   try {
     const text = await generate({
       system: SYSTEM,
-      prompt: buildPrompt(portfolio, breakdown),
+      prompt: buildPrompt(portfolio, breakdown, lang),
       json: true,
       // An explicit re-run ("refresh my review") must actually re-generate,
       // not replay the cached answer for the same profile.
@@ -131,6 +149,23 @@ export async function POST(request) {
       data = m ? JSON.parse(m[0]) : null;
     }
     if (!data) throw new Error('Could not parse AI response');
+
+    // Normalise activity grades: one per activity, clamped to within ±25 of the
+    // rubric anchor so a single over-generous model run can't turn a club
+    // membership into a Tier 1 activity (or sink a real one).
+    const raw_ = Array.isArray(data.activityGrades) ? data.activityGrades : [];
+    data.activityGrades = portfolio.activities.map((a, i) => {
+      const g = raw_.find((x) => Number(x?.index) === i) || raw_[i] || null;
+      const anchor = gradeActivityHeuristic(a).score;
+      const score = Number(g?.score);
+      if (!g || !Number.isFinite(score)) return null;
+      return {
+        index: i,
+        score: Math.round(Math.max(anchor - 25, Math.min(anchor + 25, Math.max(0, Math.min(100, score))))),
+        reason: String(g.reason || '').slice(0, 300),
+        improve: String(g.improve || '').slice(0, 300),
+      };
+    });
     return NextResponse.json({ feedback: data, breakdown });
   } catch (e) {
     console.error('[feedback]', e?.message);

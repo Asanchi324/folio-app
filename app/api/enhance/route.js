@@ -6,6 +6,7 @@ import { generate } from '@/lib/ai';
 import { enforce } from '@/lib/ratelimit';
 import { resolveAccess } from '@/lib/plan-server';
 import { aiLimitsFor } from '@/lib/plans';
+import { aiLanguageName, isLang } from '@/lib/i18n-core';
 
 export const runtime = 'nodejs';
 
@@ -38,15 +39,19 @@ export async function POST(request) {
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const { text, role, organization, kind } = body || {};
-  if (!text || !String(text).trim()) {
+  const text = String(body?.text || '').trim().slice(0, 1500);
+  const role = String(body?.role || '').slice(0, 150);
+  const organization = String(body?.organization || '').slice(0, 150);
+  const kind = body?.kind === 'honor' ? 'honor' : 'activity';
+  const lang = isLang(body?.lang) ? body.lang : 'en';
+  if (!text) {
     return NextResponse.json({ error: 'Nothing to enhance' }, { status: 400 });
   }
 
   const prompt = `Entry type: ${kind || 'activity'}
 Role/title: ${role || '(none)'}
 Organization: ${organization || '(none)'}
-Student's draft: "${text}"
+Student's draft: "${text.replace(/"/g, "'")}"
 
 Return JSON with EXACTLY this shape:
 {
@@ -56,7 +61,9 @@ Return JSON with EXACTLY this shape:
     { "label": "Concise", "text": "rewritten ~150 char description" }
   ],
   "tip": "one sentence on what would make this entry even stronger (e.g. add a metric)"
-}`;
+}
+
+The variants stay in ENGLISH (applications are submitted in English). Write the "tip" in ${aiLanguageName(lang)}.`;
 
   try {
     const out = await generate({ system: SYSTEM, prompt, json: true });

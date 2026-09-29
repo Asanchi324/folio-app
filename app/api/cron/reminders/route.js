@@ -18,8 +18,9 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 export async function GET(request) {
+  // Fail closed: without CRON_SECRET nobody may trigger the job.
   const secret = process.env.CRON_SECRET;
-  if (secret && request.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
