@@ -192,7 +192,7 @@ export function FeedbackVisual() {
         <div className="lv-note">
           <Icon name="spark" size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
           <span>
-            {t('Say what changed because of you: “Cut wait times by 30% by building a volunteer schedule” reads as Tier 2, not Tier 3.')}
+            {t('Add a result — “cut wait times by 30%” — and it becomes Tier 2.')}
           </span>
         </div>
       </div>

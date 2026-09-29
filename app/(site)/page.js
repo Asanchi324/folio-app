@@ -42,7 +42,7 @@ export default async function Landing() {
           <div className="lp-head lp-center">
             <p className="eyebrow">{t('Pricing')}</p>
             <h2>{t('Start free. Go further with Pro.')}</h2>
-            <p>{t('The portfolio, the feedback, the daily plan and your chances are free. Pro unlocks the essay coach, the AI counselor and clean exports.')}</p>
+            <p>{t('Pro adds the essay coach and the AI counselor.')}</p>
           </div>
           <PricingCards />
         </div>
@@ -100,28 +100,28 @@ function Steps({ t }) {
       n: '01',
       tag: t('Build'),
       title: t('Everything that makes you stand out, in one portfolio'),
-      body: t('Grades, tests, activities, honors and essays — in the order the Common App asks for them. Guided, so nothing important is left out.'),
+      body: t('Grades, tests, activities and essays — in Common App order.'),
       visual: <BuildVisual />,
     },
     {
       n: '02',
       tag: t('Get feedback'),
       title: t('Personal feedback on every part'),
-      body: t('Each activity gets a grade and a concrete way to make it stronger. Your profile gets a clear score across academics, testing, activities, honors and essays.'),
+      body: t('A grade for every activity and a concrete way to improve it.'),
       visual: <FeedbackVisual />,
     },
     {
       n: '03',
       tag: t('Follow the plan'),
       title: t('A plan that moves you forward every day'),
-      body: t('Three small tasks a day, picked from your weakest spots. They tick themselves off as your portfolio grows — and your streak keeps you going.'),
+      body: t('Three small tasks a day, picked from your weakest spots.'),
       visual: <PlanVisual />,
     },
     {
       n: '04',
       tag: t('Apply'),
       title: t('Apply with a list you can trust'),
-      body: t('Your chances at 800+ universities, ranked and filterable — Top 20, Top 50, Top 100. Build a balanced list of reaches, targets and safeties.'),
+      body: t('Your chances at 800+ universities — from Top 20 to safeties.'),
       visual: <ApplyVisual />,
     },
   ];
@@ -131,7 +131,7 @@ function Steps({ t }) {
         <div className="lp-head lp-center">
           <p className="eyebrow">{t('How it works')}</p>
           <h2>{t('From first draft to acceptance letter')}</h2>
-          <p>{t('Four steps, one portfolio. Change something once and everything — feedback, plan and chances — updates with it.')}</p>
+          <p>{t('Four steps, one portfolio.')}</p>
         </div>
         <div className="lp-steps">
           {steps.map((s, i) => (
@@ -154,12 +154,12 @@ function Steps({ t }) {
 
 function Product({ t }) {
   const features = [
-    ['gauge', t('Profile score'), t('A clear score for your whole profile and each of its parts.')],
-    ['university', t('University chances'), t('800+ schools with real admission data, ranked and filterable.')],
-    ['compass', t('Opportunities'), t('Olympiads, research programs and scholarships that fit your profile.')],
-    ['pen', t('Essay coach'), t('Structure, show-don’t-tell and line edits for your personal statement.')],
-    ['chat', t('AI counselor'), t('Strategy questions about your own profile, answered in your language.')],
-    ['calendar', t('Deadlines'), t('Every round and program deadline in one countdown.')],
+    ['gauge', t('Profile score'), t('Scored part by part.')],
+    ['university', t('University chances'), t('800+ schools, real admission data.')],
+    ['compass', t('Opportunities'), t('Olympiads, programs, scholarships.')],
+    ['pen', t('Essay coach'), t('Edits for your personal statement.')],
+    ['chat', t('AI counselor'), t('Strategy advice in your language.')],
+    ['calendar', t('Deadlines'), t('Every deadline in one countdown.')],
   ];
   return (
     <section className="section lp-band">
@@ -168,7 +168,7 @@ function Product({ t }) {
           <p className="eyebrow">{t('Progress')}</p>
           <h2 className="lp-h2">{t('Watch your profile grow')}</h2>
           <p className="lp-lead" style={{ fontSize: 16.5 }}>
-            {t('See your strength climb week by week and compare it with the ideal portfolio for the schools you want — built from their real admission data.')}
+            {t('Track your growth and compare it with the ideal portfolio for your schools.')}
           </p>
           <Reveal stagger className="lp-feats">
             {features.map(([icon, title, body]) => (
@@ -192,9 +192,9 @@ function Product({ t }) {
 
 function Schools({ t }) {
   const points = [
-    t('Add students by email or with one invite code'),
+    t('Add students by email or code'),
     t('Split the cohort between counselors'),
-    t('Analytics: strength trend, test readiness, balanced lists'),
+    t('Cohort analytics'),
     t('Every connected student gets Pro'),
   ];
   return (
@@ -204,7 +204,7 @@ function Schools({ t }) {
           <p className="eyebrow">{t('For schools and counselors')}</p>
           <h2 className="lp-h2">{t('Lead the whole cohort from one workspace')}</h2>
           <p className="lp-lead" style={{ fontSize: 16.5 }}>
-            {t('Students build their own portfolios; you see who is growing, who went quiet and what to talk about next.')}
+            {t('See who is growing, who went quiet and what to discuss next.')}
           </p>
           <Reveal as="ul" stagger className="lp-checks">
             {points.map((p) => (
@@ -262,7 +262,7 @@ function FinalCta({ t }) {
         <Reveal className="lp-final">
           <h2 className="lp-h2">{t('Your application starts today')}</h2>
           <p className="lp-lead" style={{ marginInline: 'auto' }}>
-            {t('Ten minutes to fill in the basics — then your score, your plan and your chances are waiting.')}
+            {t('Ten minutes — and your score, plan and chances are ready.')}
           </p>
           <div className="lp-ctas" style={{ justifyContent: 'center' }}>
             <Link href="/start" className="btn lp-cta-light">
