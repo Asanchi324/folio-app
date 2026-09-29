@@ -16,14 +16,18 @@ import Icon from '@/components/Icon';
 
 export default function StudentsPage() {
   const { t } = useT();
-  const { org, students, rows, rowsReady, paid, seatLimit, invites } = useWorkspace();
+  const { org, students, rows, rowsReady, paid, seatLimit, invites, staff, user } = useWorkspace();
   const [q, setQ] = useState('');
+  const [who, setWho] = useState('all');
   const [sort, setSort] = useState('attention');
   const [adding, setAdding] = useState(false);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     let arr = rows;
+    if (who === 'mine') arr = arr.filter((r) => r.counselorUid === user?.uid);
+    else if (who === 'none') arr = arr.filter((r) => !r.counselorUid);
+    else if (who !== 'all') arr = arr.filter((r) => r.counselorUid === who);
     if (needle) {
       arr = arr.filter(
         (r) =>
@@ -41,10 +45,10 @@ export default function StudentsPage() {
       arr.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     }
     return arr;
-  }, [rows, q, sort]);
+  }, [rows, q, sort, who, user?.uid]);
 
   function exportCsv() {
-    const blob = new Blob([rosterCsv(filtered)], { type: 'text/csv' });
+    const blob = new Blob([rosterCsv(filtered, staff)], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `folio-cohort-${new Date().toISOString().slice(0, 10)}.csv`;
@@ -89,6 +93,18 @@ export default function StudentsPage() {
           style={{ flex: '1 1 220px', maxWidth: 360 }}
           aria-label={t('Search students')}
         />
+        {staff.length > 1 && (
+          <select value={who} onChange={(e) => setWho(e.target.value)} style={{ width: 'auto' }} aria-label={t('Counselor')}>
+            <option value="all">{t('All students')}</option>
+            <option value="mine">{t('My students')}</option>
+            <option value="none">{t('Unassigned')}</option>
+            {staff
+              .filter((m) => m.uid !== user?.uid)
+              .map((m) => (
+                <option key={m.uid} value={m.uid}>{m.displayName || m.email}</option>
+              ))}
+          </select>
+        )}
         <select value={sort} onChange={(e) => setSort(e.target.value)} style={{ width: 'auto' }} aria-label={t('Sort')}>
           <option value="attention">{t('Needs attention first')}</option>
           <option value="strength">{t('By strength')}</option>
@@ -114,7 +130,7 @@ export default function StudentsPage() {
           <p className="muted" style={{ fontSize: 14 }}>{t('No students match “{q}”.', { q })}</p>
         )}
         {filtered.map((r) => (
-          <StudentRow key={r.uid} r={r} org={org} />
+          <StudentRow key={r.uid} r={r} org={org} counselor={staff.length > 1 ? staff.find((m) => m.uid === r.counselorUid) || null : undefined} />
         ))}
       </div>
     </>
@@ -249,7 +265,7 @@ const FLAG_TEXT = {
   major: 'No intended major',
 };
 
-function StudentRow({ r, org }) {
+function StudentRow({ r, org, counselor }) {
   const { t, locale } = useT();
   const { isAdmin } = useWorkspace();
   const [confirm, setConfirm] = useState(false);
@@ -265,7 +281,13 @@ function StudentRow({ r, org }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 15 }}>{name}</div>
           <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-            {[s.grade && (s.grade === 'gap' ? t('Gap year') : t('Grade {n}', { n: s.grade })), s.major, t('active {date}', { date: lastActive })]
+            {[
+              s.grade && (s.grade === 'gap' ? t('Gap year') : t('Grade {n}', { n: s.grade })),
+              s.major,
+              r.sat && `SAT ${r.sat}`,
+              counselor !== undefined && (counselor ? `→ ${counselor.displayName || counselor.email}` : t('Unassigned')),
+              t('active {date}', { date: lastActive }),
+            ]
               .filter(Boolean)
               .join(' · ')}
           </div>

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "stripe:setup": "node scripts/stripe-setup.mjs",
-    "i18n:check": "node scripts/i18n-check.mjs"
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "data:universities": "node scripts/import-scorecard.mjs",
+    "data:opportunities": "node scripts/import-opportunities.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",

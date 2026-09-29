@@ -2,8 +2,16 @@ import Link from 'next/link';
 import PricingCards from '@/components/Pricing';
 import Icon from '@/components/Icon';
 import { Reveal } from '@/components/Motion';
-import { UNIVERSITIES } from '@/lib/universities';
-import { COMPETITIONS } from '@/lib/competitions';
+import {
+  HeroVisual,
+  BuildVisual,
+  FeedbackVisual,
+  PlanVisual,
+  ApplyVisual,
+  ProgressVisual,
+  SchoolVisual,
+  LV_CSS,
+} from '@/components/LandingVisuals';
 import { getT } from '@/lib/i18n-server';
 
 // Landing — server component. Two audiences, one page: students (→ /start)
@@ -13,9 +21,9 @@ import { getT } from '@/lib/i18n-server';
 export async function generateMetadata() {
   const { t } = await getT();
   return {
-    title: { absolute: t('Folio — admissions portfolio, honest AI review and real chances') },
+    title: { absolute: t('Folio — build your portfolio, get feedback, get in') },
     description: t(
-      'Build a Common App–style portfolio, get an honest AI review of every activity, see realistic admission odds for 100+ universities, and find olympiads and programs worth your time.'
+      'Folio turns your grades, tests, activities and essays into one admissions portfolio, gives personal feedback on every part, builds a daily plan and shows your chances at 800+ universities.'
     ),
     alternates: { canonical: '/' },
   };
@@ -26,15 +34,15 @@ export default async function Landing() {
   return (
     <>
       <Hero t={t} />
-      <Facts t={t} />
-      <Grading t={t} />
+      <Steps t={t} />
       <Product t={t} />
       <Schools t={t} />
       <section className="section lp-band" id="pricing">
         <div className="wrap">
-          <div className="lp-head">
-            <h2>{t('Pricing')}</h2>
-            <p>{t('The builder, the assessment and your admission odds are free. Pay only for the deeper AI tools or a school workspace.')}</p>
+          <div className="lp-head lp-center">
+            <p className="eyebrow">{t('Pricing')}</p>
+            <h2>{t('Start free. Go further with Pro.')}</h2>
+            <p>{t('The portfolio, the feedback, the daily plan and your chances are free. Pro unlocks the essay coach, the AI counselor and clean exports.')}</p>
           </div>
           <PricingCards />
         </div>
@@ -42,6 +50,7 @@ export default async function Landing() {
       <FAQ t={t} />
       <FinalCta t={t} />
       <style>{CSS}</style>
+      <style>{LV_CSS}</style>
     </>
   );
 }
@@ -51,121 +60,93 @@ export default async function Landing() {
 function Hero({ t }) {
   return (
     <section className="lp-hero">
+      <div className="lp-hero-bg" aria-hidden />
       <div className="wrap lp-hero-grid">
         <div className="stagger">
-          <p className="eyebrow">{t('For students applying to universities abroad')}</p>
-          <h1 className="lp-h1">{t('Know exactly where you stand. Then close the gap.')}</h1>
+          <p className="eyebrow">{t('Your path to a top university')}</p>
+          <h1 className="lp-h1">
+            {t('Build your portfolio.')} <span className="lp-grad">{t('Get in.')}</span>
+          </h1>
           <p className="lp-lead">
-            {t('Folio turns your grades, tests, activities and awards into a Common App–style portfolio, grades each part the way an admissions reader would, and shows your real odds at 100+ universities.')}
+            {t('Collect everything that makes you a strong applicant in one place, get personal feedback on every part, follow a plan made for you — and apply knowing your chances.')}
           </p>
           <div className="lp-ctas">
-            <Link href="/start" className="btn btn-primary">
-              {t('Build my portfolio — free')}
+            <Link href="/start" className="btn btn-primary lp-cta-main">
+              {t('Start for free')} <span aria-hidden>→</span>
             </Link>
             <Link href="/start?type=business" className="btn btn-ghost">
               {t('I am a school or counselor')}
             </Link>
           </div>
-          <p className="lp-small">{t('No card needed · English, Russian and Kazakh')}</p>
-        </div>
-
-        <div className="lp-panel lp-panel-in" aria-hidden>
-          <div className="lp-panel-head">
-            <span>{t('Assessment')}</span>
-            <span className="muted">Aisha K. · 11</span>
-          </div>
-          <div className="lp-panel-body stagger">
-            <div className="lp-row">
-              <span className="pill band-target">{t('Tier {n}', { n: 2 })}</span>
-              <span className="lp-row-main">
-                <b>{t('Founder, coding club for rural schools')}</b>
-                <small>{t('400 students reached · 3 years · national reach')}</small>
+          <div className="lp-steps-mini">
+            {[t('Build'), t('Get feedback'), t('Follow the plan'), t('Apply')].map((x, i) => (
+              <span key={x}>
+                <i>{i + 1}</i> {x}
               </span>
-              <span className="lp-score">82</span>
-            </div>
-            <div className="lp-row">
-              <span className="pill band-hard-reach">{t('Tier {n}', { n: 4 })}</span>
-              <span className="lp-row-main">
-                <b>{t('Member, chess club')}</b>
-                <small>{t('No leadership or results described')}</small>
-              </span>
-              <span className="lp-score">6</span>
-            </div>
-            <div className="lp-divider" />
-            {[
-              ['MIT', 4.1, 'band-hard-reach'],
-              ['University of Toronto', 38, 'band-target'],
-              ['University of Michigan', 21, 'band-reach'],
-            ].map(([n, v, band]) => (
-              <div className="lp-odds" key={n}>
-                <span>{n}</span>
-                <span className="bar lp-bar">
-                  <span className={band} style={{ width: `${Math.max(4, v)}%` }} />
-                </span>
-                <b>{v}%</b>
-              </div>
             ))}
           </div>
         </div>
+        <HeroVisual />
       </div>
     </section>
   );
 }
 
-function Facts({ t }) {
-  const items = [
-    [`${UNIVERSITIES.length}+`, t('universities with real acceptance data')],
-    [`${COMPETITIONS.length}+`, t('olympiads, programs and scholarships')],
-    ['3', t('languages: English, Russian, Kazakh')],
-    ['0 ₸', t('to build and assess your portfolio')],
-  ];
-  return (
-    <div className="lp-facts">
-      <Reveal stagger className="wrap lp-facts-grid">
-        {items.map(([n, label]) => (
-          <div key={label}>
-            <div className="lp-fact-n">{n}</div>
-            <div className="lp-fact-l">{label}</div>
-          </div>
-        ))}
-      </Reveal>
-    </div>
-  );
-}
+/* ----------------------------------------------------------------- steps */
 
-/* --------------------------------------------------------------- grading */
-
-function Grading({ t }) {
-  const cols = [
+function Steps({ t }) {
+  const steps = [
     {
-      title: t('Every activity is graded, not counted'),
-      body: t('Role, reach, measurable results and hours decide the tier. “Member of a club” and “founded a project that reached 400 students” land in different places — ten weak activities do not beat three strong ones.'),
+      n: '01',
+      tag: t('Build'),
+      title: t('Everything that makes you stand out, in one portfolio'),
+      body: t('Grades, tests, activities, honors and essays — in the order the Common App asks for them. Guided, so nothing important is left out.'),
+      visual: <BuildVisual />,
     },
     {
-      title: t('Test scores count at their real weight'),
-      body: t('A 1550 SAT is around the 99th percentile; a 1200 is around the 75th. Folio scores them that far apart, and compares them to each university’s admitted range.'),
+      n: '02',
+      tag: t('Get feedback'),
+      title: t('Personal feedback on every part'),
+      body: t('Each activity gets a grade and a concrete way to make it stronger. Your profile gets a clear score across academics, testing, activities, honors and essays.'),
+      visual: <FeedbackVisual />,
     },
     {
-      title: t('Odds against each school’s admitted class'),
-      body: t('Each estimate starts from the school’s real acceptance rate and shows its reasoning. The most selective schools are capped, because past a point admission is unpredictable.'),
+      n: '03',
+      tag: t('Follow the plan'),
+      title: t('A plan that moves you forward every day'),
+      body: t('Three small tasks a day, picked from your weakest spots. They tick themselves off as your portfolio grows — and your streak keeps you going.'),
+      visual: <PlanVisual />,
+    },
+    {
+      n: '04',
+      tag: t('Apply'),
+      title: t('Apply with a list you can trust'),
+      body: t('Your chances at 800+ universities, ranked and filterable — Top 20, Top 50, Top 100. Build a balanced list of reaches, targets and safeties.'),
+      visual: <ApplyVisual />,
     },
   ];
   return (
     <section className="section" id="product">
       <div className="wrap">
-        <div className="lp-head">
-          <h2>{t('An honest assessment, not a pep talk')}</h2>
-          <p>{t('Most tools tell every student they are doing great. Folio tells you what an admissions reader would see — and what would change it.')}</p>
+        <div className="lp-head lp-center">
+          <p className="eyebrow">{t('How it works')}</p>
+          <h2>{t('From first draft to acceptance letter')}</h2>
+          <p>{t('Four steps, one portfolio. Change something once and everything — feedback, plan and chances — updates with it.')}</p>
         </div>
-        <Reveal stagger className="lp-cols">
-          {cols.map((c, i) => (
-            <div key={c.title} className="lp-col">
-              <span className="lp-num">0{i + 1}</span>
-              <h3>{c.title}</h3>
-              <p>{c.body}</p>
+        <div className="lp-steps">
+          {steps.map((s, i) => (
+            <div key={s.n} className={`lp-step${i % 2 ? ' flip' : ''}`}>
+              <Reveal className="lp-step-copy">
+                <span className="lp-step-n">
+                  {s.n} · {s.tag}
+                </span>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </Reveal>
+              <div className="lp-step-visual">{s.visual}</div>
             </div>
           ))}
-        </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -173,33 +154,37 @@ function Grading({ t }) {
 
 function Product({ t }) {
   const features = [
-    ['portfolio', t('Portfolio builder'), t('Academics, tests, up to 10 activities and 5 honors, in the order the Common App asks for them.')],
-    ['gauge', t('Assessment'), t('Profile strength, a tier for every activity, and an AI review with specific next steps.')],
-    ['university', t('Universities'), t('Your odds at 100+ schools in the US, UK and Canada, with the reasoning behind each number.')],
-    ['compass', t('Opportunities'), t('Olympiads, research programs and scholarships matched to your profile, with deadlines.')],
-    ['pen', t('Essay coach'), t('Structure, show-don’t-tell and line edits for your personal statement. It never invents facts.')],
-    ['chat', t('AI counselor'), t('Ask strategy questions about your own profile: school list, summer plans, early decision.')],
-    ['calendar', t('Deadlines'), t('Application rounds for your list and tracked programs in one countdown.')],
-    ['share', t('Share & PDF'), t('A public page you control and a clean PDF for counselors and scholarship committees.')],
+    ['gauge', t('Profile score'), t('A clear score for your whole profile and each of its parts.')],
+    ['university', t('University chances'), t('800+ schools with real admission data, ranked and filterable.')],
+    ['compass', t('Opportunities'), t('Olympiads, research programs and scholarships that fit your profile.')],
+    ['pen', t('Essay coach'), t('Structure, show-don’t-tell and line edits for your personal statement.')],
+    ['chat', t('AI counselor'), t('Strategy questions about your own profile, answered in your language.')],
+    ['calendar', t('Deadlines'), t('Every round and program deadline in one countdown.')],
   ];
   return (
     <section className="section lp-band">
-      <div className="wrap">
-        <div className="lp-head">
-          <h2>{t('Everything in one place')}</h2>
-          <p>{t('Eight tools that share one portfolio — change something once and every part updates.')}</p>
-        </div>
-        <Reveal stagger className="lp-feats">
-          {features.map(([icon, title, body]) => (
-            <div key={title} className="lp-feat">
-              <Icon name={icon} size={20} style={{ color: 'var(--primary-600)' }} />
-              <div>
-                <h3>{title}</h3>
-                <p>{body}</p>
+      <div className="wrap lp-prog">
+        <div>
+          <p className="eyebrow">{t('Progress')}</p>
+          <h2 className="lp-h2">{t('Watch your profile grow')}</h2>
+          <p className="lp-lead" style={{ fontSize: 16.5 }}>
+            {t('See your strength climb week by week and compare it with the ideal portfolio for the schools you want — built from their real admission data.')}
+          </p>
+          <Reveal stagger className="lp-feats">
+            {features.map(([icon, title, body]) => (
+              <div key={title} className="lp-feat">
+                <span className="lp-feat-ic">
+                  <Icon name={icon} size={18} />
+                </span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </Reveal>
+            ))}
+          </Reveal>
+        </div>
+        <ProgressVisual />
       </div>
     </section>
   );
@@ -208,10 +193,8 @@ function Product({ t }) {
 function Schools({ t }) {
   const points = [
     t('Add students by email or with one invite code'),
-    t('See every portfolio, its strength and its gaps on one roster'),
-    t('Leave comments students see right in their portfolio'),
-    t('Cohort analytics and CSV export for parents’ meetings'),
-    t('Your school’s name on shared portfolios and PDFs'),
+    t('Split the cohort between counselors'),
+    t('Analytics: strength trend, test readiness, balanced lists'),
     t('Every connected student gets Pro'),
   ];
   return (
@@ -219,10 +202,18 @@ function Schools({ t }) {
       <div className="wrap lp-schools">
         <div>
           <p className="eyebrow">{t('For schools and counselors')}</p>
-          <h2 className="lp-h2">{t('Follow the whole cohort without chasing spreadsheets')}</h2>
+          <h2 className="lp-h2">{t('Lead the whole cohort from one workspace')}</h2>
           <p className="lp-lead" style={{ fontSize: 16.5 }}>
-            {t('A workspace for school counselors and admissions consultants. Students keep building their own portfolios; you see progress, gaps and deadlines in one place.')}
+            {t('Students build their own portfolios; you see who is growing, who went quiet and what to talk about next.')}
           </p>
+          <Reveal as="ul" stagger className="lp-checks">
+            {points.map((p) => (
+              <li key={p}>
+                <Icon name="check" size={17} style={{ color: 'var(--primary)', marginTop: 2 }} />
+                <span>{p}</span>
+              </li>
+            ))}
+          </Reveal>
           <div className="lp-ctas">
             <Link href="/start?type=business" className="btn btn-primary">
               {t('Create a workspace')}
@@ -230,14 +221,7 @@ function Schools({ t }) {
             <span className="muted" style={{ fontSize: 14 }}>{t('Try it with 3 students for free')}</span>
           </div>
         </div>
-        <Reveal as="ul" stagger className="lp-checks">
-          {points.map((p) => (
-            <li key={p}>
-              <Icon name="check" size={18} style={{ color: 'var(--good)', marginTop: 2 }} />
-              <span>{p}</span>
-            </li>
-          ))}
-        </Reveal>
+        <SchoolVisual />
       </div>
     </section>
   );
@@ -245,8 +229,8 @@ function Schools({ t }) {
 
 function FAQ({ t }) {
   const qa = [
-    [t('Is Folio really free?'), t('Yes. The portfolio builder, the assessment, admission odds, the opportunities database and a daily AI review are free. Pro adds the essay coach, the AI counselor and clean exports.')],
-    [t('How accurate are the admission odds?'), t('They are estimates built from each university’s published acceptance rate and test ranges, compared with your profile. They are honest about uncertainty — use them to build a balanced list, not as a promise.')],
+    [t('Is Folio really free?'), t('Yes. The portfolio, feedback, the daily plan, university chances and the opportunities database are free. Pro adds the essay coach, the AI counselor and clean exports.')],
+    [t('Where do the chances come from?'), t('From each university’s published admission data — acceptance rate, SAT/ACT range and test policy — compared with your profile. They are estimates: use them to build a balanced list, not as a promise.')],
     [t('Does the AI write my application for me?'), t('No. It reviews and suggests. Rewrites use only the facts you gave it, and the essay coach asks questions instead of inventing details.')],
     [t('Who can see my portfolio?'), t('Only you — unless you turn on a public link or connect to your school’s workspace. You can switch either off at any time, and delete everything in Settings.')],
     [t('Which languages are supported?'), t('The interface and AI answers work in English, Russian and Kazakh. Activity rewrites stay in English because applications are submitted in English.')],
@@ -274,107 +258,109 @@ function FAQ({ t }) {
 function FinalCta({ t }) {
   return (
     <section className="section">
-      <div className="wrap lp-final">
-        <h2 className="lp-h2">{t('Start with where you are today')}</h2>
-        <p className="lp-lead" style={{ marginInline: 'auto' }}>
-          {t('Ten minutes to fill in the basics, and you will see your assessment and your odds.')}
-        </p>
-        <div className="lp-ctas" style={{ justifyContent: 'center' }}>
-          <Link href="/start" className="btn btn-primary">
-            {t('Build my portfolio — free')}
-          </Link>
-        </div>
+      <div className="wrap">
+        <Reveal className="lp-final">
+          <h2 className="lp-h2">{t('Your application starts today')}</h2>
+          <p className="lp-lead" style={{ marginInline: 'auto' }}>
+            {t('Ten minutes to fill in the basics — then your score, your plan and your chances are waiting.')}
+          </p>
+          <div className="lp-ctas" style={{ justifyContent: 'center' }}>
+            <Link href="/start" className="btn lp-cta-light">
+              {t('Start for free')} <span aria-hidden>→</span>
+            </Link>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 const CSS = `
-.lp-panel-in{animation:rise .9s var(--ease) .25s both; box-shadow:0 24px 60px -30px rgba(27,26,36,.25);}
-.lp-panel-body.stagger > *{animation-delay:.45s;}
-.lp-panel-body.stagger > *:nth-child(2){animation-delay:.55s;}
-.lp-panel-body.stagger > *:nth-child(3){animation-delay:.6s;}
-.lp-panel-body.stagger > *:nth-child(4){animation-delay:.68s;}
-.lp-panel-body.stagger > *:nth-child(5){animation-delay:.76s;}
-.lp-panel-body.stagger > *:nth-child(6){animation-delay:.84s;}
-.lp-bar span{animation-delay:1s;}
-.lp-feat{transition:background .3s var(--ease);}
-.lp-feat svg{transition:transform .4s var(--ease-spring);}
-.lp-feat:hover svg{transform:translateY(-2px) scale(1.08);}
-.lp-faq summary{transition:color .2s ease;}
-.lp-faq summary:hover{color:var(--primary-600);}
-.lp-faq details[open] p{animation:rise .4s var(--ease) both;}
-.lp-faq summary::after{transition:transform .3s var(--ease);}
-
-.lp-hero{padding:72px 0 64px; border-bottom:1px solid var(--line);}
-.lp-hero-grid{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr); gap:56px; align-items:center;}
-.lp-h1{font-size:clamp(34px,5vw,56px); line-height:1.08; margin-top:14px; letter-spacing:-0.01em;}
-.lp-h2{font-size:clamp(28px,3.6vw,40px); margin-top:12px;}
-.lp-lead{font-size:clamp(16px,1.8vw,18.5px); line-height:1.6; color:var(--ink-2); margin-top:18px; max-width:600px;}
-.lp-ctas{display:flex; gap:12px; margin-top:28px; flex-wrap:wrap; align-items:center;}
-.lp-ctas .btn{min-height:48px; padding:12px 22px; font-size:15.5px;}
-.lp-small{margin-top:14px; font-size:13.5px; color:var(--faint);}
-
-.lp-panel{background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-lg); overflow:hidden;}
-.lp-panel-head{display:flex; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--line); font-size:13.5px; font-weight:600; background:var(--surface-2);}
-.lp-panel-body{padding:8px 18px 18px;}
-.lp-row{display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line);}
-.lp-row-main{flex:1; min-width:0; display:grid;}
-.lp-row-main b{font-size:14px; font-weight:600;}
-.lp-row-main small{font-size:12.5px; color:var(--muted);}
-.lp-score{font-family:var(--display); font-size:18px;}
-.lp-divider{height:6px;}
-.lp-odds{display:grid; grid-template-columns:minmax(0,150px) 1fr 46px; gap:12px; align-items:center; font-size:13.5px; margin-top:12px;}
-.lp-odds span:first-child{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.lp-odds b{text-align:right;}
-
-.lp-bar .band-hard-reach{background:var(--bad);} .lp-bar .band-reach{background:var(--warn);} .lp-bar .band-target{background:var(--primary);}
-
-.lp-facts{border-bottom:1px solid var(--line); background:var(--surface);}
-.lp-facts-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; padding-top:26px; padding-bottom:26px;}
-.lp-fact-n{font-family:var(--display); font-size:28px;}
-.lp-fact-l{font-size:13.5px; color:var(--muted); margin-top:2px; line-height:1.4;}
+.lp-hero{position:relative; padding:84px 0 88px; border-bottom:1px solid var(--line); overflow:hidden;}
+.lp-hero-bg{position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(60% 50% at 85% 20%, rgba(69,133,217,.14), transparent 70%),
+    radial-gradient(40% 40% at 10% 90%, rgba(69,133,217,.07), transparent 70%);
+}
+.lp-hero-bg::after{content:''; position:absolute; inset:0;
+  background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:56px 56px; opacity:.35;
+  -webkit-mask-image:radial-gradient(70% 60% at 60% 40%, #000, transparent 75%); mask-image:radial-gradient(70% 60% at 60% 40%, #000, transparent 75%);}
+.lp-hero-grid{position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:64px; align-items:center;}
+.lp-h1{font-size:clamp(38px,5.6vw,66px); line-height:1.04; margin-top:16px; letter-spacing:-0.02em;}
+.lp-grad{background:linear-gradient(100deg, var(--primary) 10%, #7aa9ea 50%, var(--primary-600) 90%); background-size:200% auto;
+  -webkit-background-clip:text; background-clip:text; color:transparent; animation:lpShine 6s ease-in-out infinite;}
+@keyframes lpShine{0%,100%{background-position:0% center;} 50%{background-position:100% center;}}
+.lp-h2{font-size:clamp(28px,3.8vw,44px); margin-top:12px; letter-spacing:-0.015em;}
+.lp-lead{font-size:clamp(16px,1.8vw,19px); line-height:1.6; color:var(--ink-2); margin-top:20px; max-width:560px;}
+.lp-ctas{display:flex; gap:12px; margin-top:30px; flex-wrap:wrap; align-items:center;}
+.lp-ctas .btn{min-height:50px; padding:12px 24px; font-size:15.5px;}
+.lp-cta-main{box-shadow:0 12px 28px -12px rgba(69,133,217,.7);}
+.lp-cta-main span{transition:transform .3s var(--ease-spring);}
+.lp-cta-main:hover span,.lp-cta-light:hover span{transform:translateX(3px);}
+.lp-steps-mini{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:30px; font-size:13.5px; color:var(--muted); font-weight:600;}
+.lp-steps-mini span{display:inline-flex; align-items:center; gap:7px;}
+.lp-steps-mini i{font-style:normal; width:20px; height:20px; border-radius:999px; background:var(--primary-tint); color:var(--primary-600); font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center;}
 
 .lp-band{background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
-.lp-head{max-width:680px; margin-bottom:36px;}
-.lp-head h2{font-size:clamp(28px,3.6vw,40px);}
-.lp-head p{font-size:16.5px; color:var(--ink-2); margin-top:12px; line-height:1.6;}
-.lp-cols{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px;}
-.lp-col{border-top:2px solid var(--ink); padding-top:18px;}
-.lp-num{font-size:13px; font-weight:700; color:var(--faint);}
-.lp-col h3{font-size:18.5px; margin-top:8px;}
-.lp-col p{font-size:15px; color:var(--ink-2); line-height:1.6; margin-top:10px;}
+.lp-head{max-width:680px; margin-bottom:40px;}
+.lp-head.lp-center{text-align:center; margin-inline:auto;}
+.lp-head h2{font-size:clamp(28px,3.8vw,44px); margin-top:10px; letter-spacing:-0.015em;}
+.lp-head p:not(.eyebrow){font-size:16.5px; color:var(--ink-2); margin-top:14px; line-height:1.6;}
 
-.lp-feats{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; border-top:1px solid var(--line);}
-.lp-feat{display:flex; gap:14px; padding:20px 4px; border-bottom:1px solid var(--line);}
-.lp-feat:nth-child(odd){padding-right:28px;}
-.lp-feat h3{font-size:16px;}
-.lp-feat p{font-size:14.5px; color:var(--muted); line-height:1.55; margin-top:4px;}
+.lp-steps{display:grid; gap:96px; margin-top:64px;}
+.lp-step{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:72px; align-items:center;}
+.lp-step.flip .lp-step-copy{order:2;}
+.lp-step-n{font-size:13px; font-weight:700; color:var(--primary-600); letter-spacing:.02em;}
+.lp-step h3{font-size:clamp(22px,2.6vw,30px); margin-top:12px; line-height:1.2; letter-spacing:-0.01em;}
+.lp-step p{font-size:16px; color:var(--ink-2); line-height:1.65; margin-top:14px; max-width:480px;}
+.lp-step-visual{max-width:470px; width:100%; justify-self:center;}
 
-.lp-schools{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:56px; align-items:center;}
-.lp-checks{list-style:none; margin:0; padding:24px; display:grid; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg);}
-.lp-checks li{display:flex; gap:12px; font-size:15.5px; line-height:1.5;}
+.lp-prog{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr); gap:64px; align-items:center;}
+.lp-feats{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 22px; margin-top:30px;}
+.lp-feat{display:flex; gap:12px;}
+.lp-feat-ic{width:34px; height:34px; border-radius:10px; background:var(--surface); border:1px solid var(--line); color:var(--primary-600);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .4s var(--ease-spring), background .3s, color .3s;}
+.lp-feat:hover .lp-feat-ic{transform:translateY(-2px) rotate(-4deg); background:var(--primary); color:#fff;}
+.lp-feat h3{font-size:15px;}
+.lp-feat p{font-size:13.5px; color:var(--muted); line-height:1.5; margin-top:3px;}
+
+.lp-schools{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:64px; align-items:center;}
+.lp-checks{list-style:none; margin:24px 0 0; padding:0; display:grid; gap:12px;}
+.lp-checks li{display:flex; gap:10px; font-size:15.5px; line-height:1.5;}
 
 .lp-faq{border-top:1px solid var(--line);}
 .lp-faq details{border-bottom:1px solid var(--line); padding:4px 0;}
-.lp-faq summary{cursor:pointer; list-style:none; font-weight:600; font-size:16.5px; padding:16px 32px 16px 0; position:relative;}
+.lp-faq summary{cursor:pointer; list-style:none; font-weight:600; font-size:16.5px; padding:16px 32px 16px 0; position:relative; transition:color .2s ease;}
+.lp-faq summary:hover{color:var(--primary-600);}
 .lp-faq summary::-webkit-details-marker{display:none;}
-.lp-faq summary::after{content:'+'; position:absolute; right:4px; top:12px; font-size:22px; color:var(--muted); font-weight:400;}
-.lp-faq details[open] summary::after{content:'–';}
+.lp-faq summary::after{content:'+'; position:absolute; right:4px; top:12px; font-size:22px; color:var(--muted); font-weight:400; transition:transform .3s var(--ease);}
+.lp-faq details[open] summary::after{transform:rotate(45deg);}
+.lp-faq details[open] p{animation:rise .4s var(--ease) both;}
 .lp-faq p{font-size:15.5px; color:var(--ink-2); line-height:1.65; padding:0 0 18px;}
 
-.lp-final{text-align:center; max-width:680px;}
+.lp-final{position:relative; overflow:hidden; text-align:center; padding:64px 28px; border-radius:24px; color:#fff;
+  background:radial-gradient(80% 120% at 80% 0%, #6aa2ec 0%, var(--primary) 40%, #2f5fa8 100%);
+  box-shadow:0 30px 60px -30px rgba(52,112,193,.7);}
+.lp-final::before{content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+  background-size:40px 40px; -webkit-mask-image:radial-gradient(60% 80% at 50% 0%, #000, transparent); mask-image:radial-gradient(60% 80% at 50% 0%, #000, transparent);}
+.lp-final > *{position:relative;}
+.lp-final .lp-lead{color:rgba(255,255,255,.85); max-width:520px;}
+.lp-cta-light{background:#fff; color:var(--primary-600); font-weight:700; box-shadow:0 10px 24px -12px rgba(0,0,0,.4);}
+.lp-cta-light:hover{background:#f3f7fd; transform:translateY(-1px);}
+.lp-cta-light span{transition:transform .3s var(--ease-spring);}
 
 @media (max-width:900px){
-  .lp-hero{padding:44px 0 44px;}
-  .lp-hero-grid,.lp-schools{grid-template-columns:minmax(0,1fr); gap:36px;}
-  .lp-cols{grid-template-columns:minmax(0,1fr); gap:26px;}
+  .lp-hero{padding:48px 0 56px;}
+  .lp-hero-grid,.lp-schools,.lp-prog,.lp-step{grid-template-columns:minmax(0,1fr); gap:36px;}
+  .lp-step.flip .lp-step-copy{order:0;}
+  .lp-steps{gap:64px; margin-top:40px;}
+  .lp-step-visual{max-width:none;}
+}
+@media (max-width:560px){
   .lp-feats{grid-template-columns:minmax(0,1fr);}
-  .lp-feat:nth-child(odd){padding-right:4px;}
-  .lp-facts-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-}
-@media (max-width:480px){
   .lp-ctas .btn{width:100%;}
-  .lp-odds{grid-template-columns:minmax(0,110px) 1fr 42px;}
+  .lp-final{padding:44px 20px; border-radius:18px;}
 }
+@media (prefers-reduced-motion: reduce){ .lp-grad{animation:none;} }
 `;

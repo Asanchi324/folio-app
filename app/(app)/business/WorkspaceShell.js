@@ -102,7 +102,10 @@ function Guarded({ children }) {
     <div className="page">
       <div className="ws-bar">
         <div style={{ minWidth: 0 }}>
-          <div className="ws-name">{org?.name || t('Workspace')}</div>
+          <div className="ws-name">
+            {org?.name || t('Workspace')}
+            {org?.settings?.cohort && <span className="muted" style={{ fontWeight: 500 }}> · {org.settings.cohort}</span>}
+          </div>
           <div className="muted" style={{ fontSize: 13 }}>
             <span className={`pill ${paid ? 'pill-gold' : 'pill-muted'}`}>{t(orgPlanLabel(org?.plan))}</span>{' '}
             {t('{used} of {limit} student seats used', { used, limit: seatLimit })}

@@ -12,7 +12,7 @@ export async function generateMetadata() {
   const { t, lang } = await getT();
   const title = t('Folio — admissions portfolio, honest AI review and real chances');
   const description = t(
-    'Build a Common App–style portfolio, get an honest AI review of every activity, see realistic admission odds for 100+ universities, and find olympiads and programs worth your time.'
+    'Folio turns your grades, tests, activities and essays into one admissions portfolio, gives personal feedback on every part, builds a daily plan and shows your chances at 800+ universities.'
   );
   return {
     metadataBase: new URL(SITE_URL),

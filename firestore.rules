@@ -114,7 +114,7 @@ service cloud.firestore {
       allow update: if isFounder() ||
         (isOrgAdmin(orgId) &&
           request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['name', 'type', 'brandName']));
+            .hasOnly(['name', 'type', 'brandName', 'settings']));
       allow delete: if isFounder();
 
       // ---------- membership ----------

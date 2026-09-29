@@ -4,7 +4,7 @@ export async function generateMetadata() {
   const { t } = await getT();
   return {
     title: t('University admission chances'),
-    description: t('Realistic admission odds at 100+ universities in the US, UK and Canada, calculated from your grades, test scores and activities.'),
+    description: t('Your admission chances at 800+ universities, ranked and filterable (Top 20, Top 50, Top 100), from real admission data and your profile.'),
     // App pages default to noindex; these two are public, useful content.
     robots: { index: true, follow: true },
     alternates: { canonical: '/universities' },

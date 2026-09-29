@@ -13,7 +13,7 @@ import { useT } from '@/lib/i18n';
 const CHECKS = {
   free: [
     ['Portfolio builder', 'Common App–style sections, guided'],
-    ['Honest admission odds', '100+ universities, no glaze'],
+    ['University chances', '800+ universities, ranked'],
     ['AI review & polish', 'daily allowance'],
     ['Opportunities database', 'olympiads, programs, deadlines'],
     ['Public share link', 'with a small Folio badge'],
@@ -170,7 +170,7 @@ export default function PricingCards({
           color:var(--muted); padding:8px 18px; border-radius:var(--r-sm);
           transition:background .18s ease, color .18s ease;
         }
-        .pr-tab.on{background:var(--ink); color:#fff;}
+        .pr-tab.on{background:var(--primary); color:#fff;}
         .pr-grid{
           display:grid; grid-template-columns:repeat(2, minmax(0,1fr));
           gap:20px; max-width:860px; margin:0 auto; align-items:stretch;
@@ -179,16 +179,42 @@ export default function PricingCards({
           position:relative; display:flex; flex-direction:column;
           background:var(--surface); border:1px solid var(--line);
           border-radius:var(--r-lg); padding:30px 28px;
-          transition:transform .18s ease, box-shadow .18s ease;
+ transition:transform .35s var(--ease), box-shadow .35s var(--ease);
         }
         
-        .pr-card.featured{border:1.5px solid var(--ink);}
-        .pr-badge{
-          position:absolute; top:-13px; left:26px;
-          background:var(--ink); color:#fff; font-size:12px; font-weight:600;
-          padding:3px 10px; border-radius:6px; white-space:nowrap;
+        .pr-card:hover{transform:translateY(-3px); box-shadow:0 24px 50px -30px rgba(27,26,36,.35);}
+        .pr-card.featured{
+          border:0; color:#fff; overflow:hidden; isolation:isolate;
+          background:radial-gradient(120% 90% at 100% 0%, #78adf0 0%, var(--primary) 42%, #2c5a9f 100%);
+          box-shadow:0 30px 60px -28px rgba(52,112,193,.75);
         }
-        .pr-head{min-height:74px;}
+        .pr-card.featured:hover{box-shadow:0 36px 70px -28px rgba(52,112,193,.85);}
+        .pr-card.featured::before{
+          content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+          background-image:linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+          background-size:32px 32px;
+          -webkit-mask-image:radial-gradient(70% 60% at 90% 0%, #000, transparent); mask-image:radial-gradient(70% 60% at 90% 0%, #000, transparent);
+        }
+        .pr-card.featured::after{
+          content:''; position:absolute; top:-40%; left:-60%; width:40%; height:180%; z-index:-1; pointer-events:none;
+          background:linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent); transform:rotate(18deg);
+          animation:prSheen 6s ease-in-out 1.5s infinite;
+        }
+        @keyframes prSheen{0%{left:-60%;} 35%,100%{left:130%;}}
+        .pr-card.featured .muted,.pr-card.featured .pr-period,.pr-card.featured .pr-sub{color:rgba(255,255,255,.78);}
+        .pr-card.featured .pr-note{color:rgba(255,255,255,.62);}
+        .pr-card.featured .pr-checks{border-top-color:rgba(255,255,255,.22);}
+        .pr-card.featured .pr-tick{background:rgba(255,255,255,.2); color:#fff;}
+        .pr-card.featured .btn-light{background:#fff; color:var(--primary-600); border:0; font-weight:700;}
+        .pr-card.featured .btn-light:hover{background:#f1f6fd;}
+        .pr-badge{
+          position:absolute; top:22px; right:22px;
+          background:rgba(255,255,255,.18); color:#fff; font-size:11.5px; font-weight:650;
+          padding:4px 10px; border-radius:999px; white-space:nowrap; backdrop-filter:blur(4px);
+          border:1px solid rgba(255,255,255,.25);
+        }
+        @media (prefers-reduced-motion: reduce){ .pr-card.featured::after{animation:none; display:none;} }
+        .pr-head{min-height:74px; padding-right:110px;}
         .pr-price{display:flex; align-items:center; gap:10px; margin-top:16px;}
         .pr-amount{
           font-family:var(--display); font-size:46px; letter-spacing:-0.03em;
@@ -214,7 +240,7 @@ export default function PricingCards({
         
         @media (max-width:760px){
           .pr-grid{grid-template-columns:minmax(0,1fr); max-width:430px;}
-          .pr-head{min-height:0;}
+          .pr-head{min-height:0; padding-right:0;} .pr-card.featured .pr-head{padding-top:26px;}
           .pr-toggle{width:100%;}
           .pr-tab{flex:1; text-align:center; padding:9px 10px;}
         }
@@ -225,10 +251,10 @@ export default function PricingCards({
 
 function PlanCta({ cta, featured, onSelect }) {
   const { t } = useT();
-  const cls = featured ? 'btn btn-gold' : 'btn btn-ghost';
+  const cls = featured ? 'btn btn-light' : 'btn btn-ghost';
   if (cta.disabled) {
     return (
-      <span className="btn btn-ghost" style={{ opacity: 0.55, cursor: 'default' }}>
+      <span className={featured ? 'btn btn-light' : 'btn btn-ghost'} style={{ opacity: 0.7, cursor: 'default' }}>
         {t(cta.label)}
       </span>
     );

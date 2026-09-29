@@ -140,6 +140,7 @@ function CompCard({ c, tracked, onTrack }) {
         <div style={{ fontSize: 13, minWidth: 0 }}>
           <div className="muted">{t('Timing')}</div>
           <div style={{ fontWeight: 600 }}>{c.season}</div>
+          {c.verifiedOn && <div className="muted" style={{ fontSize: 12 }}>{t('Dates checked {date}', { date: c.verifiedOn })}</div>}
           {hint && (
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
               <span className={`pill ${urgency(days)}`}>

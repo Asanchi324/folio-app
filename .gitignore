@@ -6,3 +6,4 @@
 .env*.local
 .vercel
 *.tsbuildinfo
+/scripts/.cache

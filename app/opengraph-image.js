@@ -30,7 +30,7 @@ export default function OpengraphImage() {
             Know exactly where you stand.
           </div>
           <div style={{ fontSize: 32, color: '#3a3946', lineHeight: 1.35, maxWidth: 940 }}>
-            Common App–style portfolio · every activity graded · real odds at 100+ universities
+            Build your portfolio · personal feedback · a daily plan · chances at 800+ universities
           </div>
         </div>
         <div style={{ display: 'flex', gap: 14, fontSize: 24, color: '#6b6977' }}>
