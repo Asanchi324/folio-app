@@ -15,10 +15,13 @@ import Icon from '@/components/Icon';
 import LangSwitch from '@/components/LangSwitch';
 import { BrandMark } from '@/components/Brand';
 import InviteBanner from '@/components/InviteBanner';
+import { streakInfo } from '@/lib/daily';
 
 const STUDENT = [
+  { href: '/today', label: 'Today', icon: 'sun', badge: 'streak' },
   { href: '/portfolio', label: 'Portfolio', icon: 'portfolio', exact: true },
   { href: '/review', label: 'Assessment', icon: 'gauge' },
+  { href: '/progress', label: 'Progress', icon: 'target' },
   { href: '/universities', label: 'Universities', icon: 'university' },
   { href: '/discover', label: 'Opportunities', icon: 'compass' },
   { href: '/essay', label: 'Essay coach', icon: 'pen' },
@@ -43,6 +46,24 @@ export default function AppShell({ children }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => setOpen(false), [path]);
+
+  // Streak badge: read-only peek at the locally cached portfolio (pages own
+  // the real portfolio state; the shell must never write it).
+  const [streak, setStreak] = useState(0);
+  useEffect(() => {
+    const read = () => {
+      try {
+        const cached = JSON.parse(localStorage.getItem('folio:portfolio') || 'null');
+        setStreak(cached ? streakInfo(cached).streak : 0);
+      } catch {
+        setStreak(0);
+      }
+    };
+    read();
+    // Pages that record progress announce it (see today/progress pages).
+    window.addEventListener('folio:daily', read);
+    return () => window.removeEventListener('folio:daily', read);
+  }, [path]);
   // Lock page scroll behind the open drawer.
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
@@ -75,6 +96,11 @@ export default function AppShell({ children }) {
         >
           <Icon name={item.icon} size={18} />
           <span>{t(item.label)}</span>
+          {item.badge === 'streak' && streak > 0 && (
+            <span className="sb-badge" title={t('Day streak')}>
+              {streak}
+            </span>
+          )}
         </Link>
       ))}
     </div>
@@ -164,7 +190,10 @@ export default function AppShell({ children }) {
         </header>
         <main className="shell-content">
           <InviteBanner />
-          {children}
+          {/* keyed by path: each page settles in on navigation */}
+          <div key={path} className="page-enter">
+            {children}
+          </div>
         </main>
       </div>
     </div>

@@ -9,7 +9,7 @@ export default function robots() {
         allow: '/',
         disallow: [
           '/admin', '/business', '/counselor', '/api/', '/portfolio', '/review', '/essay',
-          '/advisor', '/deadlines', '/share', '/settings', '/join/',
+          '/advisor', '/deadlines', '/share', '/settings', '/join/', '/today', '/progress',
         ],
       },
     ],

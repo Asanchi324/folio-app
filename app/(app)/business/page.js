@@ -37,7 +37,7 @@ export default function OverviewPage() {
       />
 
       {/* KPIs */}
-      <div className="ov-kpis">
+      <div className="ov-kpis stagger">
         <Kpi label={t('Students')} value={students.length} hint={t('of {n} seats', { n: seatLimit })} />
         <Kpi label={t('Avg strength')} value={rowsReady ? stats.avgStrength : '…'} hint={t('out of 100')} tone="var(--primary)" />
         <Kpi label={t('Avg completeness')} value={rowsReady ? `${stats.avgCompleteness}%` : '…'} hint={t('portfolio filled in')} />

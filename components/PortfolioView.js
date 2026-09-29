@@ -74,8 +74,8 @@ export default function PortfolioView({ p, options, precomputed }) {
                   <span style={{ fontWeight: 600 }}>{tr(pl.label)}</span>
                   <span className="muted">{pl.score}</span>
                 </div>
-                <div style={{ height: 6, borderRadius: 999, background: 'var(--line)', marginTop: 5, overflow: 'hidden' }}>
-                  <div style={{ width: `${pl.score}%`, height: '100%', background: 'var(--ink-2)' }} />
+                <div className="bar" style={{ marginTop: 5 }}>
+                  <span style={{ width: `${pl.score}%`, background: 'var(--ink-2)' }} />
                 </div>
               </div>
             ))}

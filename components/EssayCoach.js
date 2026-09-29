@@ -74,7 +74,7 @@ export default function EssayCoach({ essay }) {
       {upgrade && <UpgradeNote message={err} />}
 
       {review && (
-        <div className="fade-in" style={{ display: 'grid', gap: 14, marginTop: 18 }}>
+        <div className="stagger" style={{ display: 'grid', gap: 14, marginTop: 18 }}>
           <div>
             <p style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.45 }}>{review.verdict}</p>
             {review.score && (
@@ -85,8 +85,8 @@ export default function EssayCoach({ essay }) {
                       <span style={{ fontWeight: 600 }}>{t(SCORE_LABELS[k] || k)}</span>
                       <span className="muted">{v}/10</span>
                     </div>
-                    <div style={{ height: 5, borderRadius: 99, background: 'var(--line)', marginTop: 4, overflow: 'hidden' }}>
-                      <div style={{ width: `${Math.min(10, Number(v) || 0) * 10}%`, height: '100%', background: 'var(--ink-2)' }} />
+                    <div className="bar" style={{ marginTop: 4 }}>
+                      <span style={{ width: `${Math.min(10, Number(v) || 0) * 10}%`, background: 'var(--ink-2)' }} />
                     </div>
                   </div>
                 ))}

@@ -89,7 +89,7 @@ export default function DiscoverPage() {
         <span className="muted" style={{ fontSize: 13.5, marginLeft: 'auto' }}>{t('{n} results', { n: list.length })}</span>
       </div>
 
-      <div className="dc-grid">
+      <div className="dc-grid stagger">
         {list.slice(0, limit).map((c) => (
           <CompCard key={c.id} c={c} tracked={trackedIds.has(c.id)} onTrack={toggleTracked} />
         ))}
@@ -121,7 +121,7 @@ function CompCard({ c, tracked, onTrack }) {
   const days = hint ? daysUntil(nextOccurrence(hint.month)) : null;
   const [msg, vars] = hint ? daysLeftMsg(days) : [null, null];
   return (
-    <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column' }}>
+    <div className="card card-hover" style={{ padding: 18, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
         <span className="muted" style={{ fontSize: 12.5, fontWeight: 600 }}>{t(c.category)}</span>
         <Difficulty n={c.difficulty} label={t('Difficulty {n}/5', { n: c.difficulty })} />

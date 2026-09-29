@@ -99,7 +99,7 @@ export default function DeadlinesCard({ p, update }) {
       <style>{`
         .dl-row{display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line);}
         .dl-row:last-child{border-bottom:0;}
-        .dl-check{width:22px; height:22px; flex-shrink:0; border-radius:6px; cursor:pointer; padding:0;
+        .dl-check{transition:background .25s var(--ease), border-color .25s var(--ease), transform .2s var(--ease); width:22px; height:22px; flex-shrink:0; border-radius:6px; cursor:pointer; padding:0;
           display:flex; align-items:center; justify-content:center; color:#fff;}
         .dl-toggle{background:none; border:0; color:var(--muted); cursor:pointer; font-size:13.5px; font-weight:600; padding:12px 18px;}
         .dl-x{background:none; border:0; color:var(--faint); cursor:pointer; padding:6px; flex-shrink:0;}
@@ -120,7 +120,7 @@ function Row({ it, onDone, onRemove }) {
         aria-label={it.done ? t('Mark as not done') : t('Mark as done')}
         style={{ border: `1.5px solid ${it.done ? 'var(--good)' : 'var(--line-strong)'}`, background: it.done ? 'var(--good)' : 'transparent' }}
       >
-        {it.done ? <Icon name="check" size={14} strokeWidth={2.4} /> : null}
+        {it.done ? <Icon name="check" size={14} strokeWidth={2.4} className="pop" /> : null}
       </button>
       <div style={{ flex: 1, minWidth: 0, opacity: it.done ? 0.55 : 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>

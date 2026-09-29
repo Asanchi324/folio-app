@@ -68,7 +68,7 @@ export default function UniversitiesPage() {
         </div>
       )}
 
-      <div className="uni-stats">
+      <div className="uni-stats stagger">
         <Stat label={t('Profile strength')} value={`${strength}/100`} />
         {['safety', 'target', 'reach', 'hard-reach'].map((b) => (
           <Stat key={b} label={t(BAND_META[b].label)} value={counts[b] || 0} color={BAND_META[b].color} />
@@ -112,7 +112,7 @@ export default function UniversitiesPage() {
         )}
       </div>
 
-      <div className="uni-grid">
+      <div className="uni-grid stagger">
         {rows.slice(0, limit).map(({ u, est }) => (
           <UniCard key={u.id} u={u} est={est} saved={(p.shortlist || []).includes(u.id)} onToggleSave={() => toggleShortlist(u.id, update)} />
         ))}
@@ -154,7 +154,7 @@ function UniCard({ u, est, saved, onToggleSave }) {
   const meta = BAND_META[est.band];
   const [open, setOpen] = useState(false);
   return (
-    <div className="card" style={{ padding: 18 }}>
+    <div className="card card-hover" style={{ padding: 18 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ minWidth: 0 }}>
           <h3 style={{ fontSize: 17 }}>{u.name}</h3>
@@ -166,8 +166,8 @@ function UniCard({ u, est, saved, onToggleSave }) {
         </div>
       </div>
 
-      <div style={{ height: 6, borderRadius: 999, background: 'var(--line)', marginTop: 14, overflow: 'hidden' }}>
-        <div style={{ width: `${est.chance}%`, height: '100%', background: meta.color, transition: 'width .4s ease' }} />
+      <div className="bar" style={{ marginTop: 14 }}>
+        <span style={{ width: `${est.chance}%`, background: meta.color }} />
       </div>
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 12 }}>

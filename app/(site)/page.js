@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import PricingCards from '@/components/Pricing';
 import Icon from '@/components/Icon';
+import { Reveal } from '@/components/Motion';
 import { UNIVERSITIES } from '@/lib/universities';
 import { COMPETITIONS } from '@/lib/competitions';
 import { getT } from '@/lib/i18n-server';
@@ -51,7 +52,7 @@ function Hero({ t }) {
   return (
     <section className="lp-hero">
       <div className="wrap lp-hero-grid">
-        <div>
+        <div className="stagger">
           <p className="eyebrow">{t('For students applying to universities abroad')}</p>
           <h1 className="lp-h1">{t('Know exactly where you stand. Then close the gap.')}</h1>
           <p className="lp-lead">
@@ -68,12 +69,12 @@ function Hero({ t }) {
           <p className="lp-small">{t('No card needed · English, Russian and Kazakh')}</p>
         </div>
 
-        <div className="lp-panel" aria-hidden>
+        <div className="lp-panel lp-panel-in" aria-hidden>
           <div className="lp-panel-head">
             <span>{t('Assessment')}</span>
             <span className="muted">Aisha K. · 11</span>
           </div>
-          <div className="lp-panel-body">
+          <div className="lp-panel-body stagger">
             <div className="lp-row">
               <span className="pill band-target">{t('Tier {n}', { n: 2 })}</span>
               <span className="lp-row-main">
@@ -98,7 +99,7 @@ function Hero({ t }) {
             ].map(([n, v, band]) => (
               <div className="lp-odds" key={n}>
                 <span>{n}</span>
-                <span className="lp-bar">
+                <span className="bar lp-bar">
                   <span className={band} style={{ width: `${Math.max(4, v)}%` }} />
                 </span>
                 <b>{v}%</b>
@@ -120,14 +121,14 @@ function Facts({ t }) {
   ];
   return (
     <div className="lp-facts">
-      <div className="wrap lp-facts-grid">
+      <Reveal stagger className="wrap lp-facts-grid">
         {items.map(([n, label]) => (
           <div key={label}>
             <div className="lp-fact-n">{n}</div>
             <div className="lp-fact-l">{label}</div>
           </div>
         ))}
-      </div>
+      </Reveal>
     </div>
   );
 }
@@ -156,7 +157,7 @@ function Grading({ t }) {
           <h2>{t('An honest assessment, not a pep talk')}</h2>
           <p>{t('Most tools tell every student they are doing great. Folio tells you what an admissions reader would see — and what would change it.')}</p>
         </div>
-        <div className="lp-cols">
+        <Reveal stagger className="lp-cols">
           {cols.map((c, i) => (
             <div key={c.title} className="lp-col">
               <span className="lp-num">0{i + 1}</span>
@@ -164,7 +165,7 @@ function Grading({ t }) {
               <p>{c.body}</p>
             </div>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -188,7 +189,7 @@ function Product({ t }) {
           <h2>{t('Everything in one place')}</h2>
           <p>{t('Eight tools that share one portfolio — change something once and every part updates.')}</p>
         </div>
-        <div className="lp-feats">
+        <Reveal stagger className="lp-feats">
           {features.map(([icon, title, body]) => (
             <div key={title} className="lp-feat">
               <Icon name={icon} size={20} style={{ color: 'var(--primary-600)' }} />
@@ -198,7 +199,7 @@ function Product({ t }) {
               </div>
             </div>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -229,14 +230,14 @@ function Schools({ t }) {
             <span className="muted" style={{ fontSize: 14 }}>{t('Try it with 3 students for free')}</span>
           </div>
         </div>
-        <ul className="lp-checks">
+        <Reveal as="ul" stagger className="lp-checks">
           {points.map((p) => (
             <li key={p}>
               <Icon name="check" size={18} style={{ color: 'var(--good)', marginTop: 2 }} />
               <span>{p}</span>
             </li>
           ))}
-        </ul>
+        </Reveal>
       </div>
     </section>
   );
@@ -257,14 +258,14 @@ function FAQ({ t }) {
         <div className="lp-head">
           <h2>{t('Questions')}</h2>
         </div>
-        <div className="lp-faq">
+        <Reveal stagger className="lp-faq">
           {qa.map(([q, a]) => (
             <details key={q}>
               <summary>{q}</summary>
               <p>{a}</p>
             </details>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -289,6 +290,22 @@ function FinalCta({ t }) {
 }
 
 const CSS = `
+.lp-panel-in{animation:rise .9s var(--ease) .25s both; box-shadow:0 24px 60px -30px rgba(27,26,36,.25);}
+.lp-panel-body.stagger > *{animation-delay:.45s;}
+.lp-panel-body.stagger > *:nth-child(2){animation-delay:.55s;}
+.lp-panel-body.stagger > *:nth-child(3){animation-delay:.6s;}
+.lp-panel-body.stagger > *:nth-child(4){animation-delay:.68s;}
+.lp-panel-body.stagger > *:nth-child(5){animation-delay:.76s;}
+.lp-panel-body.stagger > *:nth-child(6){animation-delay:.84s;}
+.lp-bar span{animation-delay:1s;}
+.lp-feat{transition:background .3s var(--ease);}
+.lp-feat svg{transition:transform .4s var(--ease-spring);}
+.lp-feat:hover svg{transform:translateY(-2px) scale(1.08);}
+.lp-faq summary{transition:color .2s ease;}
+.lp-faq summary:hover{color:var(--primary-600);}
+.lp-faq details[open] p{animation:rise .4s var(--ease) both;}
+.lp-faq summary::after{transition:transform .3s var(--ease);}
+
 .lp-hero{padding:72px 0 64px; border-bottom:1px solid var(--line);}
 .lp-hero-grid{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr); gap:56px; align-items:center;}
 .lp-h1{font-size:clamp(34px,5vw,56px); line-height:1.08; margin-top:14px; letter-spacing:-0.01em;}
@@ -310,8 +327,7 @@ const CSS = `
 .lp-odds{display:grid; grid-template-columns:minmax(0,150px) 1fr 46px; gap:12px; align-items:center; font-size:13.5px; margin-top:12px;}
 .lp-odds span:first-child{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .lp-odds b{text-align:right;}
-.lp-bar{height:6px; background:var(--line); border-radius:999px; overflow:hidden;}
-.lp-bar span{display:block; height:100%; border-radius:999px;}
+
 .lp-bar .band-hard-reach{background:var(--bad);} .lp-bar .band-reach{background:var(--warn);} .lp-bar .band-target{background:var(--primary);}
 
 .lp-facts{border-bottom:1px solid var(--line); background:var(--surface);}

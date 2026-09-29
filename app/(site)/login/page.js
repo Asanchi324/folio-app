@@ -19,7 +19,7 @@ export default function LoginPage() {
 
   // Once signed in (via popup OR a redirect that just completed), go to the app.
   useEffect(() => {
-    if (user) router.replace('/portfolio');
+    if (user) router.replace('/today');
   }, [user, router]);
 
   async function google() {

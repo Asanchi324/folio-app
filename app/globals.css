@@ -42,6 +42,11 @@
 
   --maxw: 1120px;
   --sb-w: 248px;
+
+  /* motion — slow, soft ease-outs read as calm and expensive */
+  --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --dur: 0.45s;
 }
 
 * {
@@ -192,8 +197,20 @@ svg {
   max-width: 100%;
   -webkit-tap-highlight-color: transparent;
 }
-.btn:active {
-  transform: translateY(1px);
+.btn {
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease),
+    transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.btn-primary:hover:not(:disabled),
+.btn-gold:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(27, 26, 36, 0.14);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 0.08s;
 }
 .btn-primary {
   background: var(--primary);
@@ -251,6 +268,16 @@ svg {
 }
 .card-pad {
   padding: 24px;
+}
+a.card,
+.card-hover {
+  transition: border-color 0.25s var(--ease), box-shadow 0.35s var(--ease), transform 0.35s var(--ease);
+}
+a.card:hover,
+.card-hover:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 10px 30px rgba(27, 26, 36, 0.07);
+  transform: translateY(-2px);
 }
 
 /* ---------- labels (formerly pills) ---------- */
@@ -323,7 +350,7 @@ textarea {
   border: 1px solid var(--line-strong);
   border-radius: var(--r-sm);
   padding: 10px 12px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.2s var(--ease), box-shadow 0.25s var(--ease);
 }
 textarea {
   resize: vertical;
@@ -388,6 +415,97 @@ textarea:focus {
     opacity: 1;
     transform: none;
   }
+}
+
+/* ---------- motion layer ---------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes growX {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+/* Page enter: every app page settles in softly on navigation. */
+.page-enter {
+  animation: rise 0.5s var(--ease) both;
+}
+/* Direct children of .stagger arrive one after another. */
+.stagger > * {
+  animation: rise 0.55s var(--ease) both;
+}
+.stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.stagger > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger > *:nth-child(4) { animation-delay: 0.15s; }
+.stagger > *:nth-child(5) { animation-delay: 0.2s; }
+.stagger > *:nth-child(6) { animation-delay: 0.25s; }
+.stagger > *:nth-child(7) { animation-delay: 0.3s; }
+.stagger > *:nth-child(n + 8) { animation-delay: 0.34s; }
+
+/* Progress bars grow from the left on first paint, then ease between values. */
+.bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transform-origin: left center;
+  animation: growX 1s var(--ease) both;
+  transition: width 0.6s var(--ease), background 0.3s ease;
+}
+
+/* Scroll reveal (components/Motion.js → <Reveal>). */
+.rv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+.rv.rv-in {
+  opacity: 1;
+  transform: none;
+}
+.rv-stagger {
+  opacity: 1;
+  transform: none;
+}
+.rv-stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.rv-stagger.rv-in > * {
+  opacity: 1;
+  transform: none;
+}
+.rv-stagger.rv-in > *:nth-child(2) { transition-delay: 0.08s; }
+.rv-stagger.rv-in > *:nth-child(3) { transition-delay: 0.16s; }
+.rv-stagger.rv-in > *:nth-child(4) { transition-delay: 0.24s; }
+.rv-stagger.rv-in > *:nth-child(5) { transition-delay: 0.3s; }
+.rv-stagger.rv-in > *:nth-child(6) { transition-delay: 0.36s; }
+.rv-stagger.rv-in > *:nth-child(n + 7) { transition-delay: 0.42s; }
+
+.pop {
+  animation: pop 0.45s var(--ease-spring) both;
+}
+.skeleton {
+  border-radius: var(--r-sm);
+  background: linear-gradient(90deg, var(--line) 25%, #efebe1 50%, var(--line) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
 }
 .notice {
   display: flex;
@@ -681,6 +799,12 @@ textarea:focus {
   background: #efece3;
   color: var(--ink);
 }
+.sb-link svg {
+  transition: transform 0.3s var(--ease), color 0.2s ease;
+}
+.sb-link:hover svg {
+  transform: translateX(2px);
+}
 .sb-link.active {
   background: var(--surface);
   color: var(--ink);
@@ -689,6 +813,18 @@ textarea:focus {
 }
 .sb-link.active svg {
   color: var(--primary);
+}
+.sb-badge {
+  margin-left: auto;
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+  animation: pop 0.45s var(--ease-spring) both;
 }
 .sb-foot {
   margin-top: auto;
@@ -908,6 +1044,19 @@ textarea:focus {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+  .rv,
+  .rv-stagger > * {
+    opacity: 1;
+    transform: none;
+  }
   .fade-in,
   .spin {
     animation: none !important;

@@ -55,8 +55,8 @@ export function StatBar({ label, count, total, color }) {
   return (
     <div className="statbar">
       <span style={{ fontSize: 13.5, fontWeight: 600 }}>{label}</span>
-      <div style={{ height: 8, borderRadius: 999, background: 'var(--line)', overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: color || 'var(--primary)', borderRadius: 999, transition: 'width .5s ease' }} />
+      <div className="bar" style={{ height: 8 }}>
+        <span style={{ width: `${pct}%`, background: color || 'var(--primary)' }} />
       </div>
       <span className="muted" style={{ fontSize: 12.5, textAlign: 'right' }}>
         {count} · {pct}%

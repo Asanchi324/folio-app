@@ -47,7 +47,7 @@ export default function ReviewPage() {
         sub={t('How an admissions reader would weigh your profile today — and what would move it most.')}
       />
       <div className="rv-grid">
-        <div style={{ display: 'grid', gap: 18, minWidth: 0 }}>
+        <div className="stagger" style={{ display: 'grid', gap: 18, minWidth: 0 }}>
           <StrengthCard breakdown={breakdown} complete={complete} />
           <ActivitiesCard p={p} />
           <HonorsCard p={p} />
@@ -87,8 +87,8 @@ function StrengthCard({ breakdown, complete }) {
               </span>
               <span>{pl.score}</span>
             </div>
-            <div style={{ height: 6, borderRadius: 999, background: 'var(--line)', marginTop: 5, overflow: 'hidden' }}>
-              <div style={{ width: `${pl.score}%`, height: '100%', background: 'var(--ink-2)', transition: 'width .4s ease' }} />
+            <div className="bar" style={{ marginTop: 5 }}>
+              <span style={{ width: `${pl.score}%`, background: 'var(--ink-2)' }} />
             </div>
             <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>{t(PILLAR_NOTE[pl.key])}</div>
           </div>
@@ -135,7 +135,7 @@ function ActivitiesCard({ p }) {
       <p className="muted" style={{ fontSize: 13.5, marginTop: 6, lineHeight: 1.5 }}>
         {t('Tier 1 is rare national or international distinction; Tier 4 is participation. Run the AI review for a reader’s judgement of each one.')}
       </p>
-      <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
+      <div className="stagger" style={{ display: 'grid', gap: 10, marginTop: 14 }}>
         {acts.map((a, i) => {
           const g = graded[i];
           if (!a.position && !a.organization && !a.description) return null;

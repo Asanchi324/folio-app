@@ -50,7 +50,7 @@ export default function PortfolioPage() {
 
       <ProgressStrip breakdown={breakdown} complete={complete} />
 
-      <div style={{ display: 'grid', gap: 18, marginTop: 18 }}>
+      <div className="stagger" style={{ display: 'grid', gap: 18, marginTop: 18 }}>
         <CommentsCard meta={meta} />
         <Basics p={p} update={update} />
         <Academics p={p} update={update} />

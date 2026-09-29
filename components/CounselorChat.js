@@ -157,7 +157,7 @@ export default function CounselorChat({ portfolio }) {
       <style>{`
         .chat{display:flex; flex-direction:column; overflow:hidden; min-height:min(640px, calc(100dvh - 190px));}
         .chat-log{flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px; background:var(--surface-2);}
-        .chat-msg{max-width:min(620px, 88%); padding:10px 13px; border-radius:12px; font-size:14.5px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere;}
+        .chat-msg{animation:rise .4s var(--ease) both; max-width:min(620px, 88%); padding:10px 13px; border-radius:12px; font-size:14.5px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere;}
         .chat-msg.me{align-self:flex-end; background:var(--primary); color:#fff; border-bottom-right-radius:4px;}
         .chat-msg.them{align-self:flex-start; background:var(--surface); border:1px solid var(--line); border-bottom-left-radius:4px;}
         .chat-starter{text-align:left; font:500 14px var(--sans); padding:10px 13px; border-radius:var(--r-sm); border:1px solid var(--line-strong); background:var(--surface); cursor:pointer; color:var(--ink);}
