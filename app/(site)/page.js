@@ -40,7 +40,7 @@ export default async function Landing() {
       <section className="section lp-band" id="pricing">
         <div className="wrap">
           <div className="lp-head lp-center">
-            <p className="eyebrow">{t('Pricing')}</p>
+            <p className="lp-kicker">{t('Pricing')}</p>
             <h2>{t('Start free. Go further with Pro.')}</h2>
             <p>{t('Pro adds the essay coach and the AI counselor.')}</p>
           </div>
@@ -63,7 +63,7 @@ function Hero({ t }) {
       <div className="lp-hero-bg" aria-hidden />
       <div className="wrap lp-hero-grid">
         <div className="stagger">
-          <p className="eyebrow">{t('Your path to a top university')}</p>
+          <p className="lp-kicker">{t('Your path to a top university')}</p>
           <h1 className="lp-h1">
             {t('Build your portfolio.')} <span className="lp-grad">{t('Get in.')}</span>
           </h1>
@@ -74,10 +74,11 @@ function Hero({ t }) {
             <Link href="/start" className="btn btn-primary lp-cta-main">
               {t('Start for free')} <span aria-hidden>→</span>
             </Link>
-            <Link href="/start?type=business" className="btn btn-ghost">
-              {t('I am a school or counselor')}
-            </Link>
           </div>
+          <p className="lp-for-schools">
+            {t('School or counselor?')}{' '}
+            <Link href="/start?type=business">{t('Create a workspace')} <span aria-hidden>→</span></Link>
+          </p>
           <div className="lp-steps-mini">
             {[t('Build'), t('Get feedback'), t('Follow the plan'), t('Apply')].map((x, i) => (
               <span key={x}>
@@ -129,7 +130,7 @@ function Steps({ t }) {
     <section className="section" id="product">
       <div className="wrap">
         <div className="lp-head lp-center">
-          <p className="eyebrow">{t('How it works')}</p>
+          <p className="lp-kicker">{t('How it works')}</p>
           <h2>{t('From first draft to acceptance letter')}</h2>
           <p>{t('Four steps, one portfolio.')}</p>
         </div>
@@ -154,32 +155,27 @@ function Steps({ t }) {
 
 function Product({ t }) {
   const features = [
-    ['gauge', t('Profile score'), t('Scored part by part.')],
-    ['university', t('University chances'), t('800+ schools, real admission data.')],
-    ['compass', t('Opportunities'), t('Olympiads, programs, scholarships.')],
-    ['pen', t('Essay coach'), t('Edits for your personal statement.')],
-    ['chat', t('AI counselor'), t('Strategy advice in your language.')],
-    ['calendar', t('Deadlines'), t('Every deadline in one countdown.')],
+    [t('Profile score'), t('Scored part by part.')],
+    [t('University chances'), t('800+ schools, real admission data.')],
+    [t('Opportunities'), t('Olympiads, programs, scholarships.')],
+    [t('Essay coach'), t('Edits for your personal statement.')],
+    [t('AI counselor'), t('Strategy advice in your language.')],
+    [t('Deadlines'), t('Every deadline in one countdown.')],
   ];
   return (
     <section className="section lp-band">
       <div className="wrap lp-prog">
         <div>
-          <p className="eyebrow">{t('Progress')}</p>
+          <p className="lp-kicker">{t('Progress')}</p>
           <h2 className="lp-h2">{t('Watch your profile grow')}</h2>
           <p className="lp-lead" style={{ fontSize: 16.5 }}>
             {t('Track your growth and compare it with the ideal portfolio for your schools.')}
           </p>
-          <Reveal stagger className="lp-feats">
-            {features.map(([icon, title, body]) => (
+          <Reveal className="lp-feats">
+            {features.map(([title, body]) => (
               <div key={title} className="lp-feat">
-                <span className="lp-feat-ic">
-                  <Icon name={icon} size={18} />
-                </span>
-                <div>
-                  <h3>{title}</h3>
-                  <p>{body}</p>
-                </div>
+                <h3>{title}</h3>
+                <p>{body}</p>
               </div>
             ))}
           </Reveal>
@@ -201,7 +197,7 @@ function Schools({ t }) {
     <section className="section" id="schools">
       <div className="wrap lp-schools">
         <div>
-          <p className="eyebrow">{t('For schools and counselors')}</p>
+          <p className="lp-kicker">{t('For schools and counselors')}</p>
           <h2 className="lp-h2">{t('Lead the whole cohort from one workspace')}</h2>
           <p className="lp-lead" style={{ fontSize: 16.5 }}>
             {t('See who is growing, who went quiet and what to discuss next.')}
@@ -302,11 +298,16 @@ const CSS = `
 .lp-steps-mini span{display:inline-flex; align-items:center; gap:7px;}
 .lp-steps-mini i{font-style:normal; width:20px; height:20px; border-radius:999px; background:var(--primary-tint); color:var(--primary-600); font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center;}
 
+.lp-kicker{font-size:clamp(16px,1.5vw,19px); font-weight:600; color:var(--primary-600); letter-spacing:-0.01em;}
+.lp-for-schools{margin-top:18px; font-size:15px; color:var(--muted);}
+.lp-for-schools a{color:var(--ink); font-weight:600; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:4px; transition:text-decoration-color .2s;}
+.lp-for-schools a:hover{text-decoration-color:currentColor;}
+
 .lp-band{background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
 .lp-head{max-width:680px; margin-bottom:40px;}
 .lp-head.lp-center{text-align:center; margin-inline:auto;}
 .lp-head h2{font-size:clamp(28px,3.8vw,44px); margin-top:10px; letter-spacing:-0.015em;}
-.lp-head p:not(.eyebrow){font-size:16.5px; color:var(--ink-2); margin-top:14px; line-height:1.6;}
+.lp-head p:not(.lp-kicker){font-size:16.5px; color:var(--ink-2); margin-top:14px; line-height:1.6;}
 
 .lp-steps{display:grid; gap:96px; margin-top:64px;}
 .lp-step{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:72px; align-items:center;}
@@ -317,11 +318,8 @@ const CSS = `
 .lp-step-visual{max-width:470px; width:100%; justify-self:center;}
 
 .lp-prog{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr); gap:64px; align-items:center;}
-.lp-feats{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 22px; margin-top:30px;}
-.lp-feat{display:flex; gap:12px;}
-.lp-feat-ic{width:34px; height:34px; border-radius:10px; background:var(--surface); border:1px solid var(--line); color:var(--primary-600);
-  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .4s var(--ease-spring), background .3s, color .3s;}
-.lp-feat:hover .lp-feat-ic{transform:translateY(-2px) rotate(-4deg); background:var(--primary); color:#fff;}
+.lp-feats{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 28px; margin-top:32px;}
+.lp-feat{border-top:1px solid var(--line); padding-top:14px;}
 .lp-feat h3{font-size:15px;}
 .lp-feat p{font-size:13.5px; color:var(--muted); line-height:1.5; margin-top:3px;}
 
