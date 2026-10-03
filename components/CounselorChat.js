@@ -22,6 +22,7 @@ const STARTERS = [
   'What should I do this summer?',
   'Which of my activities is weakest, and how do I fix it?',
   'How do I build a balanced university list?',
+  'Give me an original project idea for my field',
 ];
 
 export default function CounselorChat({ portfolio }) {
@@ -33,6 +34,7 @@ export default function CounselorChat({ portfolio }) {
   const [err, setErr] = useState('');
   const [upgrade, setUpgrade] = useState(false);
   const scrollRef = useRef(null);
+  const inputRef = useRef(null);
   const loadedFor = useRef(null);
 
   useEffect(() => {
@@ -77,6 +79,24 @@ export default function CounselorChat({ portfolio }) {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, busy]);
 
+  // The field grows with the text (up to ~8 lines, then scrolls).
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const border = el.offsetHeight - el.clientHeight; // border-box: add the borders back
+    el.style.height = `${Math.min(el.scrollHeight + border, 220)}px`;
+  }, [input]);
+
+  // Enter sends, Shift+Enter is a new line. On touch keyboards Enter is
+  // always a new line — there is a send button for that.
+  function onKeyDown(e) {
+    if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (window.matchMedia?.('(pointer: coarse)').matches) return;
+    e.preventDefault();
+    send();
+  }
+
   async function send(textArg) {
     const text = (textArg ?? input).trim();
     if (!text || busy) return;
@@ -111,7 +131,7 @@ export default function CounselorChat({ portfolio }) {
         {messages.length === 0 && (
           <div style={{ maxWidth: 520 }}>
             <p className="muted" style={{ fontSize: 14.5, lineHeight: 1.6 }}>
-              {t('Ask what you would ask an experienced counselor — your school list, summer plans, early decision strategy. It reads your portfolio before answering.')}
+              {t('Ask anything about studying abroad: your school list, essays, project ideas, summer plans. Write in any language — it answers in yours and knows your portfolio.')}
             </p>
             <div style={{ display: 'grid', gap: 8, marginTop: 14 }}>
               {STARTERS.map((s) => (
@@ -138,9 +158,12 @@ export default function CounselorChat({ portfolio }) {
           send();
         }}
       >
-        <input
+        <textarea
+          ref={inputRef}
+          rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={onKeyDown}
           placeholder={t('Ask your counselor…')}
           maxLength={2000}
           aria-label={t('Message')}
@@ -162,8 +185,9 @@ export default function CounselorChat({ portfolio }) {
         .chat-msg.them{align-self:flex-start; background:var(--surface); border:1px solid var(--line); border-bottom-left-radius:4px;}
         .chat-starter{text-align:left; font:500 14px var(--sans); padding:10px 13px; border-radius:var(--r-sm); border:1px solid var(--line-strong); background:var(--surface); cursor:pointer; color:var(--ink);}
         .chat-starter:hover{border-color:var(--ink-2);}
-        .chat-input{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line);}
-        .chat-input input{flex:1;}
+        .chat-input{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); align-items:flex-end;}
+        .chat-input textarea{flex:1; min-height:46px; max-height:220px; resize:none; overflow-y:auto; line-height:1.5;}
+        .chat-input .btn{height:46px; flex-shrink:0;}
         .chat-clear{align-self:flex-start; margin:0 12px 12px; background:none; border:0; color:var(--muted); font-size:12.5px; cursor:pointer; padding:0;}
       `}</style>
     </div>

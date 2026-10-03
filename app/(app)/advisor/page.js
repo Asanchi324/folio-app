@@ -13,7 +13,7 @@ export default function AdvisorPage() {
     <div className="page page-narrow">
       <PageHead
         title={t('AI counselor')}
-        sub={t('Strategy questions about your own profile. Pro gives you the full conversation; free accounts get 3 messages a day.')}
+        sub={t('Admissions, essays, ideas and plans — in your language. Pro gives you the full conversation; free accounts get 3 messages a day.')}
       />
       <CounselorChat portfolio={p} />
     </div>

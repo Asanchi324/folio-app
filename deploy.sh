@@ -11,12 +11,20 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 echo "▶ Deploying to production…"
-out="$(npx --yes vercel --prod --yes 2>&1)"
-echo "$out"
+# Capture output in a file and don't let a non-zero exit abort the script
+# silently (set -e used to kill it right here with nothing printed).
+log="$(mktemp)"
+status=0
+npx --yes vercel --prod --yes >"$log" 2>&1 || status=$?
+cat "$log"
 
-url="$(printf '%s\n' "$out" \
-  | grep -oE 'https://folio-[a-z0-9]+-assans-projects-6f23b41d\.vercel\.app' \
-  | head -1)"
+url="$(grep -oE 'https://folio-[a-z0-9]+-assans-projects-6f23b41d\.vercel\.app' "$log" | head -1 || true)"
+rm -f "$log"
+
+if [ "$status" -ne 0 ]; then
+  echo "✗ vercel exited with status $status (see output above)."
+  exit "$status"
+fi
 
 if [ -z "$url" ]; then
   echo "✗ Could not parse the new deployment URL from vercel output — re-point manually:"
