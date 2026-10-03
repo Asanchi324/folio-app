@@ -57,6 +57,11 @@ export async function POST(request) {
   // Server-side plan gate: anonymous/free get the demo allowance, Pro gets
   // real usage. The 429 body carries upgrade:true so the client can upsell.
   const access = await resolveAccess(request);
+  // Signed-in only: an anonymous endpoint can be hammered from rotating IPs,
+  // a Google account per request can't.
+  if (!access.uid) {
+    return NextResponse.json({ error: 'Sign in to use the essay coach.', signin: true }, { status: 401 });
+  }
   const limits = aiLimitsFor('essay', access.plan);
   const limited = await enforce(request, 'essay', limits, { id: access.uid || undefined });
   if (limited) {

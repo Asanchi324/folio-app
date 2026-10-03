@@ -5,6 +5,7 @@
 // users get 3 messages/day server-side; the 429 response shows the upsell.
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { getDb } from '@/lib/firebase';
 import { useAccount } from '@/lib/account';
@@ -26,7 +27,9 @@ const STARTERS = [
 ];
 
 export default function CounselorChat({ portfolio }) {
-  const { user } = useAccount();
+  const { user, ready: accountReady } = useAccount();
+  // The counselor API is signed-in only (abuse protection).
+  const needsSignIn = accountReady && !user;
   const { t, lang } = useT();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -99,7 +102,7 @@ export default function CounselorChat({ portfolio }) {
 
   async function send(textArg) {
     const text = (textArg ?? input).trim();
-    if (!text || busy) return;
+    if (!text || busy || needsSignIn) return;
     setInput('');
     setErr('');
     setUpgrade(false);
@@ -148,6 +151,12 @@ export default function CounselorChat({ portfolio }) {
           </div>
         ))}
         {busy && <div className="muted" style={{ fontSize: 13 }}>{t('Reading your profile…')}</div>}
+        {needsSignIn && (
+          <p className="chat-signin">
+            {t('Sign in to talk to the counselor.')}{' '}
+            <Link href="/login" className="btn btn-primary btn-sm">{t('Sign in')}</Link>
+          </p>
+        )}
         {err && !upgrade && <p className="error-text">{err}</p>}
         {upgrade && <UpgradeNote message={err} />}
       </div>
@@ -168,7 +177,7 @@ export default function CounselorChat({ portfolio }) {
           maxLength={2000}
           aria-label={t('Message')}
         />
-        <button className="btn btn-primary" type="submit" disabled={busy || !input.trim()} aria-label={t('Send')}>
+        <button className="btn btn-primary" type="submit" disabled={busy || needsSignIn || !input.trim()} aria-label={t('Send')}>
           <Icon name="arrow" size={18} />
         </button>
       </form>
@@ -188,6 +197,7 @@ export default function CounselorChat({ portfolio }) {
         .chat-input{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); align-items:flex-end;}
         .chat-input textarea{flex:1; min-height:46px; max-height:220px; resize:none; overflow-y:auto; line-height:1.5;}
         .chat-input .btn{height:46px; flex-shrink:0;}
+        .chat-signin{display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:14.5px; margin-top:6px;}
         .chat-clear{align-self:flex-start; margin:0 12px 12px; background:none; border:0; color:var(--muted); font-size:12.5px; cursor:pointer; padding:0;}
       `}</style>
     </div>

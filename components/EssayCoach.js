@@ -4,6 +4,7 @@
 // (enforced server-side), then the API returns upgrade:true.
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { apiPost } from '@/lib/auth';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
@@ -18,12 +19,14 @@ export default function EssayCoach({ essay }) {
   const [review, setReview] = useState(null);
   const [err, setErr] = useState('');
   const [upgrade, setUpgrade] = useState(false);
+  const [signin, setSignin] = useState(false);
   const [showAfter, setShowAfter] = useState(true);
 
   async function run() {
     setBusy(true);
     setErr('');
     setUpgrade(false);
+    setSignin(false);
     try {
       const data = await apiPost('/api/essay', { essay, promptQuestion: promptQ, lang });
       setReview(data.review);
@@ -31,6 +34,7 @@ export default function EssayCoach({ essay }) {
     } catch (e) {
       setErr(t(e.message));
       if (e.data?.upgrade) setUpgrade(true);
+      if (e.data?.signin) setSignin(true);
     } finally {
       setBusy(false);
     }
@@ -70,7 +74,12 @@ export default function EssayCoach({ essay }) {
         </div>
       )}
 
-      {err && !upgrade && <p className="error-text">{err}</p>}
+      {err && !upgrade && (
+        <p className="error-text">
+          {err}{' '}
+          {signin && <Link href="/login">{t('Sign in')} →</Link>}
+        </p>
+      )}
       {upgrade && <UpgradeNote message={err} />}
 
       {review && (

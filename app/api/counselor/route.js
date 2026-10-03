@@ -127,6 +127,11 @@ Relevant catalog opportunities: ${comps}`;
 
 export async function POST(request) {
   const access = await resolveAccess(request);
+  // Signed-in only: an anonymous endpoint can be hammered from rotating IPs,
+  // a Google account per request can't.
+  if (!access.uid) {
+    return NextResponse.json({ error: 'Sign in to talk to the counselor.', signin: true }, { status: 401 });
+  }
   const limits = aiLimitsFor('counselor', access.plan);
   const limited = await enforce(request, 'counselor', limits, { id: access.uid || undefined });
   if (limited) {
