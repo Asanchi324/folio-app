@@ -59,6 +59,9 @@ function Guarded({ children }) {
         <button className="btn btn-primary btn-block" style={{ marginTop: 18 }} onClick={() => signInWithGoogle().catch(() => {})}>
           {t('Continue with Google')}
         </button>
+        <Link href={`/login?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/business')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
+          {t('or sign in with email')}
+        </Link>
       </Centered>
     );
   }

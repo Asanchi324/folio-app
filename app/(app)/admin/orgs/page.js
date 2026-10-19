@@ -22,6 +22,7 @@ import {
 import { getDb } from '@/lib/firebase';
 import { useAccount } from '@/lib/account';
 import { apiPost } from '@/lib/auth';
+import { migrateCounselorCode, getCounselorCode } from '@/lib/org';
 
 export default function FounderOrgsPage() {
   const { user, ready } = useAccount();
@@ -45,7 +46,19 @@ export default function FounderOrgsPage() {
     if (!db) return;
     try {
       const snap = await getDocs(collection(db, 'orgs'));
-      setOrgs(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      // Counselor codes live in orgs/{id}/private/codes; legacy orgs still
+      // carry them on the org doc — opening this page migrates them all.
+      const withCodes = await Promise.all(
+        list.map(async (o) => {
+          if (o.counselorCode) {
+            await migrateCounselorCode(o.id, o.counselorCode);
+            return o;
+          }
+          return { ...o, counselorCode: await getCounselorCode(o.id) };
+        })
+      );
+      setOrgs(withCodes);
     } catch (e) {
       setMsg(`Could not list orgs: ${e.message}`);
     }

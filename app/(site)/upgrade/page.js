@@ -115,6 +115,9 @@ export default function UpgradePage() {
           <button className="btn btn-primary" style={{ marginTop: 14 }} onClick={() => signInWithGoogle().catch(() => {})}>
             {t('Continue with Google')}
           </button>
+          <Link href={`/login?next=${encodeURIComponent('/upgrade')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
+            {t('or sign in with email')}
+          </Link>
         </div>
       )}
 

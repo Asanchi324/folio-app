@@ -64,11 +64,14 @@ export default function JoinPage() {
             <Icon name="mail" size={30} style={{ color: 'var(--faint)' }} />
             <h1 style={{ fontSize: 26, marginTop: 12 }}>{t('You have been invited')}</h1>
             <p className="muted" style={{ marginTop: 10, fontSize: 15, lineHeight: 1.55 }}>
-              {t('Sign in with Google to see who invited you and connect your portfolio.')}
+              {t('Sign in to see who invited you and connect your portfolio.')}
             </p>
             <button className="btn btn-primary" style={{ marginTop: 20, width: '100%' }} onClick={() => signInWithGoogle().catch(() => {})}>
               {t('Continue with Google')}
             </button>
+            <Link href={`/login?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
+              {t('or sign in with email')}
+            </Link>
           </>
         ) : codeDoc === undefined ? (
           <p className="muted">{t('Checking the invite…')}</p>

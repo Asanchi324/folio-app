@@ -29,13 +29,19 @@ service cloud.firestore {
     function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
 
     // Founder admins — EDIT THIS LIST (must match FOLIO_ADMIN_EMAILS env).
+    // email_verified is essential: if an email/password provider is ever
+    // enabled, anyone could register an unverified account with this address.
     function isFounder() {
       return signedIn() &&
+        request.auth.token.email_verified == true &&
         request.auth.token.email in ['djdjdj.9413@gmail.com'];
     }
 
     function orgDoc(orgId) {
       return get(/databases/$(database)/documents/orgs/$(orgId)).data;
+    }
+    function orgCodes(orgId) {
+      return get(/databases/$(database)/documents/orgs/$(orgId)/private/codes).data;
     }
     function isMember(orgId) {
       return signedIn() &&
@@ -103,19 +109,37 @@ service cloud.firestore {
         (signedIn() && resource.data.ownerUid == request.auth.uid);
       // Self-serve workspace creation — must start on the free plan, and can
       // never smuggle billing fields in (Stripe writes those via the webhook).
+      // counselorCode may NOT live here: every member can read this doc.
       allow create: if isFounder() ||
         (signedIn() &&
           request.resource.data.ownerUid == request.auth.uid &&
           request.resource.data.plan == 'free' &&
           !request.resource.data.keys().hasAny(
-            ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt']));
+            ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'counselorCode']));
       // Admins manage the org but can ONLY touch cosmetic fields — plan/seats
       // are billing (webhook/founder-only), codes + ownerUid stay stable.
+      // Exception: removing a legacy counselorCode (migration to private/codes).
       allow update: if isFounder() ||
         (isOrgAdmin(orgId) &&
           request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['name', 'type', 'brandName', 'settings']));
+            .hasOnly(['name', 'type', 'brandName', 'settings', 'counselorCode']) &&
+          !('counselorCode' in request.resource.data));
       allow delete: if isFounder();
+
+      // ---------- private/codes — staff invite code, admins only ----------
+      // Created in the same batch as the org (getAfter) or by the legacy
+      // migration, which must copy the org's existing code verbatim.
+      match /private/{docId} {
+        allow read: if isFounder() || isOrgAdmin(orgId);
+        allow create: if isFounder() ||
+          (docId == 'codes' && signedIn() &&
+            request.resource.data.keys().hasOnly(['counselorCode']) &&
+            (getAfter(/databases/$(database)/documents/orgs/$(orgId)).data.ownerUid == request.auth.uid ||
+              isOrgAdmin(orgId)) &&
+            (!exists(/databases/$(database)/documents/orgs/$(orgId)) ||
+              request.resource.data.counselorCode == orgDoc(orgId).get('counselorCode', null)));
+        allow update, delete: if isFounder();
+      }
 
       // ---------- membership ----------
       match /members/{memberUid} {
@@ -134,7 +158,7 @@ service cloud.firestore {
               (request.resource.data.role == 'student' &&
                 request.resource.data.joinCode == orgDoc(orgId).joinCode) ||
               (request.resource.data.role == 'counselor' &&
-                request.resource.data.joinCode == orgDoc(orgId).counselorCode) ||
+                request.resource.data.joinCode == orgCodes(orgId).counselorCode) ||
               (request.resource.data.role == 'student' &&
                 request.auth.token.email_verified == true &&
                 request.resource.data.inviteId == orgId + '_' + request.auth.token.email.lower() &&

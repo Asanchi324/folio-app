@@ -122,6 +122,9 @@ export default function SettingsPage() {
                 <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => signInWithGoogle().catch(() => {})}>
                   {t('Continue with Google')}
                 </button>
+                <Link href={`/login?next=${encodeURIComponent('/settings')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
+                  {t('or sign in with email')}
+                </Link>
               </>
             )}
           </section>
