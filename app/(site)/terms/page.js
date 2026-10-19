@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { getT } from '@/lib/i18n-server';
+import { pageAlternates } from '@/lib/seo';
 
 export async function generateMetadata() {
   const { t } = await getT();
   return {
     title: t('Terms of use'),
     description: t('The rules for using Folio, its AI tools and paid plans.'),
-    alternates: { canonical: '/terms' },
+    alternates: await pageAlternates('/terms'),
   };
 }
 

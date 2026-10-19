@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { getT } from '@/lib/i18n-server';
+import { pageAlternates } from '@/lib/seo';
 
 export async function generateMetadata() {
   const { t } = await getT();
   return {
     title: t('Privacy policy'),
     description: t('What Folio collects, why, who processes it, and how to export or delete your data.'),
-    alternates: { canonical: '/privacy' },
+    alternates: await pageAlternates('/privacy'),
   };
 }
 

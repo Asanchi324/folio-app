@@ -13,6 +13,8 @@ import {
   LV_CSS,
 } from '@/components/LandingVisuals';
 import { getT } from '@/lib/i18n-server';
+import { pageAlternates, SITE_URL, SITE_NAME } from '@/lib/seo';
+import { PLANS } from '@/lib/plans';
 
 // Landing — server component. Two audiences, one page: students (→ /start)
 // and schools/counselors (→ /start?type=business). Anchors: #product,
@@ -25,14 +27,68 @@ export async function generateMetadata() {
     description: t(
       'Folio turns your grades, tests, activities and essays into one admissions portfolio, gives personal feedback on every part, builds a daily plan and shows your chances at 800+ universities.'
     ),
-    alternates: { canonical: '/' },
+    alternates: await pageAlternates('/'),
+  };
+}
+
+// Structured data: who we are, the site, the app with its prices, and the FAQ
+// (eligible for rich results in Google and Yandex).
+function jsonLd(t, lang) {
+  const description = t(
+    'Folio turns your grades, tests, activities and essays into one admissions portfolio, gives personal feedback on every part, builds a daily plan and shows your chances at 800+ universities.'
+  );
+  const org = { '@id': `${SITE_URL}/#org` };
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        ...org,
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: `${SITE_URL}/icon-512`,
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE_URL}/#website`,
+        name: SITE_NAME,
+        url: SITE_URL,
+        inLanguage: ['en', 'ru', 'kk'],
+        publisher: org,
+      },
+      {
+        '@type': 'WebApplication',
+        name: SITE_NAME,
+        url: SITE_URL,
+        description,
+        applicationCategory: 'EducationalApplication',
+        operatingSystem: 'Web',
+        inLanguage: lang,
+        publisher: org,
+        offers: Object.values(PLANS)
+          .filter((p) => p.id === 'free' || p.id === 'pro')
+          .map((p) => ({ '@type': 'Offer', name: p.id === 'free' ? 'Free' : 'Pro', price: String(p.price.monthly), priceCurrency: 'USD' })),
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqItems(t).map(([q, a]) => ({
+          '@type': 'Question',
+          name: q,
+          acceptedAnswer: { '@type': 'Answer', text: a },
+        })),
+      },
+    ],
   };
 }
 
 export default async function Landing() {
-  const { t } = await getT();
+  const { t, lang } = await getT();
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(t, lang)).replace(/</g, '\\u003c') }}
+      />
       <Hero t={t} />
       <Steps t={t} />
       <Product t={t} />
@@ -223,8 +279,8 @@ function Schools({ t }) {
   );
 }
 
-function FAQ({ t }) {
-  const qa = [
+function faqItems(t) {
+  return [
     [t('Is Folio really free?'), t('Yes. The portfolio, feedback, the daily plan, university chances and the opportunities database are free. Pro adds the essay coach, the AI counselor and clean exports.')],
     [t('Where do the chances come from?'), t('From each university’s published admission data — acceptance rate, SAT/ACT range and test policy — compared with your profile. They are estimates: use them to build a balanced list, not as a promise.')],
     [t('Does the AI write my application for me?'), t('No. It reviews and suggests. Rewrites use only the facts you gave it, and the essay coach asks questions instead of inventing details.')],
@@ -232,6 +288,10 @@ function FAQ({ t }) {
     [t('Which languages are supported?'), t('The interface and AI answers work in English, Russian and Kazakh. Activity rewrites stay in English because applications are submitted in English.')],
     [t('How does the school workspace work?'), t('A counselor creates a workspace, adds students by email or invite code, and sees their portfolios read-only. Students confirm the connection themselves and can disconnect at any time.')],
   ];
+}
+
+function FAQ({ t }) {
+  const qa = faqItems(t);
   return (
     <section className="section lp-band" id="faq">
       <div className="wrap" style={{ maxWidth: 820 }}>

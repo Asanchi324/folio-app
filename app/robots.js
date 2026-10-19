@@ -1,5 +1,5 @@
 // SEO: index the marketing + share surfaces, keep app/console routes out.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://foli0.vercel.app';
+import { SITE_URL } from '@/lib/seo';
 
 export default function robots() {
   return {
@@ -14,5 +14,6 @@ export default function robots() {
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

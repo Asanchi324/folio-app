@@ -1,16 +1,25 @@
-// Static sitemap for the public marketing surfaces. Share pages (/p/*) are
-// intentionally excluded — they're unlisted-by-link, not discoverable content.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://foli0.vercel.app';
+// Sitemap for the public marketing surfaces, with hreflang alternates for the
+// ?lang= language versions. Share pages (/p/*) are intentionally excluded —
+// they're unlisted-by-link, not discoverable content.
+import { SITE_URL, languageAlternates } from '@/lib/seo';
+
+const PAGES = [
+  ['/', 'weekly', 1],
+  ['/universities', 'weekly', 0.9],
+  ['/discover', 'weekly', 0.9],
+  ['/start', 'monthly', 0.8],
+  ['/upgrade', 'monthly', 0.7],
+  ['/privacy', 'yearly', 0.2],
+  ['/terms', 'yearly', 0.2],
+];
 
 export default function sitemap() {
   const now = new Date();
-  return [
-    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${SITE_URL}/start`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${SITE_URL}/upgrade`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${SITE_URL}/universities`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${SITE_URL}/discover`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
-  ];
+  return PAGES.map(([path, changeFrequency, priority]) => ({
+    url: SITE_URL + path,
+    lastModified: now,
+    changeFrequency,
+    priority,
+    alternates: { languages: languageAlternates(path, true) },
+  }));
 }
