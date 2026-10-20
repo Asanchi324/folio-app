@@ -11,7 +11,8 @@ import { deleteUser } from 'firebase/auth';
 import { getDb, getFirebaseAuth, isFirebaseConfigured } from '@/lib/firebase';
 import { usePortfolio } from '@/lib/store';
 import { useEffectivePlan } from '@/lib/account';
-import { signInWithGoogle, signOut } from '@/lib/auth';
+import { signOut } from '@/lib/auth';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { openBillingPortal } from '@/lib/billing';
 import { unpublishShare } from '@/lib/share';
 import { leaveOrg } from '@/lib/org';
@@ -119,9 +120,7 @@ export default function SettingsPage() {
                 <p className="muted" style={{ fontSize: 14, marginTop: 6, lineHeight: 1.55 }}>
                   {t('Your portfolio is saved on this device only. Sign in to keep it safe and use it on any device.')}
                 </p>
-                <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => signInWithGoogle().catch(() => {})}>
-                  {t('Continue with Google')}
-                </button>
+                <GoogleSignInButton style={{ marginTop: 12 }} />
                 <Link href={`/login?next=${encodeURIComponent('/settings')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
                   {t('or sign in with email')}
                 </Link>

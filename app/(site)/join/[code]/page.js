@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useAccount } from '@/lib/account';
 import { lookupJoinCode, joinOrg } from '@/lib/org';
-import { signInWithGoogle } from '@/lib/auth';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
@@ -66,9 +66,7 @@ export default function JoinPage() {
             <p className="muted" style={{ marginTop: 10, fontSize: 15, lineHeight: 1.55 }}>
               {t('Sign in to see who invited you and connect your portfolio.')}
             </p>
-            <button className="btn btn-primary" style={{ marginTop: 20, width: '100%' }} onClick={() => signInWithGoogle().catch(() => {})}>
-              {t('Continue with Google')}
-            </button>
+            <GoogleSignInButton style={{ marginTop: 20, width: '100%' }} />
             <Link href={`/login?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
               {t('or sign in with email')}
             </Link>

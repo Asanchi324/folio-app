@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { usePortfolio } from '@/lib/store';
 import { useAccount } from '@/lib/account';
 import { createOrg } from '@/lib/org';
-import { signInWithGoogle } from '@/lib/auth';
+import { signInWithGoogle, googleSignInError } from '@/lib/auth';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
@@ -415,7 +415,7 @@ function BusinessSurvey({ router, onSwitch }) {
       // students; a plan can be chosen from Billing whenever they're ready.
       router.push('/business/students?created=1');
     } catch (e) {
-      setErr(e?.message || t('Could not create the workspace.'));
+      setErr(e?.code?.startsWith('auth/') ? googleSignInError(e, t) : e?.message || t('Could not create the workspace.'));
       setBusy(false);
     }
   }

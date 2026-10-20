@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 import PricingCards from '@/components/Pricing';
 import { useEffectivePlan } from '@/lib/account';
 import { startCheckout, openBillingPortal, contactHref, BILLING_CONTACT } from '@/lib/billing';
-import { signInWithGoogle } from '@/lib/auth';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { ORG_PLAN_IDS } from '@/lib/plans';
 import { track } from '@/lib/analytics';
 import { apiPost } from '@/lib/auth';
@@ -112,9 +112,7 @@ export default function UpgradePage() {
           <p className="muted" style={{ fontSize: 14, marginTop: 8, lineHeight: 1.6 }}>
             {t('Sign in with Google so the plan is attached to your account, then choose the plan again.')}
           </p>
-          <button className="btn btn-primary" style={{ marginTop: 14 }} onClick={() => signInWithGoogle().catch(() => {})}>
-            {t('Continue with Google')}
-          </button>
+          <GoogleSignInButton style={{ marginTop: 14 }} />
           <Link href={`/login?next=${encodeURIComponent('/upgrade')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
             {t('or sign in with email')}
           </Link>

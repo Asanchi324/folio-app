@@ -11,7 +11,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { WorkspaceProvider, useWorkspace } from '@/lib/workspace';
-import { signInWithGoogle, apiPost } from '@/lib/auth';
+import { apiPost } from '@/lib/auth';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { orgPlanLabel } from '@/lib/plans';
 import { useT } from '@/lib/i18n';
@@ -56,9 +57,7 @@ function Guarded({ children }) {
     return (
       <Centered icon="building" title={t('Sign in to your workspace')}>
         {t('The workspace is where schools and counselors follow their students’ portfolios.')}
-        <button className="btn btn-primary btn-block" style={{ marginTop: 18 }} onClick={() => signInWithGoogle().catch(() => {})}>
-          {t('Continue with Google')}
-        </button>
+        <GoogleSignInButton className="btn btn-primary btn-block" style={{ marginTop: 18 }} />
         <Link href={`/login?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/business')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
           {t('or sign in with email')}
         </Link>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   signInWithGoogle,
+  googleSignInError,
   signInWithEmail,
   signUpWithEmail,
   resetPassword,
@@ -92,7 +93,7 @@ export default function LoginPage() {
       await signInWithGoogle(); // on mobile this redirects away; effect handles return
       setBusy(false);
     } catch (e) {
-      setErr(t('Could not sign in. Allow pop-ups for this site and try again.'));
+      setErr(googleSignInError(e, t));
       setBusy(false);
     }
   }
