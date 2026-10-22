@@ -7,7 +7,6 @@ const PAGES = [
   ['/', 'weekly', 1],
   ['/universities', 'weekly', 0.9],
   ['/discover', 'weekly', 0.9],
-  ['/start', 'monthly', 0.8],
   ['/upgrade', 'monthly', 0.7],
   ['/privacy', 'yearly', 0.2],
   ['/terms', 'yearly', 0.2],

@@ -7,6 +7,9 @@ export async function generateMetadata() {
     title: t('Get started'),
     description: t('Answer a few questions and Folio sets up your admissions portfolio — or creates a workspace for your school.'),
     alternates: await pageAlternates('/start'),
+    // The onboarding survey isn't a search landing page — searches should
+    // surface the landing (/), which links here.
+    robots: { index: false, follow: true },
   };
 }
 
