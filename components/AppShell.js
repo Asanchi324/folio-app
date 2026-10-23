@@ -149,7 +149,6 @@ export default function AppShell({ children }) {
           <Icon name="settings" size={18} />
           <span>{t('Settings')}</span>
         </Link>
-        <LangSwitch className="sb-lang" />
         {authEnabled &&
           (user ? (
             <div className="sb-user">
@@ -169,6 +168,7 @@ export default function AppShell({ children }) {
               {t('Sign in to sync')}
             </Link>
           ))}
+        <LangSwitch className="sb-lang" />
       </div>
     </>
   );
@@ -188,7 +188,6 @@ export default function AppShell({ children }) {
             <BrandMark size={24} />
             <span>Folio</span>
           </Link>
-          <LangSwitch variant="select" />
         </header>
         <main className="shell-content">
           <InviteBanner />

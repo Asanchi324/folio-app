@@ -10,7 +10,6 @@ import { useAccount } from '@/lib/account';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { useT } from '@/lib/i18n';
 import { BrandMark } from '@/components/Brand';
-import LangSwitch from '@/components/LangSwitch';
 import Icon from '@/components/Icon';
 
 const LINKS = [
@@ -46,7 +45,6 @@ export default function Nav() {
         </nav>
 
         <div className="nav-actions">
-          <LangSwitch variant="select" />
           {authEnabled && !user && (
             <Link href="/login" className="nav-signin">
               {t('Sign in')}

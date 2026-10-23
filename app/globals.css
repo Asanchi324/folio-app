@@ -701,8 +701,34 @@ textarea:focus {
   font-weight: 700;
   margin-bottom: 8px;
 }
-.footer-lang {
-  margin-top: 16px;
+.lang-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12.5px;
+}
+.lang-text button {
+  width: auto;
+  padding: 2px 4px;
+  border: none;
+  background: none;
+  color: var(--faint);
+  font: inherit;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.lang-text button + button::before {
+  content: '·';
+  margin-right: 6px;
+  color: var(--line-strong);
+}
+.lang-text button:hover {
+  color: var(--ink-2);
+}
+.lang-text button.on {
+  color: var(--ink-2);
+  font-weight: 600;
 }
 .footer-base {
   display: flex;
@@ -856,7 +882,7 @@ textarea:focus {
 }
 .sb-lang {
   justify-self: start;
-  margin-left: 8px;
+  margin-left: 6px;
 }
 .sb-user {
   display: flex;

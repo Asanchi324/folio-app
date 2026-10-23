@@ -100,7 +100,7 @@ export default function SettingsPage() {
             {t('Interface and AI answers. Activity rewrites stay in English, because applications are submitted in English.')}
           </p>
           <div style={{ marginTop: 12 }}>
-            <LangSwitch />
+            <LangSwitch variant="segmented" />
           </div>
         </section>
 

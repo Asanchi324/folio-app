@@ -18,7 +18,6 @@ export default function Footer() {
           <p className="muted" style={{ fontSize: 14, marginTop: 10, maxWidth: 320, lineHeight: 1.6 }}>
             {t('Admissions portfolios for students applying abroad — and the schools that guide them.')}
           </p>
-          <LangSwitch className="footer-lang" />
         </div>
         <div>
           <div className="footer-h">{t('Product')}</div>
@@ -36,7 +35,10 @@ export default function Footer() {
       </div>
       <div className="wrap footer-base">
         <span>© {new Date().getFullYear()} Folio</span>
-        <span>{t('Made in Kazakhstan')}</span>
+        <span style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+          {t('Made in Kazakhstan')}
+          <LangSwitch />
+        </span>
       </div>
     </footer>
   );
