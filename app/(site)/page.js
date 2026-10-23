@@ -363,7 +363,8 @@ const CSS = `
 .lp-for-schools a{color:var(--ink); font-weight:600; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:4px; transition:text-decoration-color .2s;}
 .lp-for-schools a:hover{text-decoration-color:currentColor;}
 
-.lp-band{background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+.lp-band{background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+.lp-band .card{background:var(--surface-2);}
 .lp-head{max-width:680px; margin-bottom:40px;}
 .lp-head.lp-center{text-align:center; margin-inline:auto;}
 .lp-head h2{font-size:clamp(28px,3.8vw,44px); margin-top:10px; letter-spacing:-0.015em;}

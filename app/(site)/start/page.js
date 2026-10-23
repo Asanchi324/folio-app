@@ -11,6 +11,8 @@ import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
 import Icon from '@/components/Icon';
+import ScoreRuler from '@/components/ScoreRuler';
+import { markTourPending } from '@/components/ProductTour';
 
 // First-run onboarding. Forks by audience on step 0:
 //   student → the portfolio survey (pre-fills the builder), then /portfolio
@@ -27,6 +29,16 @@ const GRADES = [
 ];
 
 const TARGETS = ['USA', 'UK', 'Canada', 'Europe', 'Asia'];
+
+// Ruler settings per GPA scale: range, snap step, tick spacing (px), a major
+// tick every `major` steps, a label every `labelEvery` steps.
+const GPA_RULER = {
+  4: { min: 2, max: 4, step: 0.05, gap: 14, major: 2, labelEvery: 10, start: 3.5 },
+  5: { min: 2.5, max: 5, step: 0.05, gap: 14, major: 2, labelEvery: 10, start: 4.3 },
+  100: { min: 50, max: 100, step: 1, gap: 12, major: 5, labelEvery: 10, start: 85 },
+};
+const SAT_RULER = { min: 400, max: 1600, step: 10, gap: 10, major: 10, labelEvery: 10, start: 1200 };
+const IELTS_RULER = { min: 4, max: 9, step: 0.5, gap: 40, major: 2, labelEvery: 1, start: 6.5 };
 
 const HAVE_TESTS = [
   { v: 'yes', label: 'Yes, I have scores' },
@@ -177,18 +189,14 @@ function StudentSurvey({ router, onSwitch }) {
       valid: () => true,
       body: (
         <>
-          <div className="row row-2">
-            <Field label="GPA" hint={t('if you know it')}>
-              <input type="number" step="0.01" value={form.gpa} onChange={(e) => set({ gpa: e.target.value })} placeholder="3.9" />
-            </Field>
-            <Field label={t('GPA scale')}>
-              <select value={form.gpaScale} onChange={(e) => set({ gpaScale: e.target.value })}>
-                <option value="4">{t('out of 4.0')}</option>
-                <option value="5">{t('out of 5.0')}</option>
-                <option value="100">{t('out of 100')}</option>
-              </select>
-            </Field>
-          </div>
+          <Field label={t('GPA scale')}>
+            <select value={form.gpaScale} onChange={(e) => set({ gpaScale: e.target.value, gpa: '' })}>
+              <option value="4">{t('out of 4.0')}</option>
+              <option value="5">{t('out of 5.0')}</option>
+              <option value="100">{t('out of 100')}</option>
+            </select>
+          </Field>
+          <ScoreRuler key={form.gpaScale} label="GPA" hint={t('if you know it')} value={form.gpa} onChange={(v) => set({ gpa: v })} {...GPA_RULER[form.gpaScale]} />
           <span className="field-label">{t('Do you have SAT / IELTS scores?')}</span>
           <div style={{ display: 'grid', gap: 10, marginBottom: 6 }}>
             {HAVE_TESTS.map((h) => (
@@ -196,13 +204,9 @@ function StudentSurvey({ router, onSwitch }) {
             ))}
           </div>
           {form.haveTests === 'yes' && (
-            <div className="row row-2 fade-in" style={{ marginTop: 8 }}>
-              <Field label={t('SAT total')} hint={t('optional')}>
-                <input type="number" value={form.sat} onChange={(e) => set({ sat: e.target.value })} placeholder="1480" />
-              </Field>
-              <Field label="IELTS" hint={t('optional')}>
-                <input type="number" step="0.5" value={form.ielts} onChange={(e) => set({ ielts: e.target.value })} placeholder="7.5" />
-              </Field>
+            <div className="fade-in" style={{ marginTop: 14 }}>
+              <ScoreRuler label={t('SAT total')} hint={t('optional')} value={form.sat} onChange={(v) => set({ sat: v })} {...SAT_RULER} />
+              <ScoreRuler label="IELTS" hint={t('optional')} value={form.ielts} onChange={(v) => set({ ielts: v })} {...IELTS_RULER} />
             </div>
           )}
         </>
@@ -243,6 +247,7 @@ function StudentSurvey({ router, onSwitch }) {
       testing: { ...prev.testing, ...testing },
     }));
     track('onboarding_complete', { grade: form.gradeLevel, major: form.intendedMajor || '(none)' });
+    markTourPending();
     router.push('/portfolio');
   }
 
@@ -270,7 +275,7 @@ function StudentSurvey({ router, onSwitch }) {
           </div>
           <p style={{ textAlign: 'center', marginTop: 22 }}>
             <button
-              onClick={() => { update({ onboarded: true }); track('onboarding_complete', { skipped: true }); router.push('/portfolio'); }}
+              onClick={() => { update({ onboarded: true }); track('onboarding_complete', { skipped: true }); markTourPending(); router.push('/portfolio'); }}
               style={{ background: 'none', border: 'none', color: 'var(--faint)', fontSize: 13.5, cursor: 'pointer', width: 'auto' }}
             >
               {t('Skip — I will fill it in myself')}

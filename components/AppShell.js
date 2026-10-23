@@ -16,6 +16,7 @@ import LangSwitch from '@/components/LangSwitch';
 import { BrandMark } from '@/components/Brand';
 import InviteBanner from '@/components/InviteBanner';
 import { streakInfo } from '@/lib/daily';
+import ProductTour from '@/components/ProductTour';
 
 const STUDENT = [
   { href: '/today', label: 'Today', icon: 'sun', badge: 'streak' },
@@ -176,6 +177,7 @@ export default function AppShell({ children }) {
     <div className="shell">
       <aside className={`sb${open ? ' open' : ''}`}>{sidebar}</aside>
       {open && <div className="sb-scrim" onClick={() => setOpen(false)} aria-hidden />}
+      <ProductTour />
 
       <div className="shell-main">
         <header className="topbar">
