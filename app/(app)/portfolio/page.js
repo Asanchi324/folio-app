@@ -271,6 +271,8 @@ const SIGNAL_TEXT = {
   distinction: 'Recognised result or output',
   no_commitment: 'Add years and hours per week',
   vague: 'Too vague to credit — describe what you did',
+  selective_program: 'Selective program — admission itself is a distinction',
+  paid_program: 'Paid program — shows interest, not selection',
 };
 
 function ActivityRow({ a, index, total, patch, move, remove }) {
@@ -307,7 +309,7 @@ function ActivityRow({ a, index, total, patch, move, remove }) {
     }
   }
 
-  const hints = grade.signals.filter((s) => ['role_member', 'no_numbers', 'no_commitment', 'vague'].includes(s.key));
+  const hints = grade.signals.filter((s) => ['role_member', 'no_numbers', 'no_commitment', 'vague', 'paid_program'].includes(s.key));
 
   return (
     <div className="act-row">

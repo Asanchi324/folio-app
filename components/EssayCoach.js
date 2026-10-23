@@ -9,6 +9,7 @@ import { apiPost } from '@/lib/auth';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
 import { Spinner, UpgradeNote } from '@/components/ui';
+import { HOOK_LABEL, HOOK_SAMPLE } from '@/lib/essay-hooks';
 
 const SCORE_LABELS = { structure: 'Structure', voice: 'Voice', specificity: 'Specificity', impact: 'Impact' };
 
@@ -111,6 +112,34 @@ export default function EssayCoach({ essay }) {
                   — {i}
                 </p>
               ))}
+            </Panel>
+          )}
+
+          {review.hook?.diagnosis && (
+            <Panel
+              title={t('Hook')}
+              right={
+                <span className="muted" style={{ fontSize: 12.5 }}>
+                  {review.hook.type ? t(HOOK_LABEL[review.hook.type]) : ''}
+                  {Number.isFinite(review.hook.strength) ? ` · ${review.hook.strength}/10` : ''}
+                </span>
+              }
+            >
+              <p style={{ fontSize: 14, lineHeight: 1.55 }}>{review.hook.diagnosis}</p>
+              {(review.hook.alternatives || []).map((a, i) => (
+                <div key={i} style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+                  <div className="muted" style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    {a.type ? t(HOOK_LABEL[a.type]) : t('Another way in')}
+                  </div>
+                  <p style={{ fontSize: 14, marginTop: 6, padding: '8px 10px', background: 'var(--good-tint)', borderRadius: 6, lineHeight: 1.5 }}>
+                    {a.opening}
+                  </p>
+                  {a.why && <p className="muted" style={{ fontSize: 13, marginTop: 5 }}>{a.why}</p>}
+                </div>
+              ))}
+              <p className="muted" style={{ fontSize: 12, marginTop: 12, lineHeight: 1.5 }}>
+                {t('Compared with how {n} essays published by admissions offices open (Johns Hopkins, Hamilton, Tufts, Connecticut College).', { n: HOOK_SAMPLE })}
+              </p>
             </Panel>
           )}
 

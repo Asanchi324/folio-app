@@ -1,0 +1,235 @@
+{
+  "_about": "Folio Admit Library — real admitted applicants, facts only, each tied to a public source (checked 2026-10-24). No names of minors, no essay text. verification: A = published by the university, B = national press / ministry, C = self-reported on a third-party platform. uniId = id in lib/universities.js (curated ids win over generated). Levels: school < regional < national < international. Essay-only references live in data/essay-hooks.json.",
+  "version": 2,
+  "records": [
+    {
+      "id": "kz-2026-haileybury-mit-imo",
+      "verification": "B",
+      "source": { "publisher": "Digital Business, citing the Ministry of Enlightenment of Kazakhstan", "url": "https://digitalbusiness.kz/2026-04-10/pyat-topovih-vuzov-mira-pozvali-kazahstanskogo-shkolnika-on-otkazal-chetirem/" },
+      "cycle": "2025/2026",
+      "applicant": { "country": "Kazakhstan", "city": "Almaty", "school": "private international school", "field": "stem", "major": "Mathematics" },
+      "admitted": [{ "uniId": "mit", "enrolled": true, "aid": "full" }, { "uniId": "harvard" }, { "uniId": "stanford" }, { "uniId": "caltech" }, { "uniId": "imperial" }],
+      "stats": {},
+      "honors": [
+        { "title": "IMO 2025 — silver medal", "level": "international" },
+        { "title": "Presidential award for the IMO result", "level": "national" }
+      ],
+      "activities": [{ "title": "Olympiad mathematics with coaches since grade 7", "level": "international", "role": "competitor", "years": 5 }],
+      "archetype": "olympiad_spike",
+      "headline": {
+        "en": "IMO silver → 5 of 5 offers, chose MIT on a full grant",
+        "ru": "Серебро IMO → 5 офферов из 5, выбор — MIT с полным грантом",
+        "kk": "IMO күміс медалі → 5 ұсыныстың 5-еуі, толық грантпен MIT-ті таңдады"
+      },
+      "lesson": {
+        "en": "One international-level result outweighs everything else on the file.",
+        "ru": "Один результат международного уровня перевешивает всё остальное в заявке.",
+        "kk": "Халықаралық деңгейдегі бір нәтиже өтінімдегі қалғанның бәрінен басым."
+      }
+    },
+    {
+      "id": "kz-2018-nis-taldykorgan-chem",
+      "verification": "B",
+      "source": { "publisher": "informburo.kz (via novacity.kz)", "url": "https://informburo.kz/novosti/uchenik-nish-iz-taldykorgana-poluchil-priglasheniya-uchitsya-v-pyati-topovyh-vuzah-ssha.html" },
+      "cycle": "2017/2018",
+      "applicant": { "country": "Kazakhstan", "city": "Taldykorgan", "school": "Nazarbayev Intellectual School", "field": "stem", "major": "Chemistry" },
+      "admitted": [{ "uniId": "mit", "aid": "grant" }, { "uniId": "harvard" }, { "uniId": "stanford" }, { "uniId": "columbia" }, { "uniId": "caltech" }],
+      "stats": {},
+      "honors": [
+        { "title": "IChO (International Chemistry Olympiad) — gold", "level": "international" },
+        { "title": "International Mendeleev Chemistry Olympiad — gold", "level": "international" }
+      ],
+      "activities": [
+        { "title": "Founded a school science magazine; its site reached ~8,000 unique visitors a month", "level": "national", "role": "founder" },
+        { "title": "Built an online community of NIS students preparing for chemistry olympiads", "level": "national", "role": "founder" },
+        { "title": "Blog on applying abroad and English exams", "level": "national", "role": "creator" }
+      ],
+      "archetype": "olympiad_spike",
+      "headline": {
+        "en": "IChO gold + a self-founded science magazine → MIT, Harvard, Stanford, Columbia, Caltech",
+        "ru": "Золото IChO + свой научный журнал → MIT, Harvard, Stanford, Columbia, Caltech",
+        "kk": "IChO алтын медалі + өзі ашқан ғылыми журнал → MIT, Harvard, Stanford, Columbia, Caltech"
+      },
+      "lesson": {
+        "en": "The olympiad opened the door; the magazine and the prep community showed impact on others.",
+        "ru": "Олимпиада открыла дверь, а журнал и сообщество показали влияние на других.",
+        "kk": "Олимпиада есікті ашты, ал журнал мен қауымдастық басқаларға ықпалды көрсетті."
+      }
+    },
+    {
+      "id": "kz-2023-astana-stanford-cs",
+      "verification": "B",
+      "source": { "publisher": "Tengri Life (tengrinews.kz), 28.04.2023", "url": "https://tengrinews.kz/healthy/hochu-vdohnovit-nashih-devushek-kazahstanskuyu-shkolnitsu-496732/amp/" },
+      "cycle": "2022/2023",
+      "applicant": { "country": "Kazakhstan", "city": "Astana", "school": "public school", "field": "stem", "major": "Computer Science" },
+      "admitted": [{ "uniId": "stanford", "enrolled": true, "aid": "86% of cost" }],
+      "stats": {},
+      "honors": [
+        { "title": "European Girls' Olympiad in Informatics (EGOI) — bronze", "level": "international" },
+        { "title": "National olympiad in informatics — silver", "level": "national" }
+      ],
+      "activities": [
+        { "title": "Research Science Institute (RSI) at MIT — research paper with a Harvard professor", "level": "international", "role": "researcher", "note": "free, highly selective" },
+        { "title": "Created and taught a C++ course at school", "level": "school", "role": "founder" },
+        { "title": "Ran and competed in robotics and programming contests", "level": "regional", "role": "organizer" }
+      ],
+      "archetype": "olympiad_research",
+      "headline": {
+        "en": "EGOI bronze + RSI research → Stanford CS with 86% aid",
+        "ru": "Бронза EGOI + исследование на RSI → Stanford CS, 86% финпомощи",
+        "kk": "EGOI қола медалі + RSI зерттеуі → Stanford CS, 86% қаржылай көмек"
+      },
+      "lesson": {
+        "en": "Everything was free: olympiads and a selective research program, not paid summer schools.",
+        "ru": "Всё бесплатно: олимпиады и отборная исследовательская программа, а не платные летние школы.",
+        "kk": "Барлығы тегін: олимпиадалар мен іріктеуі бар зерттеу бағдарламасы, ақылы жазғы мектептер емес."
+      }
+    },
+    {
+      "id": "kz-rfmsh-astana-harvard",
+      "verification": "B",
+      "source": { "publisher": "24KZ", "url": "https://24.kz/ru/news/obrazovanie-i-nauka/761057-kak-shkolnitse-iz-kazakhstana-udalos-postupit-v-garvard" },
+      "cycle": null,
+      "applicant": { "country": "Kazakhstan", "city": "Astana", "school": "Republican Physics & Math School", "field": "stem", "major": "Mechanical Engineering" },
+      "admitted": [{ "uniId": "harvard", "enrolled": true, "aid": "grant" }],
+      "stats": { "apCount": 7 },
+      "honors": [],
+      "activities": [
+        { "title": "Selected for an international research program; research under a US university professor", "level": "international", "role": "researcher" },
+        { "title": "7 AP exams by the end of grade 10", "level": "school", "role": "student" },
+        { "title": "Self-taught Chinese", "level": "school", "role": "self-directed" }
+      ],
+      "archetype": "academic_research",
+      "headline": {
+        "en": "7 APs by grade 10 + research with a US professor → Harvard on a grant",
+        "ru": "7 AP к 10 классу + исследование с американским профессором → Harvard на грант",
+        "kk": "10-сыныпқа дейін 7 AP + американдық профессормен зерттеу → грантпен Harvard"
+      },
+      "lesson": {
+        "en": "Academic depth plus real research — no olympiad medal needed.",
+        "ru": "Академическая глубина и настоящее исследование, без олимпиадной медали.",
+        "kk": "Академиялық тереңдік пен нақты зерттеу, олимпиада медалінсіз."
+      }
+    },
+    {
+      "id": "kz-2025-shoqan-harvard-cs",
+      "verification": "B",
+      "source": { "publisher": "Digital Business, 12.04.2025", "url": "https://digitalbusiness.kz/2025-04-12/shkolniki-iz-kazahstana-postupili-v-garvard-i-berkli-kak-im-eto-udalos/" },
+      "cycle": "2024/2025",
+      "applicant": { "country": "Kazakhstan", "city": "Almaty", "school": "private school", "field": "stem", "major": "Computer Engineering" },
+      "admitted": [{ "uniId": "harvard", "enrolled": true, "aid": "full" }],
+      "stats": { "sat": 1510 },
+      "honors": [],
+      "activities": [
+        { "title": "Robotics for 6 years", "level": "regional", "role": "member", "years": 6 },
+        { "title": "Teaches robotics to younger students", "level": "school", "role": "teacher", "years": 3 },
+        { "title": "Co-built STEM X, an educational STEM kit", "level": "regional", "role": "co-founder" },
+        { "title": "Harvard Summer School (2 months)", "level": "school", "role": "participant", "note": "paid program — interest, not selection" }
+      ],
+      "archetype": "builder_teacher",
+      "headline": {
+        "en": "SAT 1510 (bottom of Harvard's range) + 6 years of robotics and a self-built STEM kit → Harvard",
+        "ru": "SAT 1510 (нижняя граница Гарварда) + 6 лет робототехники и собственный STEM-набор → Harvard",
+        "kk": "SAT 1510 (Гарвардтың төменгі шегі) + 6 жыл робототехника және өз STEM жинағы → Harvard"
+      },
+      "lesson": {
+        "en": "Long commitment and building something for others carried a score at the bottom of the band.",
+        "ru": "Долгое увлечение и продукт для других вытянули балл на нижней границе.",
+        "kk": "Ұзақ айналысу және басқаларға арналған өнім төменгі шектегі балды көтерді."
+      }
+    },
+    {
+      "id": "kz-2025-shoqan-berkeley-met",
+      "verification": "B",
+      "source": { "publisher": "Digital Business, 12.04.2025", "url": "https://digitalbusiness.kz/2025-04-12/shkolniki-iz-kazahstana-postupili-v-garvard-i-berkli-kak-im-eto-udalos/" },
+      "cycle": "2024/2025",
+      "applicant": { "country": "Kazakhstan", "city": "Almaty", "school": "private school", "field": "business", "major": "Management, Entrepreneurship & Technology" },
+      "admitted": [{ "uniId": "berkeley", "program": "M.E.T.", "enrolled": true }],
+      "stats": {},
+      "honors": [],
+      "activities": [],
+      "archetype": "unknown",
+      "headline": {
+        "en": "Berkeley M.E.T. — a business + engineering program far more selective than Berkeley overall",
+        "ru": "Berkeley M.E.T. — бизнес + инженерия, отбор жёстче, чем в Berkeley в целом",
+        "kk": "Berkeley M.E.T. — бизнес + инженерия, іріктеуі жалпы Berkeley-ден әлдеқайда қатаң"
+      },
+      "lesson": {
+        "en": "Program-level selectivity matters: the same university can be a target and a reach.",
+        "ru": "Важен отбор на программу: один и тот же вуз может быть и target, и reach.",
+        "kk": "Бағдарламаның іріктеуі маңызды: бір университет әрі target, әрі reach бола алады."
+      }
+    },
+    {
+      "id": "hamilton-2030-ukraine-math",
+      "verification": "A",
+      "source": { "publisher": "Hamilton College Admission — Essays That Worked", "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked" },
+      "cycle": "2025/2026",
+      "applicant": { "country": "Ukraine", "city": "Kyiv", "school": "US boarding school (after refugee years in Poland)", "field": "stem", "major": "Mathematics" },
+      "admitted": [{ "uniId": "hamilton-college", "enrolled": true }],
+      "stats": {},
+      "honors": [],
+      "activities": [
+        { "title": "MIT PRIMES Yulia's Dream — math research (color groups)", "level": "international", "role": "researcher", "note": "free, selective" },
+        { "title": "Runs the school math club, writes the problem sets", "level": "school", "role": "leader" },
+        { "title": "Climbing since 2017; helped create climbing guidebooks in Ukraine", "level": "national", "role": "contributor", "years": 8 }
+      ],
+      "archetype": "academic_research",
+      "headline": {
+        "en": "Refugee from Kyiv: MIT PRIMES research + a self-run math club → Hamilton",
+        "ru": "Из Киева, через беженство: исследование в MIT PRIMES + свой матклуб → Hamilton",
+        "kk": "Киевтен келген босқын: MIT PRIMES зерттеуі + өз математика клубы → Hamilton"
+      },
+      "lesson": {
+        "en": "The essay (a 'folder of files') carried the activities as a story instead of repeating the list.",
+        "ru": "Эссе («папка с файлами») подало активности как историю, а не повторило список.",
+        "kk": "Эссесі («файлдар папкасы») белсенділіктерді тізім емес, оқиға ретінде көрсетті."
+      }
+    },
+    {
+      "id": "hamilton-2030-girl-scouts",
+      "verification": "A",
+      "source": { "publisher": "Hamilton College Admission — Essays That Worked", "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked" },
+      "cycle": "2025/2026",
+      "applicant": { "country": "USA", "city": "Maplewood, NJ", "school": "US high school", "field": "social", "major": null },
+      "admitted": [{ "uniId": "hamilton-college", "enrolled": true }],
+      "stats": {},
+      "honors": [],
+      "activities": [{ "title": "6-year girl-led proposal to change the Girl Scout Promise, debated at the National Convention", "level": "national", "role": "co-author", "years": 6 }],
+      "archetype": "long_commitment",
+      "headline": {
+        "en": "Six years pushing one change to a national organization → Hamilton",
+        "ru": "Шесть лет продвижения одного изменения в национальной организации → Hamilton",
+        "kk": "Алты жыл бойы ұлттық ұйымда бір өзгерісті ілгерілетті → Hamilton"
+      },
+      "lesson": {
+        "en": "A small cause pursued for years to a national stage reads as real leadership.",
+        "ru": "Маленькая цель, доведённая за годы до национального уровня, читается как настоящее лидерство.",
+        "kk": "Жылдар бойы ұлттық деңгейге жеткізілген шағын мақсат нағыз көшбасшылық болып көрінеді."
+      }
+    },
+    {
+      "id": "clastify-2425-kansas",
+      "verification": "C",
+      "source": { "publisher": "Clastify (self-reported)", "url": "https://www.clastify.com/applicants/67d8ec38cb2e3b8974e66b13" },
+      "cycle": "2024/2025",
+      "applicant": { "country": "USA", "school": "public high school", "field": "unknown", "major": null },
+      "admitted": [{ "uniId": "duke" }, { "uniId": "university-of-wisconsin-madison" }, { "uniId": "indiana-university-bloomington" }, { "uniId": "university-of-illinois-chicago" }, { "name": "University of Kansas", "enrolled": true }, { "uniId": "university-of-georgia" }],
+      "rejected": [{ "uniId": "university-of-north-carolina-at-chapel-hill" }, { "uniId": "rice-university" }, { "uniId": "washington-university-in-st-louis" }, { "uniId": "university-of-virginia-main-campus" }],
+      "stats": { "act": 35, "sat": 1330, "gpa": 3.99, "gpaScale": "weighted", "apCount": 2 },
+      "honors": [],
+      "activities": [{ "title": "Busser/barback at a busy neighbourhood restaurant", "level": "school", "role": "employee" }],
+      "archetype": "scores_first",
+      "headline": {
+        "en": "ACT 35, few listed activities → Duke yes, but UNC, Rice, WashU and UVA no",
+        "ru": "ACT 35, мало активностей → Duke да, но UNC, Rice, WashU и UVA нет",
+        "kk": "ACT 35, белсенділік аз → Duke иә, бірақ UNC, Rice, WashU және UVA жоқ"
+      },
+      "lesson": {
+        "en": "At very selective schools strong scores alone give a lottery ticket, not a plan — results scatter.",
+        "ru": "В очень избирательных вузах одни баллы дают лотерейный билет, а не план: результаты разбросаны.",
+        "kk": "Өте іріктеуші университеттерде тек балл лотерея билетін береді, жоспар емес — нәтижелер шашыраңқы."
+      }
+    }
+  ]
+}

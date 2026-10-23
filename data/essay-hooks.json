@@ -1,0 +1,769 @@
+{
+ "_about": "Hook taxonomy built from essays that admissions offices published themselves (JHU, Connecticut College, Hamilton, Tufts), checked 2026-10-24. Opening of each essay hand-labelled. Essay text is NOT stored — only links, labels and paraphrased \"moves\".",
+ "version": 1,
+ "sample": {
+  "essays": 76,
+  "bySchool": {
+   "johns-hopkins-university": 63,
+   "connecticut-college": 9,
+   "hamilton-college": 3,
+   "tufts-university": 1
+  }
+ },
+ "findings": [
+  "A third (33%) of admitted essays open on a concrete scene, mid-action. It is the safest strong hook.",
+  "Only 14% open reflectively (\"Ever since I was little…\") — and 2 of the 3 \"Why Hopkins\" supplements in the sample do. A weak first line is survivable; a vague essay is not.",
+  "High-risk/high-reward formats (recipe, file archive, narrator robot, pop quiz) are 11% — they work when the format itself says something about the writer.",
+  "Not one published essay opens with an achievement (\"I won…\", \"As president of…\"). Achievements live in the activity list; the essay shows the person.",
+  "Almost every strong opening has a concrete noun, number or proper name in sentence 1, and a tension or surprise by sentence 2–3."
+ ],
+ "taxonomy": [
+  {
+   "id": "scene",
+   "name": "Scene, mid-action",
+   "what": "Drops the reader into one physical moment — present tense or vivid past — with a sensory detail and a small tension, before any explanation.",
+   "why": "The reader is inside the writer's head in one sentence; the meaning is earned later instead of announced.",
+   "risk": "A scene that is pure atmosphere with no tension, or a dramatic moment (injury, game-winning shot) that the rest of the essay never connects to the writer's thinking.",
+   "test": "Does sentence 1 contain a concrete object, place or action AND a hint that something is about to go wrong or change?",
+   "examples": [
+    {
+     "school": "Johns Hopkins",
+     "title": "In the Belly of the Ship",
+     "url": "https://apply.jhu.edu/hopkins-insider/in-the-belly-of-the-ship/",
+     "move": "Sweat, a swaying cot and a mosquito net — then the twist that the worst discomfort is shame, not heat."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "A Splash of Color",
+     "url": "https://apply.jhu.edu/hopkins-insider/a-splash-of-color/",
+     "move": "Taking off a pandemic mask at the mirror before the first unmasked school day; the blush experiment sets up an identity story."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Finding My Voice",
+     "url": "https://apply.jhu.edu/hopkins-insider/finding-my-voice/",
+     "move": "Facing sixty eighth-graders to teach public speaking — then paragraph 2 reveals the writer was born with a speech impediment."
+    },
+    {
+     "school": "Connecticut College",
+     "title": "Nikeya Tankard ’28",
+     "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/nikeya-tankard-28/",
+     "move": "Morning hair routine staged as a battle on the bathroom counter — a physical feature becomes an identity essay."
+    }
+   ],
+   "share": 33
+  },
+  {
+   "id": "bold_claim",
+   "name": "Bold or paradoxical claim",
+   "what": "A short, surprising sentence the reader cannot leave unexplained: a confession, a contradiction, a flat statement of failure.",
+   "why": "It creates an open question; the essay is the answer. Short sentences read as confident.",
+   "risk": "Clickbait that the essay never pays off, or a \"shocking\" claim that is a cliché (\"I am a perfectionist\").",
+   "test": "Is it under ~15 words, specific to the writer, and would a stranger ask \"wait, what?\"",
+   "examples": [
+    {
+     "school": "Johns Hopkins",
+     "title": "A Study in Ambidexterity",
+     "url": "https://apply.jhu.edu/hopkins-insider/a-study-in-ambidexterity/",
+     "move": "Claims to have been born with an extra hand, then immediately corrects itself with humour — ambidexterity."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Left and Right Don't Exist",
+     "url": "https://apply.jhu.edu/hopkins-insider/left-and-right-dont-exist/",
+     "move": "States a pilot-training lesson as a paradox, then grounds it at 36,000 feet."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Clean Closet",
+     "url": "https://apply.jhu.edu/hopkins-insider/clean-closet/",
+     "move": "One task never gets checked off a to-do list — a tiny admission that opens an essay about letting go."
+    },
+    {
+     "school": "Connecticut College",
+     "title": "Jackson Spallone ’28",
+     "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/jackson-spallone-28/",
+     "move": "Four words announcing every plant died; failure first, the hobby lesson after."
+    }
+   ],
+   "share": 13
+  },
+  {
+   "id": "dialogue",
+   "name": "Line of dialogue",
+   "what": "Opens on someone speaking — a parent, coach, friend, stranger on the phone.",
+   "why": "Instant voice, relationship and conflict without exposition.",
+   "risk": "Generic dialogue (\"Wake up!\" / \"You can do it!\") or a famous quote. The line must only make sense in THIS writer's life.",
+   "test": "Could this line appear in anyone else's essay? If yes, cut it.",
+   "examples": [
+    {
+     "school": "Johns Hopkins",
+     "title": "From Yonkers to Accra",
+     "url": "https://apply.jhu.edu/hopkins-insider/from-yonkers-to-accra/",
+     "move": "A teenager on the phone asking a supplier for leak-proof body bags — an alarming request that turns out to be a public-health project."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Bridging Polarity",
+     "url": "https://apply.jhu.edu/hopkins-insider/bridging-polarity/",
+     "move": "A childhood friend's whispered judgement in San Francisco sets up an essay about respecting opposite views."
+    },
+    {
+     "school": "Tufts",
+     "title": "Shaan Merchant ’19",
+     "url": "https://admissions.tufts.edu/blogs/inside-admissions/post/essays-that-worked/",
+     "move": "A shouted defence of a long word during a family Bananagrams game — the essay is about loving words."
+    }
+   ],
+   "share": 11
+  },
+  {
+   "id": "format",
+   "name": "Unconventional format",
+   "what": "The structure itself is the hook: a recipe, a file archive, a pop quiz, a robot narrator, a poem, an inner \"council\", a calculation.",
+   "why": "Shows creativity and control before a single claim is made; memorable in a pile of 50 essays a day.",
+   "risk": "The highest-variance hook. Fails when the gimmick carries no meaning or makes the essay hard to follow. Needs strong writing.",
+   "test": "Remove the format — does the content still show who the writer is? Does the format itself say something about them?",
+   "examples": [
+    {
+     "school": "Hamilton",
+     "title": "Tymofii Kolisnyk (Class of 2030)",
+     "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked",
+     "move": "Life told as a folder of digital files a future self opens — war, emigration, math research and climbing, each a file name."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Fried Rice in One (Not So) Easy Step",
+     "url": "https://apply.jhu.edu/hopkins-insider/fried-rice-in-one-not-so-easy-step/",
+     "move": "Pastes a Google recipe, then declares it wrong — and explains why through family."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Beep bop beep bop. I’m Pebble.",
+     "url": "https://apply.jhu.edu/hopkins-insider/beep-bop-beep-bop-im-pebble-nice-to-meet-you/",
+     "move": "Narrated by the Lego robot the writer built in 5th grade."
+    },
+    {
+     "school": "Hamilton",
+     "title": "Benjamin Frenkel (Class of 2030)",
+     "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked",
+     "move": "An imagined council of inner \"officials\" debating the writer's day."
+    }
+   ],
+   "share": 11
+  },
+  {
+   "id": "concept",
+   "name": "Idea or concept as a lens",
+   "what": "Opens with a fact, law, legend or object (entropy, salt, a thousand paper cranes, an Oreo) and turns it into a lens on the writer.",
+   "why": "Signals intellectual curiosity — strong for STEM and academic-interest essays.",
+   "risk": "Reads like a textbook or a Wikipedia intro if the writer doesn't appear by sentence 3.",
+   "test": "Is the writer in the first 2–3 sentences? Is the concept one they actually live with, not decoration?",
+   "examples": [
+    {
+     "school": "Johns Hopkins",
+     "title": "Ordering the Disorderly",
+     "url": "https://apply.jhu.edu/hopkins-insider/ordering-the-disorderly/",
+     "move": "Second law of thermodynamics, then: \"I, unlike the universe…\" — a planner-obsessed personality."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "Just Keep Folding",
+     "url": "https://apply.jhu.edu/hopkins-insider/just-keep-folding/",
+     "move": "The Japanese legend of a thousand cranes taken as a literal challenge in 8th grade."
+    }
+   ],
+   "share": 8
+  },
+  {
+   "id": "question",
+   "name": "Question to the reader",
+   "what": "Opens on a question or riddle the essay answers.",
+   "why": "Works when the question is strange and specific — the answer IS the writer.",
+   "risk": "Most question openings are weak (\"Have you ever wondered…?\", \"What is success?\"). Only odd, concrete questions earn a place.",
+   "test": "Would the reader be unable to guess the answer?",
+   "examples": [
+    {
+     "school": "Connecticut College",
+     "title": "Anonymous",
+     "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/anonymous/",
+     "move": "What do you get when you combine a needle, a mainframe, clay and the national budget? — the jobs of the women in the writer's family."
+    },
+    {
+     "school": "Johns Hopkins",
+     "title": "On Potatoes",
+     "url": "https://apply.jhu.edu/hopkins-insider/on-potatoes/",
+     "move": "The \"one food forever\" small-talk question answered with mock-seriousness."
+    }
+   ],
+   "share": 7
+  },
+  {
+   "id": "setting_detail",
+   "name": "Precise setting or irony",
+   "what": "Establishes a world through one exact, often ironic detail: a population figure, a misused stop sign, the \"best\" month in Vermont being the coldest.",
+   "why": "Humour and precision prove the writer observes closely.",
+   "risk": "Can drift into travel-writing about a place rather than the person.",
+   "test": "Does the detail say something about how the WRITER sees things?",
+   "examples": [
+    {
+     "school": "Johns Hopkins",
+     "title": "The Two Sides of America",
+     "url": "https://apply.jhu.edu/hopkins-insider/the-two-sides-of-america/",
+     "move": "A Mississippi town of 3,000 whose residents still haven't mastered a five-year-old four-way stop."
+    },
+    {
+     "school": "Hamilton",
+     "title": "Taylor Barnes (Class of 2030)",
+     "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked",
+     "move": "First trip to Florida — no beaches, no Disney, just an over-air-conditioned convention ballroom where her troop's proposal is debated."
+    }
+   ],
+   "share": 4
+  },
+  {
+   "id": "reflective",
+   "name": "Reflective / summary opening",
+   "what": "\"Ever since I was little…\", \"For as long as I can remember…\", \"My lifelong dream…\", \"Growing up in…\".",
+   "why": "It doesn't — this is the weakest opening. It still appears in 14% of published admitted essays, mostly where the BODY carried the essay (and in \"Why us\" supplements).",
+   "risk": "Burns the first 2 sentences on information the reader already assumes. Almost always fixable by deleting sentence 1 and starting at the first concrete moment.",
+   "test": "Delete the first sentence. If nothing is lost, it was a reflective opening.",
+   "examples": [],
+   "share": 14
+  }
+ ],
+ "corpus": [
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/20-questions/",
+   "slug": "20-questions",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/a-growing-world/",
+   "slug": "a-growing-world",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/a-splash-of-color/",
+   "slug": "a-splash-of-color",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/a-study-in-ambidexterity/",
+   "slug": "a-study-in-ambidexterity",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/a-wider-lens/",
+   "slug": "a-wider-lens",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/and-on-that-note/",
+   "slug": "and-on-that-note",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/and-the-secret-ingredient-is/",
+   "slug": "and-the-secret-ingredient-is",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/balancing-life-a-life-of-balance/",
+   "slug": "balancing-life-a-life-of-balance",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/be-the-salt-of-the-earth/",
+   "slug": "be-the-salt-of-the-earth",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/beep-bop-beep-bop-im-pebble-nice-to-meet-you/",
+   "slug": "beep-bop-beep-bop-im-pebble-nice-to-meet-you",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/being-the-handyman/",
+   "slug": "being-the-handyman",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/bridging-polarity/",
+   "slug": "bridging-polarity",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/building-a-universe/",
+   "slug": "building-a-universe",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/classical-reflections-in-herstory/",
+   "slug": "classical-reflections-in-herstory",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/clean-closet/",
+   "slug": "clean-closet",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/conquering/",
+   "slug": "conquering",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/dancing-together/",
+   "slug": "dancing-together",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/developing-roots/",
+   "slug": "developing-roots",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/facing-the-hot-griddle/",
+   "slug": "facing-the-hot-griddle",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/finding-my-voice/",
+   "slug": "finding-my-voice",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/finding-purpose-in-trivial-projects/",
+   "slug": "finding-purpose-in-trivial-projects",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/fried-rice-in-one-not-so-easy-step/",
+   "slug": "fried-rice-in-one-not-so-easy-step",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/from-alone-to-unique/",
+   "slug": "from-alone-to-unique",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/from-yonkers-to-accra/",
+   "slug": "from-yonkers-to-accra",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/growing-strawberries-in-a-high-school-locker/",
+   "slug": "growing-strawberries-in-a-high-school-locker",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/how-hopkins-will-help-me-become-a-better-mathematician/",
+   "slug": "how-hopkins-will-help-me-become-a-better-mathematician",
+   "hook": "reflective",
+   "kind": "why_us"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/in-pursuit-of-the-sublime/",
+   "slug": "in-pursuit-of-the-sublime",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/in-the-belly-of-the-ship/",
+   "slug": "in-the-belly-of-the-ship",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/intercom-enthusiast/",
+   "slug": "intercom-enthusiast",
+   "hook": "setting_detail",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/just-keep-folding/",
+   "slug": "just-keep-folding",
+   "hook": "concept",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/korean-sticky-notes/",
+   "slug": "korean-sticky-notes",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/left-and-right-dont-exist/",
+   "slug": "left-and-right-dont-exist",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/lessons-learned/",
+   "slug": "lessons-learned",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/lifelong-learning/",
+   "slug": "lifelong-learning",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/looking-through-a-wider-lens/",
+   "slug": "looking-through-a-wider-lens",
+   "hook": "question",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/musical-movement/",
+   "slug": "musical-movement",
+   "hook": "concept",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/my-rock/",
+   "slug": "my-rock",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/my-spotify-playlist/",
+   "slug": "my-spotify-playlist",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/on-and-off/",
+   "slug": "on-and-off",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/on-potatoes/",
+   "slug": "on-potatoes",
+   "hook": "question",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/ordering-the-disorderly/",
+   "slug": "ordering-the-disorderly",
+   "hook": "concept",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/oreo-by-design/",
+   "slug": "oreo-by-design",
+   "hook": "concept",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/pack-light-but-be-prepared/",
+   "slug": "pack-light-but-be-prepared",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/pursuing-my-passion-in-research/",
+   "slug": "pursuing-my-passion-in-research",
+   "hook": "reflective",
+   "kind": "why_us"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/queens-gambit/",
+   "slug": "queens-gambit",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/red-over-black/",
+   "slug": "red-over-black",
+   "hook": "dialogue",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/research-as-an-echo-to-storytelling/",
+   "slug": "research-as-an-echo-to-storytelling",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/rock-climbing-as-a-second-language/",
+   "slug": "rock-climbing-as-a-second-language",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/stepping-out-of-my-comfort-zone/",
+   "slug": "stepping-out-of-my-comfort-zone",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/superheroes/",
+   "slug": "superheroes",
+   "hook": "concept",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/switching-shoes/",
+   "slug": "switching-shoes",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-art-of-imperfection/",
+   "slug": "the-art-of-imperfection",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-blue-armchair/",
+   "slug": "the-blue-armchair",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-mechanisms-of-collaboration/",
+   "slug": "the-mechanisms-of-collaboration",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-palate-of-my-mind/",
+   "slug": "the-palate-of-my-mind",
+   "hook": "question",
+   "kind": "why_us"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-secret-ingredient-is-connection/",
+   "slug": "the-secret-ingredient-is-connection",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-two-sides-of-america/",
+   "slug": "the-two-sides-of-america",
+   "hook": "setting_detail",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/the-voice-of-many/",
+   "slug": "the-voice-of-many",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/tikkun-olam/",
+   "slug": "tikkun-olam",
+   "hook": "concept",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/time-to-spin-the-wheel/",
+   "slug": "time-to-spin-the-wheel",
+   "hook": "reflective",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/to-stand-out-or-fit-in/",
+   "slug": "to-stand-out-or-fit-in",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/translating-my-story-into-words/",
+   "slug": "translating-my-story-into-words",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "johns-hopkins-university",
+   "url": "https://apply.jhu.edu/hopkins-insider/where-math-collides-with-art/",
+   "slug": "where-math-collides-with-art",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/anonymous/",
+   "slug": "anonymous",
+   "hook": "question",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/edie-banovic-25/",
+   "slug": "edie-banovic-25",
+   "hook": "question",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/elizabeth-madden-28/",
+   "slug": "elizabeth-madden-28",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/elle-yarborough-28/",
+   "slug": "elle-yarborough-28",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/jackson-spallone-28/",
+   "slug": "jackson-spallone-28",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/nancy-owusu-28/",
+   "slug": "nancy-owusu-28",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/nikeya-tankard-28/",
+   "slug": "nikeya-tankard-28",
+   "hook": "scene",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/phoebe-hughes-28/",
+   "slug": "phoebe-hughes-28",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "connecticut-college",
+   "url": "https://www.conncoll.edu/admission/apply/essays-that-worked/riley-anderson-25/",
+   "slug": "riley-anderson-25",
+   "hook": "bold_claim",
+   "kind": "personal"
+  },
+  {
+   "school": "hamilton-college",
+   "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked",
+   "slug": "kolisnyk-file-archive",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "hamilton-college",
+   "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked",
+   "slug": "barnes-girl-scout-promise",
+   "hook": "setting_detail",
+   "kind": "personal"
+  },
+  {
+   "school": "hamilton-college",
+   "url": "https://www.hamilton.edu/admission/apply/college-essays-that-worked",
+   "slug": "frenkel-the-council",
+   "hook": "format",
+   "kind": "personal"
+  },
+  {
+   "school": "tufts-university",
+   "url": "https://admissions.tufts.edu/blogs/inside-admissions/post/essays-that-worked/",
+   "slug": "merchant-bananagrams",
+   "hook": "dialogue",
+   "kind": "personal"
+  }
+ ]
+}

@@ -112,6 +112,8 @@ const SIGNAL_TEXT = {
   distinction: 'Recognised result or output',
   no_commitment: 'Add years and hours per week',
   vague: 'Too vague to credit — describe what you did',
+  selective_program: 'Selective program — admission itself is a distinction',
+  paid_program: 'Paid program — shows interest, not selection',
 };
 
 function ActivitiesCard({ p }) {
@@ -282,6 +284,12 @@ function FeedbackCard({ p, update }) {
         </button>
       </div>
       <h3 style={{ fontSize: 18.5, marginTop: 14, lineHeight: 1.35 }}>{fb.headline}</h3>
+      {fb.benchmarkComparison && (
+        <p style={{ fontSize: 14, marginTop: 10, lineHeight: 1.55, padding: '10px 12px', background: 'var(--surface-2)', border: '1px solid var(--line)', borderRadius: 'var(--r-sm)' }}>
+          <b>{t('Compared with real admits')}:</b> {fb.benchmarkComparison}{' '}
+          <Link href="/progress" className="link">{t('See them')}</Link>
+        </p>
+      )}
 
       <List title={t('Strengths')} items={fb.strengths} mark="+" color="var(--good)" />
       <List title={t('Gaps')} items={fb.gaps} mark="−" color="var(--bad)" />

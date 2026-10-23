@@ -16,6 +16,7 @@ import { PageHead, Loading } from '@/components/ui';
 import { CountUp } from '@/components/Motion';
 import Sparkline from '@/components/Sparkline';
 import Icon from '@/components/Icon';
+import SimilarAdmits from '@/components/SimilarAdmits';
 
 export default function ProgressPage() {
   const { t, locale } = useT();
@@ -192,6 +193,8 @@ export default function ProgressPage() {
           </Link>
         </section>
       </div>
+
+      <SimilarAdmits p={p} />
 
       <style>{`
         .pg-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start;}

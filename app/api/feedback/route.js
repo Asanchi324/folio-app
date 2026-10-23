@@ -10,6 +10,7 @@ import { reviewSnapshot } from '@/lib/review-input';
 import { resolveAccess } from '@/lib/plan-server';
 import { aiLimitsFor } from '@/lib/plans';
 import { aiLanguageName, isLang } from '@/lib/i18n-core';
+import { admitsPromptBlock } from '@/lib/admits';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,9 @@ Rules:
 - When recommending competitions, prefer ones from the provided catalog and reference them by name.
 - For Extracurriculars and Honors, give the student real choice: 2–3 concrete, varied ideas (different competitions, projects or roles) inside that area's items list, not a single suggestion.
 - Calibrate to reality: a strong profile is still a reach at single-digit-acceptance schools.
+- Calibrate against the REFERENCE ADMITS in the prompt: they are real, verified files. Compare the LEVEL of the student's strongest honor and activity with theirs, not the count. Refer to them only by description ("a student from Almaty admitted to Harvard with SAT 1510"), never by name, never invent details about them, and never imply that matching one record guarantees an admission — single files are noisy, so reason from the pattern across them.
+- Paid summer schools and pay-to-attend pre-college programs show interest, not selection: never grade them above Tier 3 and never recommend them as a strategy. Recommend free, selective programs and competitions instead.
+- Above roughly SAT 1500, more test points barely move admissions at top schools; do not make a retake the top priority for such a student unless the score is below the target school's 25th percentile.
 - Grade every extracurricular on the admissions tier rubric. Judge the EVIDENCE in the text, not the title: a "President" with no described outcome is not Tier 1. Rubric (score 0-100):
   Tier 1 (85-100): rare distinction — national/international recognition, founded something with large measurable reach, published research, elite selective program.
   Tier 2 (65-84): significant leadership or impact beyond school — regional/national results, sustained initiative with concrete numbers.
@@ -66,6 +70,8 @@ ${portfolio.honors.map((h, i) => `  honor #${i}: ${gradeHonor(h).score}/100`).jo
 COMPUTED PROFILE STRENGTH: ${breakdown.strength}/100
 PILLAR SCORES: ${breakdown.pillars.map((p) => `${p.label} ${p.score}/100`).join(', ')}
 
+${admitsPromptBlock(portfolio)}
+
 COMPETITION CATALOG you may recommend from:
 ${catalog}
 
@@ -73,6 +79,7 @@ Group ALL advice into ONE block per area — never repeat an area, max 5 blocks 
 Return JSON with EXACTLY this shape:
 {
   "headline": "one honest sentence summarizing where this applicant stands",
+  "benchmarkComparison": "1-2 sentences: how this profile compares with the reference admits most similar to it — what they had at which level that this student does not yet (or does)",
   "overallTier": "developing | competitive | strong | exceptional",
   "strengths": ["2-4 concrete strengths"],
   "gaps": ["2-4 concrete weaknesses, each explaining the admissions impact"],
@@ -131,23 +138,27 @@ export async function POST(request) {
   const breakdown = profileBreakdown(portfolio);
   const lang = isLang(body?.lang) ? body.lang : 'en';
 
-  try {
-    const text = await generate({
-      system: SYSTEM,
-      prompt: buildPrompt(portfolio, breakdown, lang),
-      json: true,
-      // An explicit re-run ("refresh my review") must actually re-generate,
-      // not replay the cached answer for the same profile.
-      cache: !body?.fresh,
-    });
-    let data;
+  const parse = (text) => {
     try {
-      data = JSON.parse(text);
+      return JSON.parse(text);
     } catch {
       // Best-effort: strip code fences if the model added them.
       const m = text.match(/\{[\s\S]*\}/);
-      data = m ? JSON.parse(m[0]) : null;
+      try {
+        return m ? JSON.parse(m[0]) : null;
+      } catch {
+        return null;
+      }
     }
+  };
+
+  try {
+    const prompt = buildPrompt(portfolio, breakdown, lang);
+    // An explicit re-run ("refresh my review") must actually re-generate,
+    // not replay the cached answer for the same profile.
+    let data = parse(await generate({ system: SYSTEM, prompt, json: true, cache: !body?.fresh }));
+    // Long JSON occasionally comes back malformed; one uncached retry.
+    if (!data) data = parse(await generate({ system: SYSTEM, prompt, json: true, cache: false }));
     if (!data) throw new Error('Could not parse AI response');
 
     // Normalise activity grades: one per activity, clamped to within ±25 of the
