@@ -1348,3 +1348,157 @@ textarea:focus {
   width: 16px;
   background: var(--primary);
 }
+
+/* ---------- smooth scroll (components/SmoothScroll.js, Lenis) ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- pinned "How it works" (components/ScrollSteps.js) ---------- */
+.ss {
+  position: relative;
+  margin-top: 24px;
+}
+.ss-stick {
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  height: calc(100dvh - 64px);
+  display: flex;
+  align-items: center;
+}
+.ss-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 72px;
+  align-items: center;
+}
+.ss-rail {
+  list-style: none;
+  margin: 0 0 34px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.ss-rail li {
+  display: grid;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--faint);
+  transition: color 0.3s ease;
+}
+.ss-rail li.on,
+.ss-rail li.done {
+  color: var(--ink-2);
+}
+.ss-rail-n {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ss-rail li.on .ss-rail-n {
+  color: var(--primary-600);
+}
+.ss-rail-tag {
+  font-weight: 600;
+  line-height: 1.3;
+  min-height: 2.6em;
+}
+.ss-rail-bar {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.ss-rail-bar i {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transform-origin: left;
+}
+.ss-copies {
+  position: relative;
+  min-height: 230px;
+}
+.ss-copy {
+  position: absolute;
+  inset: 0 0 auto 0;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.5s var(--ease), transform 0.6s var(--ease);
+  pointer-events: none;
+}
+.ss-copy.past {
+  transform: translateY(-28px);
+}
+.ss-copy.on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+/* title and body arrive a beat apart */
+.ss-copy > * {
+  transition: opacity 0.5s var(--ease), transform 0.6s var(--ease);
+}
+.ss-copy h3 {
+  font-size: clamp(26px, 3vw, 38px);
+  margin-top: 14px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+.ss-copy p {
+  font-size: 17px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  margin-top: 16px;
+  max-width: 460px;
+}
+.ss-copy:not(.on) h3,
+.ss-copy:not(.on) p {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.ss-copy.on h3 {
+  transition-delay: 0.06s;
+}
+.ss-copy.on p {
+  transition-delay: 0.14s;
+}
+.ss-right {
+  position: relative;
+  height: min(520px, calc(100vh - 160px));
+}
+.ss-visual {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(60px) scale(0.96);
+  transition: opacity 0.55s var(--ease), transform 0.8s var(--ease);
+  pointer-events: none;
+}
+.ss-visual.past {
+  transform: translateY(-50px) scale(0.97);
+}
+.ss-visual.on {
+  opacity: 1;
+  transform: translateY(var(--drift, 0px)) scale(1);
+  pointer-events: auto;
+}
+.ss-visual > * {
+  width: 100%;
+  max-width: 470px;
+}

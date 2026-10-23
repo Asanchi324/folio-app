@@ -2,6 +2,7 @@ import Link from 'next/link';
 import PricingCards from '@/components/Pricing';
 import Icon from '@/components/Icon';
 import { Reveal } from '@/components/Motion';
+import ScrollSteps from '@/components/ScrollSteps';
 import {
   HeroVisual,
   BuildVisual,
@@ -190,20 +191,9 @@ function Steps({ t }) {
           <h2>{t('From first draft to acceptance letter')}</h2>
           <p>{t('Four steps, one portfolio.')}</p>
         </div>
-        <div className="lp-steps">
-          {steps.map((s, i) => (
-            <div key={s.n} className={`lp-step${i % 2 ? ' flip' : ''}`}>
-              <Reveal className="lp-step-copy">
-                <span className="lp-step-n">
-                  {s.n} · {s.tag}
-                </span>
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-              </Reveal>
-              <div className="lp-step-visual">{s.visual}</div>
-            </div>
-          ))}
-        </div>
+      </div>
+      <div className="wrap">
+        <ScrollSteps steps={steps} />
       </div>
     </section>
   );
