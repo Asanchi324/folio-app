@@ -11,7 +11,7 @@ import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
 import Icon from '@/components/Icon';
-import ScoreRuler from '@/components/ScoreRuler';
+import ScorePicker from '@/components/ScorePicker';
 import { markTourPending } from '@/components/ProductTour';
 
 // First-run onboarding. Forks by audience on step 0:
@@ -30,15 +30,15 @@ const GRADES = [
 
 const TARGETS = ['USA', 'UK', 'Canada', 'Europe', 'Asia'];
 
-// Ruler settings per GPA scale: range, snap step, tick spacing (px), a major
-// tick every `major` steps, a label every `labelEvery` steps.
-const GPA_RULER = {
-  4: { min: 2, max: 4, step: 0.05, gap: 14, major: 2, labelEvery: 10, start: 3.5 },
-  5: { min: 2.5, max: 5, step: 0.05, gap: 14, major: 2, labelEvery: 10, start: 4.3 },
-  100: { min: 50, max: 100, step: 1, gap: 12, major: 5, labelEvery: 10, start: 85 },
+// Picker settings per GPA scale: range, snap step, starting point and a few
+// typical values as quick picks.
+const GPA_PICK = {
+  4: { min: 2, max: 4, step: 0.01, start: 3.5, quick: [3.5, 3.7, 3.8, 3.9, 4.0] },
+  5: { min: 2.5, max: 5, step: 0.01, start: 4.3, quick: [4.3, 4.5, 4.7, 4.9, 5.0] },
+  100: { min: 50, max: 100, step: 1, start: 85, quick: [85, 90, 93, 95, 98] },
 };
-const SAT_RULER = { min: 400, max: 1600, step: 10, gap: 10, major: 10, labelEvery: 10, start: 1200 };
-const IELTS_RULER = { min: 4, max: 9, step: 0.5, gap: 40, major: 2, labelEvery: 1, start: 6.5 };
+const SAT_PICK = { min: 400, max: 1600, step: 10, start: 1200, quick: [1200, 1350, 1450, 1500, 1550] };
+const IELTS_PICK = { min: 4, max: 9, step: 0.5, start: 6.5, quick: [6, 6.5, 7, 7.5, 8] };
 
 const HAVE_TESTS = [
   { v: 'yes', label: 'Yes, I have scores' },
@@ -196,7 +196,7 @@ function StudentSurvey({ router, onSwitch }) {
               <option value="100">{t('out of 100')}</option>
             </select>
           </Field>
-          <ScoreRuler key={form.gpaScale} label="GPA" hint={t('if you know it')} value={form.gpa} onChange={(v) => set({ gpa: v })} {...GPA_RULER[form.gpaScale]} />
+          <ScorePicker key={form.gpaScale} label="GPA" hint={t('if you know it')} value={form.gpa} onChange={(v) => set({ gpa: v })} {...GPA_PICK[form.gpaScale]} />
           <span className="field-label">{t('Do you have SAT / IELTS scores?')}</span>
           <div style={{ display: 'grid', gap: 10, marginBottom: 6 }}>
             {HAVE_TESTS.map((h) => (
@@ -205,8 +205,8 @@ function StudentSurvey({ router, onSwitch }) {
           </div>
           {form.haveTests === 'yes' && (
             <div className="fade-in" style={{ marginTop: 14 }}>
-              <ScoreRuler label={t('SAT total')} hint={t('optional')} value={form.sat} onChange={(v) => set({ sat: v })} {...SAT_RULER} />
-              <ScoreRuler label="IELTS" hint={t('optional')} value={form.ielts} onChange={(v) => set({ ielts: v })} {...IELTS_RULER} />
+              <ScorePicker label={t('SAT total')} hint={t('optional')} value={form.sat} onChange={(v) => set({ sat: v })} {...SAT_PICK} />
+              <ScorePicker label="IELTS" hint={t('optional')} value={form.ielts} onChange={(v) => set({ ielts: v })} {...IELTS_PICK} />
             </div>
           )}
         </>

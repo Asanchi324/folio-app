@@ -3,6 +3,7 @@ import { I18nProvider } from '@/lib/i18n';
 import { getLang, dictFor, getT } from '@/lib/i18n-server';
 import { LANGS } from '@/lib/i18n-core';
 import Analytics from '@/components/Analytics';
+import VisitCounter from '@/components/VisitCounter';
 import { SITE_URL, SITE_NAME, ogLocale } from '@/lib/seo';
 
 // NEXT_PUBLIC_GA_ID = GA4 Measurement ID. Unset → no analytics and no banner.
@@ -84,6 +85,7 @@ export default async function RootLayout({ children }) {
         <I18nProvider lang={lang} dict={dictFor(lang)}>
           {children}
           <Analytics gaId={GA_ID} />
+          <VisitCounter />
         </I18nProvider>
       </body>
     </html>

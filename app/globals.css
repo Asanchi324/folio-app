@@ -1079,17 +1079,21 @@ textarea:focus {
   }
 }
 
-/* ---------- score ruler (components/ScoreRuler.js) ---------- */
-.ruler-field {
-  margin-bottom: 22px;
+/* ---------- score picker (components/ScorePicker.js) ---------- */
+.sp {
+  padding: 14px 16px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  margin-bottom: 14px;
 }
-.ruler-head {
+.sp-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 10px;
 }
-.ruler-clear {
+.sp-clear {
   background: none;
   border: none;
   padding: 0;
@@ -1098,103 +1102,160 @@ textarea:focus {
   color: var(--faint);
   cursor: pointer;
 }
-.ruler-clear:hover {
+.sp-clear:hover {
   color: var(--ink-2);
 }
-.ruler-value {
+.sp-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 8px 0 10px;
+}
+.sp-value {
+  min-width: 3.2ch;
+  text-align: center;
   font-family: var(--display);
   font-size: 34px;
   line-height: 1.1;
-  text-align: center;
-  margin: 8px 0 6px;
   font-variant-numeric: tabular-nums;
-  transition: color 0.2s ease;
+  transition: transform 0.18s var(--ease-spring), color 0.2s ease;
 }
-.ruler-value.unset {
+.sp-value.pressed {
+  transform: scale(1.06);
+  color: var(--primary-600);
+}
+.sp-unset .sp-value {
   color: var(--line-strong);
 }
-.ruler {
-  position: relative;
-  height: 62px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
+.sp-step {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
   background: var(--surface);
-  cursor: grab;
-  touch-action: pan-y;
+  color: var(--ink-2);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
-/* fades the tape out at both edges; the frame and centre mark stay crisp */
-.ruler-window {
-  position: absolute;
-  inset: 0;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+.sp-step:hover:not(:disabled) {
+  border-color: var(--ink-2);
 }
-.ruler:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.sp-step:active:not(:disabled) {
+  transform: scale(0.94);
+  background: var(--surface-2);
 }
-.ruler.dragging {
-  cursor: grabbing;
+.sp-step:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
-.ruler-tape {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
+/* thin track, filled up to the thumb */
+.sp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
-.ruler-tick {
-  position: absolute;
-  top: 0;
-  width: 1px;
-  height: 14px;
-  background: var(--line-strong);
-  transform: translateX(-0.5px);
+.sp-range:focus {
+  outline: none;
 }
-.ruler-tick.major {
-  height: 24px;
-  background: var(--muted);
+.sp-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary) var(--p), var(--line) var(--p));
 }
-.ruler-tick.on {
+.sp-unset .sp-range::-webkit-slider-runnable-track {
+  background: var(--line);
+}
+.sp-range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+}
+.sp-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
   background: var(--primary);
 }
-.ruler-tick em {
-  position: absolute;
-  top: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-style: normal;
+.sp-unset .sp-range::-moz-range-progress {
+  background: transparent;
+}
+.sp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  box-shadow: 0 1px 4px rgba(27, 26, 36, 0.18);
+  transition: transform 0.15s var(--ease-spring);
+}
+.sp-range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+.sp-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  box-shadow: 0 1px 4px rgba(27, 26, 36, 0.18);
+}
+.sp-unset .sp-range::-webkit-slider-thumb {
+  border-color: var(--line-strong);
+}
+.sp-unset .sp-range::-moz-range-thumb {
+  border-color: var(--line-strong);
+}
+.sp-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px var(--primary-tint);
+}
+.sp-scale {
+  display: flex;
+  justify-content: space-between;
   font-size: 11.5px;
-  color: var(--muted);
-  white-space: nowrap;
+  color: var(--faint);
+  margin-top: 2px;
   font-variant-numeric: tabular-nums;
 }
-.ruler-mark {
-  position: absolute;
-  top: 0;
-  height: 28px;
-  left: 50%;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--primary);
-  border-radius: 2px;
-  pointer-events: none;
+.sp-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
 }
-.ruler-mark::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--primary);
+.sp-quick button {
+  width: auto;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
-.ruler-help {
-  font-size: 12.5px;
-  color: var(--faint);
-  text-align: center;
-  margin-top: 6px;
+.sp-quick button:hover {
+  border-color: var(--line-strong);
+}
+.sp-quick button.on {
+  border-color: var(--primary);
+  background: var(--primary-tint);
+  color: var(--primary-600);
+  font-weight: 600;
 }
 
 /* ---------- first-visit tour (components/ProductTour.js) ---------- */

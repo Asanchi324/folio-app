@@ -11,7 +11,7 @@ export async function generateMetadata() {
   };
 }
 
-const UPDATED = '2026-09-29';
+const UPDATED = '2026-10-24';
 
 export default async function PrivacyPage() {
   const { t } = await getT();
@@ -20,6 +20,7 @@ export default async function PrivacyPage() {
       t('Account: if you sign in with Google, we receive your name, email address and a user ID. We never see your Google password.'),
       t('Portfolio: what you type into Folio — grades, test scores, activities, awards, essays, your university list and deadlines.'),
       t('Payments: if you subscribe, Stripe processes your card. We only store a Stripe customer and subscription ID and your plan status — never card numbers.'),
+      t('Visit counts: anonymous, cookie-free page-view counts (Vercel Web Analytics) for every visitor, so we know how many people use Folio. No cookies, no personal identifiers, and private IDs in links are removed.'),
       t('Analytics: only if you allow it — anonymous page views and product events (for example “opened the assessment”). Links that contain private IDs are shortened before sending.'),
     ]],
     [t('Why we use it'), [
@@ -27,7 +28,7 @@ export default async function PrivacyPage() {
       t('We do not sell your data, show ads, or use your portfolio for marketing.'),
     ]],
     [t('Who processes it'), [
-      t('Google Firebase (sign-in and database), Vercel (hosting), Stripe (payments), Google Analytics (only with your consent).'),
+      t('Google Firebase (sign-in and database), Vercel (hosting and cookie-free visit counts), Stripe (payments), Google Analytics (only with your consent).'),
       t('AI providers (Groq, OpenRouter, Google Gemini) receive the part of your portfolio needed to answer a specific AI request. Only the current portfolio is sent — never your email or payment details.'),
     ]],
     [t('Who can see your portfolio'), [
