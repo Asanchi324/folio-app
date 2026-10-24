@@ -81,7 +81,7 @@ export default function PricingCards({
     {
       plan: PLANS.pro,
       checks: CHECKS.pro,
-      badge: 'Most popular',
+      badge: 'Recommended',
       cta:
         currentPlan === 'pro'
           ? { label: 'Your current plan', disabled: true }
@@ -94,7 +94,7 @@ export default function PricingCards({
     {
       plan: PLANS.business,
       checks: CHECKS.business,
-      badge: 'Most schools start here',
+      badge: 'Recommended',
       cta:
         orgPlan === 'business'
           ? { label: 'Your workspace plan', disabled: true }
@@ -149,7 +149,6 @@ export default function PricingCards({
                   }
                 : undefined
             }
-            aria-hidden={deck && i !== front ? true : undefined}
           >
             {badge && <span className="pr-badge">{t(badge)}</span>}
             <div className="pr-head">
@@ -185,7 +184,7 @@ export default function PricingCards({
       </div>
 
       {deck && (
-        <div className="pr-dots" role="tablist">
+        <div className="pr-dots" role="tablist" aria-label={t('Plans')}>
           {cards.map(({ plan }, i) => (
             <button key={plan.id} role="tab" aria-selected={i === front} className={i === front ? 'on' : ''} onClick={() => setFront(i)}>
               {plan.name}
@@ -193,6 +192,11 @@ export default function PricingCards({
           ))}
         </div>
       )}
+
+      <p className="pr-fine">
+        {t('Prices in US dollars, no hidden fees. Any tax is shown at checkout before you pay.')}{' '}
+        <Link href="/refunds" className="link">{t('Refund policy')}</Link>
+      </p>
 
       <style>{`
         .pr-wrap{margin-top:40px;}
@@ -260,6 +264,7 @@ export default function PricingCards({
         .pr-period{font-size:13px; color:var(--muted); font-weight:600; line-height:1.35;}
         .pr-note{font-weight:500; color:var(--faint); font-size:12px;}
         .pr-cta{margin-top:20px;}
+        .pr-fine{text-align:center; font-size:13px; color:var(--muted); margin-top:22px; line-height:1.5;}
         .pr-cta .btn{width:100%;}
         .pr-checks{
           list-style:none; padding:20px 0 0; margin:18px 0 0;

@@ -334,7 +334,7 @@ const CSS = `
   -webkit-mask-image:radial-gradient(70% 60% at 60% 40%, #000, transparent 75%); mask-image:radial-gradient(70% 60% at 60% 40%, #000, transparent 75%);}
 .lp-hero-grid{position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:64px; align-items:center;}
 .lp-h1{font-size:clamp(38px,5.6vw,66px); line-height:1.04; margin-top:16px; letter-spacing:-0.02em;}
-.lp-grad{background:linear-gradient(100deg, var(--primary) 10%, #7aa9ea 50%, var(--primary-600) 90%); background-size:200% auto;
+.lp-grad{background:linear-gradient(100deg, var(--primary) 10%, #5487cc 50%, var(--primary-600) 90%); background-size:200% auto;
   -webkit-background-clip:text; background-clip:text; color:transparent; animation:lpShine 6s ease-in-out infinite;}
 @keyframes lpShine{0%,100%{background-position:0% center;} 50%{background-position:100% center;}}
 .lp-h2{font-size:clamp(28px,3.8vw,44px); margin-top:12px; letter-spacing:-0.015em;}

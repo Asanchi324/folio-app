@@ -27,6 +27,13 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => setOpen(false), [path]);
+  // Escape closes the phone menu.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
     <header className="nav-header">

@@ -14,8 +14,8 @@ const isDev = process.env.NODE_ENV !== 'production';
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://apis.google.com https://www.googletagmanager.com https://va.vercel-scripts.com`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com data:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",  // fonts are self-hosted via next/font
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com" +
     (isDev ? ' ws: wss:' : ''),

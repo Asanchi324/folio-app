@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import ConsentNote from '@/components/ConsentNote';
 import { useRouter } from 'next/navigation';
 import {
   signInWithGoogle,
@@ -260,9 +261,9 @@ export default function LoginPage() {
         </div>
 
         <p className="muted" style={{ fontSize: 12.5, marginTop: 16, textAlign: 'center' }}>
-          {t('We use your account only to sign you in and save your portfolio. We never post or share anything.')}{' '}
-          <Link href="/privacy" className="link">{t('Privacy policy')}</Link>
+          {t('We use your account only to sign you in and save your portfolio. We never post or share anything.')}
         </p>
+        <ConsentNote style={{ marginTop: 8 }} />
       </div>
 
       <p style={{ textAlign: 'center', marginTop: 18 }}>

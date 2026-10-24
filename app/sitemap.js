@@ -10,6 +10,7 @@ const PAGES = [
   ['/upgrade', 'monthly', 0.7],
   ['/privacy', 'yearly', 0.2],
   ['/terms', 'yearly', 0.2],
+  ['/refunds', 'yearly', 0.2],
 ];
 
 export default function sitemap() {

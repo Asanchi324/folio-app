@@ -94,13 +94,13 @@ export default function Analytics({ gaId }) {
     <div className="consent" role="dialog" aria-live="polite" aria-label={t('Cookie preferences')}>
       <p>
         {t('We use one optional analytics cookie to see which parts of Folio help students. No ads, no selling data.')}{' '}
-        <Link href="/privacy">{t('Privacy policy')}</Link>
+        <Link href="/privacy#cookies">{t('Privacy policy')}</Link>
       </p>
       <div className="consent-actions">
         <button className="btn btn-ghost btn-sm" onClick={() => choose('denied')}>
           {t('Only necessary')}
         </button>
-        <button className="btn btn-primary btn-sm" onClick={() => choose('granted')}>
+        <button className="btn btn-ghost btn-sm" onClick={() => choose('granted')}>
           {t('Allow analytics')}
         </button>
       </div>

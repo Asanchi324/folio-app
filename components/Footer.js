@@ -30,6 +30,8 @@ export default function Footer() {
           <div className="footer-h">{t('Company')}</div>
           <Link href="/privacy">{t('Privacy policy')}</Link>
           <Link href="/terms">{t('Terms of use')}</Link>
+          <Link href="/refunds">{t('Refund policy')}</Link>
+          <Link href="/privacy#cookies">{t('Cookies')}</Link>
           <a href="mailto:temirbekov.assan@outlook.com">{t('Contact')}</a>
         </div>
       </div>

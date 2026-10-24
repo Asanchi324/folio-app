@@ -9,6 +9,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAccount } from '@/lib/account';
 import { lookupJoinCode, joinOrg } from '@/lib/org';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import ConsentNote from '@/components/ConsentNote';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
@@ -70,6 +71,7 @@ export default function JoinPage() {
             <Link href={`/login?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`} className="link" style={{ display: 'block', marginTop: 10, fontSize: 13.5 }}>
               {t('or sign in with email')}
             </Link>
+            <ConsentNote />
           </>
         ) : codeDoc === undefined ? (
           <p className="muted">{t('Checking the invite…')}</p>

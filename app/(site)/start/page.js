@@ -9,6 +9,7 @@ import { createOrg } from '@/lib/org';
 import { signInWithGoogle, googleSignInError } from '@/lib/auth';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
+import ConsentNote from '@/components/ConsentNote';
 import { useT } from '@/lib/i18n';
 import Icon from '@/components/Icon';
 import ScorePicker from '@/components/ScorePicker';
@@ -273,6 +274,7 @@ function StudentSurvey({ router, onSwitch }) {
               </button>
             )}
           </div>
+          {last && <ConsentNote />}
           <p style={{ textAlign: 'center', marginTop: 22 }}>
             <button
               onClick={() => { update({ onboarded: true }); track('onboarding_complete', { skipped: true }); markTourPending(); router.push('/portfolio'); }}
@@ -449,6 +451,7 @@ function BusinessSurvey({ router, onSwitch }) {
               </button>
             )}
           </div>
+          {last && <ConsentNote />}
           <p style={{ textAlign: 'center', marginTop: 22 }}>
             {step === 0 && (
               <button

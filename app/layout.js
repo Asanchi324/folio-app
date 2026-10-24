@@ -1,10 +1,17 @@
 import './globals.css';
+import { Inter, Unbounded, Days_One } from 'next/font/google';
 import { I18nProvider } from '@/lib/i18n';
 import { getLang, dictFor, getT } from '@/lib/i18n-server';
 import { LANGS } from '@/lib/i18n-core';
 import Analytics from '@/components/Analytics';
 import VisitCounter from '@/components/VisitCounter';
 import { SITE_URL, SITE_NAME, ogLocale } from '@/lib/seo';
+
+// Fonts are downloaded at build time and served from our own domain — no
+// request to Google when someone opens the site. All three are SIL OFL.
+const inter = Inter({ subsets: ['latin', 'cyrillic', 'cyrillic-ext'], weight: ['400', '500', '600', '700'], variable: '--font-inter', display: 'swap' });
+const unbounded = Unbounded({ subsets: ['latin', 'cyrillic', 'cyrillic-ext'], weight: ['600', '700'], variable: '--font-unbounded', display: 'swap' });
+const daysOne = Days_One({ subsets: ['latin', 'cyrillic'], weight: '400', variable: '--font-days-one', display: 'swap' });
 
 // NEXT_PUBLIC_GA_ID = GA4 Measurement ID. Unset → no analytics and no banner.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -72,15 +79,7 @@ export default async function RootLayout({ children }) {
   const lang = await getLang();
   const htmlLang = LANGS.find((l) => l.code === lang)?.htmlLang || 'en';
   return (
-    <html lang={htmlLang}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Days+One&family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang={htmlLang} className={`${inter.variable} ${unbounded.variable} ${daysOne.variable}`}>
       <body>
         <I18nProvider lang={lang} dict={dictFor(lang)}>
           {children}

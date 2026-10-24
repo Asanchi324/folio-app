@@ -47,6 +47,13 @@ export default function AppShell({ children }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => setOpen(false), [path]);
+  // Escape closes the phone drawer.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   // Streak badge: read-only peek at the locally cached portfolio (pages own
   // the real portfolio state; the shell must never write it).
@@ -175,6 +182,7 @@ export default function AppShell({ children }) {
 
   return (
     <div className="shell">
+      <a href="#main" className="skip-link">{t('Skip to content')}</a>
       <aside className={`sb${open ? ' open' : ''}`}>{sidebar}</aside>
       {open && <div className="sb-scrim" onClick={() => setOpen(false)} aria-hidden />}
       <ProductTour onDrawer={setOpen} />
@@ -189,7 +197,7 @@ export default function AppShell({ children }) {
             <span>Folio</span>
           </Link>
         </header>
-        <main className="shell-content">
+        <main className="shell-content" id="main" tabIndex={-1}>
           <InviteBanner />
           {/* keyed by path: each page settles in on navigation */}
           <div key={path} className="page-enter">
