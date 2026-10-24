@@ -40,12 +40,14 @@ function Guarded({ children }) {
     const tm = setTimeout(() => setWelcome(false), 30000);
     return () => clearTimeout(tm);
   }, [welcome]);
-  // Back from Stripe: confirm the session so the plan (and, for a first
+  // Back from checkout: confirm the session so the plan (and, for a first
   // purchase, the workspace itself) is applied without waiting for the webhook.
   useEffect(() => {
     if (!user) return;
-    const sid = new URLSearchParams(window.location.search).get('session_id');
-    if (sid) apiPost('/api/billing/confirm', { sessionId: sid }).catch(() => {});
+    const q = new URLSearchParams(window.location.search);
+    const sid = q.get('session_id');
+    const subId = q.get('subscription_id'); // Dodo Payments return
+    if (sid || subId) apiPost('/api/billing/confirm', subId ? { subscriptionId: subId } : { sessionId: sid }).catch(() => {});
   }, [user]);
 
   if (!isFirebaseConfigured()) {

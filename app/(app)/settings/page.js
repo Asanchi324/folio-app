@@ -147,11 +147,11 @@ export default function SettingsPage() {
           </div>
           {profile?.subscriptionStatus === 'past_due' && (
             <div className="notice notice-warn" style={{ marginTop: 12 }}>
-              {t('Your last payment failed. Update your card to keep Pro — Stripe will retry automatically.')}
+              {t('Your last payment failed. Update your card to keep Pro — Dodo Payments will retry automatically.')}
             </div>
           )}
           <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-            {ownPro && profile?.stripeCustomerId ? (
+            {ownPro && (profile?.stripeCustomerId || profile?.dodoCustomerId) ? (
               <button className="btn btn-ghost" onClick={portal} disabled={busy === 'portal'}>
                 {busy === 'portal' ? t('Opening…') : t('Manage subscription')}
               </button>

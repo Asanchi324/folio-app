@@ -74,12 +74,12 @@ service cloud.firestore {
     // otherwise open someone else's billing portal.
     function noBillingFieldsOnCreate() {
       return !request.resource.data.keys().hasAny(
-        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder',
+        ['stripeCustomerId', 'stripeSubscriptionId', 'dodoCustomerId', 'dodoSubscriptionId', 'planUpdatedAt', 'founder',
          'subscriptionStatus', 'currentPeriodEnd', 'cancelAtPeriodEnd']);
     }
     function billingFieldsUntouched() {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-        ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'founder',
+        ['stripeCustomerId', 'stripeSubscriptionId', 'dodoCustomerId', 'dodoSubscriptionId', 'planUpdatedAt', 'founder',
          'subscriptionStatus', 'currentPeriodEnd', 'cancelAtPeriodEnd']);
     }
     match /users/{uid} {
@@ -115,7 +115,7 @@ service cloud.firestore {
           request.resource.data.ownerUid == request.auth.uid &&
           request.resource.data.plan == 'free' &&
           !request.resource.data.keys().hasAny(
-            ['stripeCustomerId', 'stripeSubscriptionId', 'planUpdatedAt', 'counselorCode']));
+            ['stripeCustomerId', 'stripeSubscriptionId', 'dodoCustomerId', 'dodoSubscriptionId', 'planUpdatedAt', 'counselorCode']));
       // Admins manage the org but can ONLY touch cosmetic fields — plan/seats
       // are billing (webhook/founder-only), codes + ownerUid stay stable.
       // Exception: removing a legacy counselorCode (migration to private/codes).

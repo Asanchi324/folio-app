@@ -59,7 +59,7 @@ export default function BillingPage() {
     <>
       <PageHead
         title={t('Billing')}
-        sub={t('Card checkout via Stripe. The plan activates automatically as soon as payment completes, and every connected student gets Pro.')}
+        sub={t('Card checkout via Dodo Payments. The plan activates automatically as soon as payment completes, and every connected student gets Pro.')}
       />
 
       {/* current state */}
@@ -86,7 +86,7 @@ export default function BillingPage() {
 
       {paid ? (
         <p className="muted" style={{ fontSize: 13.5, marginTop: 14, lineHeight: 1.6, maxWidth: 620 }}>
-          {t('The Stripe portal handles everything: switch between Business and Business Plus (prorated automatically), update the card, download invoices, or cancel. Your plan and seats update here within a minute.')}
+          {t('The Dodo Payments portal handles everything: switch between Business and Business Plus (prorated automatically), update the card, download invoices, or cancel. Your plan and seats update here within a minute.')}
         </p>
       ) : (
         <>
@@ -124,7 +124,7 @@ export default function BillingPage() {
             })}
           </div>
           <p className="muted" style={{ fontSize: 12.5, marginTop: 14, textAlign: 'center' }}>
-            {t('Secure checkout by Stripe · cancel anytime · invoices in the billing portal')}
+            {t('Secure checkout by Dodo Payments · cancel anytime · invoices in the billing portal')}
           </p>
         </>
       )}

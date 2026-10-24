@@ -1,11 +1,11 @@
 'use client';
 
-// Upgrade — the checkout front door. Selecting a paid plan creates a Stripe
-// Checkout Session (/api/billing/checkout) and redirects; the webhook flips
+// Upgrade — the checkout front door. Selecting a paid plan creates a Dodo
+// Payments (or Stripe) checkout session (/api/billing/checkout) and redirects; the webhook flips
 // the plan in Firestore automatically after payment. Signed-out visitors are
 // asked to sign in first so the purchase lands on their account.
 //
-// Degradation: without Stripe env the API answers 501 and this page falls
+// Degradation: without billing env the API answers 501 and this page falls
 // back to the concierge flow (write to us — Kaspi/card, same-day activation).
 
 import { useEffect, useState } from 'react';
@@ -36,20 +36,23 @@ export default function UpgradePage() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     setWanted(q.get('plan'));
-    setPaid(q.get('success') === '1');
+    // Dodo appends ?status=… — a declined or expired checkout is not "paid".
+    setPaid(q.get('success') === '1' && !['failed', 'expired', 'cancelled'].includes(q.get('status')));
   }, []);
 
-  // Back from Stripe: confirm the session server-side so Pro switches on right
+  // Back from checkout: confirm the session server-side so Pro switches on right
   // away, even if the webhook is slow. Idempotent — the webhook may also apply it.
   useEffect(() => {
     if (!paid || !user) return;
-    const sid = new URLSearchParams(window.location.search).get('session_id');
-    if (!sid) return;
-    apiPost('/api/billing/confirm', { sessionId: sid }).catch(() => {});
+    const q = new URLSearchParams(window.location.search);
+    const sid = q.get('session_id');
+    const subId = q.get('subscription_id'); // Dodo Payments return
+    if (!sid && !subId) return;
+    apiPost('/api/billing/confirm', subId ? { subscriptionId: subId } : { sessionId: sid }).catch(() => {});
   }, [paid, user]);
 
   const orgPlan = org?.plan || null;
-  const hasSubscription = Boolean(profile?.stripeCustomerId || org?.stripeCustomerId);
+  const hasSubscription = Boolean(profile?.stripeCustomerId || profile?.dodoCustomerId || org?.stripeCustomerId || org?.dodoCustomerId);
 
   async function select(planId) {
     setErr('');
@@ -155,7 +158,7 @@ export default function UpgradePage() {
           </button>
         )}
         <p className="muted" style={{ fontSize: 13, marginTop: 14 }}>
-          {t('Secure checkout by Stripe · cancel anytime · questions?')}{' '}
+          {t('Secure checkout by Dodo Payments · cancel anytime · questions?')}{' '}
           <a href={`mailto:${BILLING_CONTACT}`} style={{ color: 'var(--primary)', fontWeight: 600 }}>
             {BILLING_CONTACT}
           </a>

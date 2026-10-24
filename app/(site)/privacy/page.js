@@ -19,7 +19,7 @@ export default async function PrivacyPage() {
     [null, t('What we collect'), [
       t('Account: if you sign in with Google, we receive your name, email address and a user ID. We never see your Google password.'),
       t('Portfolio: what you type into Folio — grades, test scores, activities, awards, essays, your university list and deadlines.'),
-      t('Payments: if you subscribe, Stripe processes your card. We only store a Stripe customer and subscription ID and your plan status — never card numbers.'),
+      t('Payments: if you subscribe, Dodo Payments processes your card. We only store a Dodo Payments customer and subscription ID and your plan status — never card numbers.'),
       t('Visit counts: anonymous, cookie-free page-view counts (Vercel Web Analytics) for every visitor, so we know how many people use Folio. No cookies, no personal identifiers, and private IDs in links are removed.'),
       t('Analytics: only if you allow it — anonymous page views and product events (for example “opened the assessment”). Links that contain private IDs are shortened before sending.'),
     ]],
@@ -28,7 +28,7 @@ export default async function PrivacyPage() {
       t('We do not sell your data, show ads, or use your portfolio for marketing.'),
     ]],
     [null, t('Who processes it'), [
-      t('Google Firebase (sign-in and database), Vercel (hosting and cookie-free visit counts), Stripe (payments), Google Analytics (only with your consent).'),
+      t('Google Firebase (sign-in and database), Vercel (hosting and cookie-free visit counts), Dodo Payments (payments), Google Analytics (only with your consent).'),
       t('AI providers (Groq, OpenRouter, Google Gemini) receive the part of your portfolio needed to answer a specific AI request. Only the current portfolio is sent — never your email or payment details.'),
       t('These are the only third-party services and SDKs in Folio. Fonts are served from our own domain, so opening the site sends nothing to font providers.'),
     ]],
@@ -51,7 +51,7 @@ export default async function PrivacyPage() {
       t('We send only emails about your account and the deadlines you track — no marketing. Every non-essential email has an unsubscribe link, and you can also reply “unsubscribe” or write to us.'),
     ]],
     [null, t('How long we keep data'), [
-      t('As long as your account exists. When you delete it, your portfolio, chat history and public link are removed immediately; billing records required by law are kept by Stripe.'),
+      t('As long as your account exists. When you delete it, your portfolio, chat history and public link are removed immediately; billing records required by law are kept by Dodo Payments.'),
     ]],
   ];
   return (
