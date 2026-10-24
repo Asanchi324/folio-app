@@ -118,7 +118,9 @@ async function dodoCheckout({ plan, access, origin, isOrgPlan }) {
       return_url: returnUrl,
       cancel_url: `${origin}/upgrade?plan=${plan}`,
       metadata: { uid: access.uid, plan },
-      feature_flags: { allow_discount_code: true },
+      // The account email is locked so the payment can always be traced back
+      // to this account, even if the uid in metadata were ever lost.
+      feature_flags: { allow_discount_code: true, allow_customer_editing_email: false },
     });
     if (!session.checkout_url) throw new Error('No checkout_url in Dodo response');
     return NextResponse.json({ url: session.checkout_url });

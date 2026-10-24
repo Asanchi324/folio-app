@@ -21,7 +21,7 @@ export async function POST(request) {
   const access = await resolveAccess(request);
   if (!access.uid) return NextResponse.json({ error: 'Sign in first.' }, { status: 401 });
 
-  const limited = await enforce(request, 'billing-confirm', { burst: { limit: 5, windowMs: 60_000 }, daily: { limit: 30 } }, { id: access.uid });
+  const limited = await enforce(request, 'billing-confirm', { burst: { limit: 15, windowMs: 60_000 }, daily: { limit: 60 } }, { id: access.uid });
   if (limited) return NextResponse.json(limited.body, { status: limited.status });
 
   let body = {};

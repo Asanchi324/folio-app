@@ -11,11 +11,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { WorkspaceProvider, useWorkspace } from '@/lib/workspace';
-import { apiPost } from '@/lib/auth';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { orgPlanLabel } from '@/lib/plans';
 import { useT } from '@/lib/i18n';
+import { confirmCheckoutReturn } from '@/lib/billing';
 import Icon from '@/components/Icon';
 import { Spinner } from '@/components/ui';
 
@@ -44,10 +44,7 @@ function Guarded({ children }) {
   // purchase, the workspace itself) is applied without waiting for the webhook.
   useEffect(() => {
     if (!user) return;
-    const q = new URLSearchParams(window.location.search);
-    const sid = q.get('session_id');
-    const subId = q.get('subscription_id'); // Dodo Payments return
-    if (sid || subId) apiPost('/api/billing/confirm', subId ? { subscriptionId: subId } : { sessionId: sid }).catch(() => {});
+    confirmCheckoutReturn();
   }, [user]);
 
   if (!isFirebaseConfigured()) {

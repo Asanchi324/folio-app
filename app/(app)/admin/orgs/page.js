@@ -113,6 +113,8 @@ export default function FounderOrgsPage() {
         </p>
       )}
 
+      <PaymentsCheck />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h2 style={{ fontSize: 20 }}>Workspaces ({orgs.length})</h2>
         <button className="btn btn-ghost btn-sm" onClick={loadOrgs}>↻ Refresh</button>
@@ -153,6 +155,69 @@ export default function FounderOrgsPage() {
 
       <GrantPro onMsg={setMsg} />
     </Shell>
+  );
+}
+
+// Dodo reconciliation on demand (the same pass runs daily via Vercel Cron):
+// switches on any paid plan that never landed, and lists payments it could
+// not attach to an account — refund those or activate them by hand below.
+function PaymentsCheck() {
+  const [busy, setBusy] = useState(false);
+  const [report, setReport] = useState(null);
+  const [err, setErr] = useState('');
+
+  async function run() {
+    setBusy(true);
+    setErr('');
+    try {
+      setReport(await apiPost('/api/admin/billing-sync', {}));
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const problems = report ? report.unmatched.length + report.duplicates.length + report.errors.length : 0;
+  return (
+    <div className="card card-pad" style={{ marginBottom: 26 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div>
+          <h3 style={{ fontSize: 17 }}>Payments check</h3>
+          <p className="muted" style={{ fontSize: 13, marginTop: 6 }}>
+            Compares every Dodo subscription with Folio plans and fixes the gaps. Runs daily on its own.
+          </p>
+        </div>
+        <button className="btn btn-gold btn-sm" disabled={busy} onClick={run}>
+          {busy ? 'Checking…' : 'Check payments now'}
+        </button>
+      </div>
+      {err && <p style={{ color: 'var(--bad)', fontSize: 13.5, marginTop: 12 }}>{err}</p>}
+      {report && (
+        <div style={{ fontSize: 13.5, marginTop: 14, lineHeight: 1.6 }}>
+          <p>
+            Checked {report.checked} subscriptions · fixed {report.fixed.length} ·{' '}
+            {problems ? <b style={{ color: 'var(--bad)' }}>{problems} need you</b> : 'all good'}
+          </p>
+          {report.fixed.map((f) => (
+            <p key={f.subscriptionId} className="muted">✓ {f.action === 'grant' ? 'activated' : 'ended'} {f.plan} for {f.email || f.uid}</p>
+          ))}
+          {report.unmatched.map((u) => (
+            <p key={u.subscriptionId} style={{ color: 'var(--bad)' }}>
+              ⚠ Paid {u.plan}, no Folio account for <b>{u.email || 'unknown email'}</b> ({u.subscriptionId}) — ask them to sign in with that email, then run again; or refund in Dodo.
+            </p>
+          ))}
+          {report.duplicates.map((d) => (
+            <p key={d.uid + d.plan} style={{ color: 'var(--bad)' }}>
+              ⚠ Account {d.uid} pays for {d.plan} {d.subscriptionIds.length}× ({d.subscriptionIds.join(', ')}) — cancel and refund the extra one in Dodo.
+            </p>
+          ))}
+          {report.errors.map((x) => (
+            <p key={x.subscriptionId} style={{ color: 'var(--bad)' }}>⚠ {x.subscriptionId}: {x.error}</p>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

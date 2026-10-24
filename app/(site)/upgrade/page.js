@@ -13,11 +13,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PricingCards from '@/components/Pricing';
 import { useEffectivePlan } from '@/lib/account';
-import { startCheckout, openBillingPortal, contactHref, BILLING_CONTACT } from '@/lib/billing';
+import { startCheckout, openBillingPortal, contactHref, BILLING_CONTACT, confirmCheckoutReturn, checkoutReference } from '@/lib/billing';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { ORG_PLAN_IDS } from '@/lib/plans';
 import { track } from '@/lib/analytics';
-import { apiPost } from '@/lib/auth';
 import { useT } from '@/lib/i18n';
 
 export default function UpgradePage() {
@@ -32,6 +31,7 @@ export default function UpgradePage() {
   const [err, setErr] = useState('');
   const [needSignIn, setNeedSignIn] = useState(false);
   const [fallbackPlan, setFallbackPlan] = useState(null);
+  const [confirm, setConfirm] = useState(null); // null (checking) | 'active' | 'pending' | 'none'
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
@@ -44,11 +44,11 @@ export default function UpgradePage() {
   // away, even if the webhook is slow. Idempotent — the webhook may also apply it.
   useEffect(() => {
     if (!paid || !user) return;
-    const q = new URLSearchParams(window.location.search);
-    const sid = q.get('session_id');
-    const subId = q.get('subscription_id'); // Dodo Payments return
-    if (!sid && !subId) return;
-    apiPost('/api/billing/confirm', subId ? { subscriptionId: subId } : { sessionId: sid }).catch(() => {});
+    let live = true;
+    confirmCheckoutReturn().then((r) => live && setConfirm(r));
+    return () => {
+      live = false;
+    };
   }, [paid, user]);
 
   const orgPlan = org?.plan || null;
@@ -98,8 +98,18 @@ export default function UpgradePage() {
           <p style={{ fontSize: 14, marginTop: 8, lineHeight: 1.6 }}>
             {isPro
               ? t('The essay coach and AI counselor are unlocked.')
-              : t('Your plan switches on automatically within a minute. If nothing changes in 10 minutes, write to us and we will fix it right away.')}
+              : confirm === 'pending'
+                ? t('Your payment is safe — the plan is still being confirmed and will switch on automatically. If Pro is not on within an hour, write to us with this reference and we will activate it or refund you.')
+                : t('Your plan switches on automatically within a minute. If nothing changes in 10 minutes, write to us and we will fix it right away.')}
           </p>
+          {!isPro && confirm === 'pending' && (
+            <p style={{ fontSize: 13, marginTop: 10 }}>
+              {t('Reference')}: <code>{checkoutReference()}</code> ·{' '}
+              <a href={`mailto:${BILLING_CONTACT}?subject=${encodeURIComponent('Folio Pro ' + checkoutReference())}`} style={{ color: 'var(--primary)', fontWeight: 600 }}>
+                {BILLING_CONTACT}
+              </a>
+            </p>
+          )}
           <Link href="/portfolio" className="btn btn-primary btn-sm" style={{ marginTop: 14 }}>
             {t('Back to my portfolio')}
           </Link>
