@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Deploy Folio to production AND move the foli0.vercel.app alias onto the new build.
 #
+# Normally not needed: the Vercel project is connected to GitHub
+# (Asanchi324/folio-app), so every push to main deploys to production, and
+# foli0.vercel.app is a project domain that follows it. Use this script only
+# to ship uncommitted local changes.
+#
 # Why this script exists:
 #   foli0.vercel.app is a MANUAL Vercel alias. Plain `vercel --prod` only moves
 #   the auto-generated domains (folio-sigma-steel.vercel.app, …) to the new
