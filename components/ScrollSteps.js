@@ -5,26 +5,37 @@
 // the copy and the product visual of the active step slide in, the previous
 // one lifts away, and a progress rail fills as you go. Scroll position maps
 // to a continuous progress value (0 … steps), so it follows the wheel exactly
-// (and stays smooth with Lenis). Phones, small screens and reduced motion get
-// the plain stacked list instead.
+// (and stays smooth with Lenis). On phones the same sequence runs stacked —
+// rail, copy, visual — inside the pinned viewport. Very short viewports
+// (landscape phones) and reduced motion get the plain stacked list instead.
 
 import { useEffect, useRef, useState } from 'react';
 import { prefersReducedMotion, Reveal } from '@/components/Motion';
 
 const PER_STEP_VH = 85; // scroll distance per step
+const PER_STEP_VH_PHONE = 65; // thumbs travel less per swipe
 
 export default function ScrollSteps({ steps }) {
   const outer = useRef(null);
   const [pinned, setPinned] = useState(false);
+  const [phone, setPhone] = useState(false);
   const [p, setP] = useState(0); // 0 … steps.length (continuous)
   const [seen, setSeen] = useState(() => new Set([0]));
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 900px) and (min-height: 560px)');
-    const update = () => setPinned(mq.matches && !prefersReducedMotion());
+    const mq = window.matchMedia('(min-height: 560px)');
+    const narrow = window.matchMedia('(max-width: 899px)');
+    const update = () => {
+      setPinned(mq.matches && !prefersReducedMotion());
+      setPhone(narrow.matches);
+    };
     update();
     mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
+    narrow.addEventListener('change', update);
+    return () => {
+      mq.removeEventListener('change', update);
+      narrow.removeEventListener('change', update);
+    };
   }, []);
 
   useEffect(() => {
@@ -81,7 +92,7 @@ export default function ScrollSteps({ steps }) {
   }
 
   return (
-    <div ref={outer} className="ss" style={{ height: `${steps.length * PER_STEP_VH + 100}vh` }}>
+    <div ref={outer} className="ss" style={{ height: `${steps.length * (phone ? PER_STEP_VH_PHONE : PER_STEP_VH) + 100}vh` }}>
       <div className="ss-stick">
         <div className="ss-grid">
           <div className="ss-left">

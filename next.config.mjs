@@ -40,6 +40,9 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  // A stray lockfile in the home folder makes Turbopack pick ~ as the
+  // workspace root and crawl all of it; pin the root to this project.
+  turbopack: { root: import.meta.dirname },
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },

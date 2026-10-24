@@ -1453,13 +1453,12 @@ html.lenis body {
   background: var(--primary);
   transform-origin: left;
 }
+/* all copies share one grid cell, so the box is as tall as the longest one */
 .ss-copies {
-  position: relative;
-  min-height: 230px;
+  display: grid;
 }
 .ss-copy {
-  position: absolute;
-  inset: 0 0 auto 0;
+  grid-area: 1 / 1;
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.5s var(--ease), transform 0.6s var(--ease);
@@ -1527,4 +1526,58 @@ html.lenis body {
 .ss-visual > * {
   width: 100%;
   max-width: 470px;
+}
+
+/* phones: rail, copy and visual stacked inside the pinned viewport */
+@media (max-width: 899px) {
+  .ss {
+    margin-top: 0;
+  }
+  .ss-stick {
+    align-items: stretch;
+    padding: 18px 0 20px;
+  }
+  .ss-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+  }
+  .ss-rail {
+    margin-bottom: 18px;
+    gap: 8px;
+  }
+  .ss-rail li {
+    font-size: 11.5px;
+    gap: 5px;
+  }
+  .ss-rail-tag {
+    min-height: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ss-copy h3 {
+    font-size: clamp(21px, 6vw, 26px);
+    margin-top: 8px;
+  }
+  .ss-copy p {
+    font-size: 15px;
+    line-height: 1.55;
+    margin-top: 10px;
+  }
+  .ss-right {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+  }
+  .ss-visual {
+    transform: translateY(40px) scale(0.97);
+  }
+  .ss-visual.past {
+    transform: translateY(-30px) scale(0.97);
+  }
+  .ss-visual > * {
+    max-width: none;
+  }
 }

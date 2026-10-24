@@ -406,8 +406,26 @@ const CSS = `
   .lp-steps{gap:64px; margin-top:40px;}
   .lp-step-visual{max-width:none;}
 }
+/* phones: one idea per screen — drop what the pinned steps already show */
+@media (max-width:760px){
+  .lp-hero{padding:36px 0 44px;}
+  .lp-hero-grid{gap:28px;}
+  .lp-lead{margin-top:16px;}
+  .lp-ctas{margin-top:24px;}
+  .lp-steps-mini{display:none;}
+  .lp-hero .lv-h-tasks,.lp-hero .lv-h-odds{display:none;}
+  .lp-head{margin-bottom:28px;}
+  .lp-prog > :last-child,.lp-schools > :last-child{display:none;}
+  .lp-feats{gap:16px 18px; margin-top:24px;}
+  .lp-feat{padding-top:10px;}
+  .lp-feat h3{font-size:14px;}
+  .lp-feat p{font-size:12.5px;}
+  .lp-checks{margin-top:18px; gap:10px;}
+  .lp-checks li{font-size:15px;}
+  .lp-faq summary{font-size:15.5px; padding:14px 30px 14px 0;}
+  .lp-faq p{font-size:14.5px;}
+}
 @media (max-width:560px){
-  .lp-feats{grid-template-columns:minmax(0,1fr);}
   .lp-ctas .btn{width:100%;}
   .lp-final{padding:44px 20px; border-radius:18px;}
 }

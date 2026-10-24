@@ -3,7 +3,9 @@
 // Pricing — rendered on the landing page and /upgrade. One audience toggle
 // (students ↔ schools), two focused cards per audience. Reads everything from
 // lib/plans.js; `onSelect(planId)` lets /upgrade start checkout directly,
-// otherwise CTAs link into the funnel.
+// otherwise CTAs link into the funnel. On phones the two cards sit side by
+// side as an overlapping deck: one in front, the other peeking out behind it;
+// tapping the back card brings it forward.
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -54,6 +56,17 @@ export default function PricingCards({
   useEffect(() => {
     setAudience(initialAudience);
   }, [initialAudience]);
+
+  const [deck, setDeck] = useState(false);
+  const [front, setFront] = useState(0); // index of the card in front of the deck
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 760px)');
+    const update = () => setDeck(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  useEffect(() => setFront(0), [audience]);
 
   const studentCards = [
     {
@@ -121,9 +134,23 @@ export default function PricingCards({
         ))}
       </div>
 
-      <div className="pr-grid" key={audience}>
-        {cards.map(({ plan, checks, cta, badge, featured }) => (
-          <div key={plan.id} className={`pr-card${featured ? ' featured' : ''} fade-in`}>
+      <div className={`pr-grid${deck ? ' deck' : ''}`} key={audience}>
+        {cards.map(({ plan, checks, cta, badge, featured }, i) => (
+          <div
+            key={plan.id}
+            className={`pr-card${featured ? ' featured' : ''}${deck ? (i === front ? ' front' : ' back') : ''}${deck && i === 1 ? ' right' : ''} fade-in`}
+            // the back card's first tap only brings it forward
+            onClickCapture={
+              deck && i !== front
+                ? (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setFront(i);
+                  }
+                : undefined
+            }
+            aria-hidden={deck && i !== front ? true : undefined}
+          >
             {badge && <span className="pr-badge">{t(badge)}</span>}
             <div className="pr-head">
               <h3 style={{ fontSize: 18, letterSpacing: '-0.01em' }}>{plan.name}</h3>
@@ -156,6 +183,16 @@ export default function PricingCards({
           </div>
         ))}
       </div>
+
+      {deck && (
+        <div className="pr-dots" role="tablist">
+          {cards.map(({ plan }, i) => (
+            <button key={plan.id} role="tab" aria-selected={i === front} className={i === front ? 'on' : ''} onClick={() => setFront(i)}>
+              {plan.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <style>{`
         .pr-wrap{margin-top:40px;}
@@ -241,8 +278,33 @@ export default function PricingCards({
         @media (max-width:760px){
           .pr-grid{grid-template-columns:minmax(0,1fr); max-width:430px;}
           .pr-head{min-height:0; padding-right:0;} .pr-card.featured .pr-head{padding-top:26px;}
-          .pr-toggle{width:100%;}
-          .pr-tab{flex:1; text-align:center; padding:9px 10px;}
+          .pr-toggle{width:100%; margin-bottom:22px;}
+          .pr-tab{flex:1; text-align:center; padding:9px 10px; font-size:13px;}
+          /* deck: both cards in one cell, the back one peeks out to its side */
+          .pr-grid.deck{grid-template-columns:minmax(0,1fr); align-items:start;}
+          .pr-grid.deck .pr-card{
+            grid-area:1/1; width:86%; padding:24px 20px; animation:none;
+            transition:transform .5s var(--ease-spring), opacity .4s var(--ease), filter .4s var(--ease), box-shadow .4s var(--ease);
+          }
+          .pr-grid.deck .pr-card.right{justify-self:end;}
+          .pr-grid.deck .pr-card.front{z-index:2; transform:none;}
+          .pr-grid.deck .pr-card.back{z-index:1; cursor:pointer; transform:translateY(14px) scale(.93); filter:saturate(.75); opacity:.85;}
+          .pr-grid.deck .pr-card.back > *{pointer-events:none;}
+          .pr-grid.deck .pr-card.front:not(.featured){box-shadow:0 24px 50px -28px rgba(27,26,36,.45);}
+          .pr-grid.deck .pr-card:hover{transform:none;}
+          .pr-grid.deck .pr-card.back:hover{transform:translateY(14px) scale(.93);}
+          .pr-badge{top:18px; right:18px;}
+          .pr-amount{font-size:40px;}
+          .pr-checks{gap:9px; padding-top:16px; margin-top:16px;}
+          .pr-checks li{font-size:13px;}
+          .pr-sub{display:none;}
+          .pr-dots{display:flex; justify-content:center; gap:6px; margin-top:26px;}
+          .pr-dots button{
+            border:1px solid var(--line); background:var(--surface); color:var(--muted);
+            font:600 12.5px var(--sans); padding:6px 14px; border-radius:999px; cursor:pointer;
+            transition:background .2s ease, color .2s ease, border-color .2s ease;
+          }
+          .pr-dots button.on{background:var(--ink); color:#fff; border-color:var(--ink);}
         }
       `}</style>
     </div>
