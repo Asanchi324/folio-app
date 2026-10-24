@@ -177,7 +177,7 @@ export default function AppShell({ children }) {
     <div className="shell">
       <aside className={`sb${open ? ' open' : ''}`}>{sidebar}</aside>
       {open && <div className="sb-scrim" onClick={() => setOpen(false)} aria-hidden />}
-      <ProductTour />
+      <ProductTour onDrawer={setOpen} />
 
       <div className="shell-main">
         <header className="topbar">

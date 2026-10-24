@@ -6,7 +6,8 @@
 // Only people who just finished (or skipped) /start see it: the start page
 // sets `folio:tour` = 'pending', and finishing or skipping sets it to 'done'.
 // Existing users never get it. On phones the sidebar is a hidden drawer, so
-// the steps show as a card without the spotlight.
+// the tour slides it open (via `onDrawer`) and spotlights the links inside it,
+// with the card above or below the link; the drawer closes with the tour.
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -34,7 +35,9 @@ export function markTourPending() {
   }
 }
 
-export default function ProductTour() {
+const isPhone = () => window.innerWidth <= 900;
+
+export default function ProductTour({ onDrawer }) {
   const { t } = useT();
   const path = usePathname();
   const [open, setOpen] = useState(false);
@@ -59,6 +62,7 @@ export default function ProductTour() {
   const close = useCallback(
     (how) => {
       setOpen(false);
+      if (isPhone()) onDrawer?.(false);
       try {
         localStorage.setItem(KEY, 'done');
       } catch {
@@ -66,21 +70,35 @@ export default function ProductTour() {
       }
       track('tour_end', { how, step: i + 1 });
     },
-    [i]
+    [i, onDrawer]
   );
 
-  // Where the current step's sidebar link is (null on phones / hidden sidebar).
+  // Phones: open the drawer so the steps can point at real links.
+  useEffect(() => {
+    if (open && isPhone()) onDrawer?.(true);
+  }, [open, onDrawer]);
+
+  // Where the current step's sidebar link is (null while the sidebar is hidden).
   const measure = useCallback(() => {
     const el = document.querySelector(`.sb a.sb-link[href="${STEPS[i].href}"]`);
+    if (el && isPhone()) el.scrollIntoView({ block: 'nearest' });
     const r = el?.getBoundingClientRect();
-    setRect(r && r.width > 0 && r.left >= 0 && window.innerWidth > 900 ? { top: r.top, left: r.left, width: r.width, height: r.height } : null);
+    setRect(r && r.width > 0 && r.left >= 0 && r.right <= window.innerWidth ? { top: r.top, left: r.left, width: r.width, height: r.height } : null);
   }, [i]);
 
   useLayoutEffect(() => {
     if (!open) return;
     measure();
+    // again once the phone drawer has finished sliding in
+    const id = setTimeout(measure, 320);
+    const onSlid = (e) => e.target.classList?.contains('sb') && measure();
+    document.addEventListener('transitionend', onSlid);
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener('transitionend', onSlid);
+      window.removeEventListener('resize', measure);
+    };
   }, [open, measure]);
 
   useEffect(() => {
@@ -98,9 +116,15 @@ export default function ProductTour() {
   const step = STEPS[i];
   const last = i === STEPS.length - 1;
   const pad = 6;
-  const cardStyle = rect
-    ? { position: 'fixed', left: rect.left + rect.width + 18, top: Math.max(16, Math.min(window.innerHeight - 220, rect.top - 18)) }
-    : { position: 'fixed', left: '50%', bottom: 24, transform: 'translateX(-50%)' };
+  const centered = { position: 'fixed', left: '50%', transform: 'translateX(-50%)' };
+  const cardStyle = !rect
+    ? { ...centered, bottom: 24 }
+    : isPhone()
+      ? // the drawer fills the width: put the card in the half without the link
+        rect.top > window.innerHeight / 2
+        ? { ...centered, top: 16 }
+        : { ...centered, bottom: 24 }
+      : { position: 'fixed', left: rect.left + rect.width + 18, top: Math.max(16, Math.min(window.innerHeight - 220, rect.top - 18)) };
 
   return (
     <div className="tour" role="dialog" aria-modal="true" aria-label={t('Quick tour')}>
