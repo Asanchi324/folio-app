@@ -6,8 +6,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useEffectivePlan } from '@/lib/account';
-import { publishShare, unpublishShare, DEFAULT_SHARE_OPTIONS } from '@/lib/share';
-import { planHas, isOrgPaidPlan } from '@/lib/plans';
+import { publishShare, unpublishShare, shareExtras, DEFAULT_SHARE_OPTIONS } from '@/lib/share';
+import { planHas } from '@/lib/plans';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
@@ -28,8 +28,8 @@ export default function ShareCard({ p, meta }) {
   }, [meta?.shareOptions]);
 
   const cleanShare = planHas(plan, 'cleanShare');
-  const brand = isOrgPaidPlan(org?.plan) ? org?.brandName || org?.name : null;
-  const extras = { badge: !cleanShare, brand };
+  const extras = shareExtras(plan, org);
+  const brand = extras.brand;
 
   useEffect(() => {
     if (!shareId || !user) return;
@@ -109,7 +109,15 @@ export default function ShareCard({ p, meta }) {
               <div style={{ display: 'grid', gap: 9, marginTop: 14 }}>
                 <Check label={t('Show test scores')} on={options.testing !== false} set={(v) => setOpt('testing', v)} />
                 <Check label={t('Show strength score')} on={options.strength !== false} set={(v) => setOpt('strength', v)} />
+                <Check
+                  label={t('Show target universities')}
+                  on={options.targets !== false || options.listed === true}
+                  set={(v) => setOpt('targets', v)}
+                  disabled={options.listed === true}
+                />
+                <Check label={t('Show links')} on={options.links !== false} set={(v) => setOpt('links', v)} />
                 <Check label={t('Include spike and essay')} on={options.narrative === true} set={(v) => setOpt('narrative', v)} />
+                <Check label={t('Show me in “Students like you”')} on={options.listed === true} set={(v) => setOpt('listed', v)} />
               </div>
               {!cleanShare && (
                 <p className="muted" style={{ fontSize: 13, marginTop: 12, lineHeight: 1.5 }}>
@@ -144,10 +152,10 @@ export default function ShareCard({ p, meta }) {
   );
 }
 
-function Check({ label, on, set }) {
+function Check({ label, on, set, disabled }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} style={{ width: 18, height: 18 }} />
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.6 : 1 }}>
+      <input type="checkbox" checked={on} disabled={disabled} onChange={(e) => set(e.target.checked)} style={{ width: 18, height: 18 }} />
       {label}
     </label>
   );

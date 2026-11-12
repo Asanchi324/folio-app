@@ -14,6 +14,7 @@ import { studentSummary } from '@/lib/insights';
 import { estimateChance, BAND_META } from '@/lib/chances';
 import { getUniversity } from '@/lib/universities';
 import PortfolioView from '@/components/PortfolioView';
+import { resolveTargets } from '@/lib/targets';
 import { activityAssessments } from '@/lib/profile';
 import { useT } from '@/lib/i18n';
 import { TierBadge } from '@/components/ui';
@@ -73,7 +74,7 @@ export default function StudentDetail() {
               <p className="muted">{t('This student has not filled anything in yet.')}</p>
             </div>
           ) : (
-            <PortfolioView p={p} options={{ narrative: true }} />
+            <PortfolioView p={p} targets={resolveTargets(p)} options={{ narrative: true }} />
           )}
         </div>
 

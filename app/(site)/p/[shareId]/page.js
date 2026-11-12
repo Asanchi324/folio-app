@@ -11,6 +11,7 @@ import PortfolioView from '@/components/PortfolioView';
 import { decodeFields } from '@/lib/plan-server';
 import { getT } from '@/lib/i18n-server';
 import { BrandMark } from '@/components/Brand';
+import { shortUniName } from '@/lib/profile-card';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,8 +40,10 @@ export async function generateMetadata({ params }) {
   const { t } = await getT();
   if (!s) return { title: t('Portfolio'), robots: { index: false } };
   const name = s.fullName || t('A student');
+  const targetNames = (Array.isArray(s.targets) ? s.targets : []).slice(0, 3).map((u) => shortUniName(u.name));
   const bits = [
-    s.intendedMajor && `${s.intendedMajor}`,
+    s.headline || (s.intendedMajor && `${s.intendedMajor}`),
+    targetNames.length && t('Target: {list}', { list: targetNames.join(', ') }),
     s.strength?.value != null && t('Profile strength {n}/100', { n: s.strength.value }),
     (s.activities || []).length && t('{n} activities', { n: s.activities.length }),
   ]
@@ -83,6 +86,7 @@ export default async function SharePage({ params }) {
   // Reconstruct a portfolio-shaped object for the shared renderer.
   const p = {
     fullName: s.fullName,
+    headline: s.headline || '',
     gradeLevel: s.gradeLevel,
     country: s.country,
     targetCountries: s.targetCountries || [],
@@ -92,15 +96,20 @@ export default async function SharePage({ params }) {
     activities: s.activities || [],
     honors: s.honors || [],
     narrative: s.narrative || {},
+    targets: Array.isArray(s.targets) ? s.targets : [],
+    topChoice: s.topChoice || null,
+    links: Array.isArray(s.links) ? s.links : [],
   };
   const options = {
     testing: Boolean(s.testing),
     narrative: Boolean(s.narrative),
     strength: Boolean(s.strength),
+    targets: Array.isArray(s.targets),
+    links: Array.isArray(s.links),
   };
 
   return (
-    <div className="wrap" style={{ maxWidth: 760, paddingTop: 36, paddingBottom: 80 }}>
+    <div className="wrap" style={{ maxWidth: 820, paddingTop: 36, paddingBottom: 80 }}>
       {s.brand && (
         <p className="muted" style={{ fontSize: 13, marginBottom: 14, fontWeight: 600 }}>
           {t('Presented by {brand}', { brand: s.brand })}

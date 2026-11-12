@@ -20,6 +20,7 @@ import ProductTour from '@/components/ProductTour';
 
 const STUDENT = [
   { href: '/today', label: 'Today', icon: 'sun', badge: 'streak' },
+  { href: '/profile', label: 'My profile', icon: 'user' },
   { href: '/portfolio', label: 'Portfolio', icon: 'portfolio', exact: true },
   { href: '/review', label: 'Assessment', icon: 'gauge' },
   { href: '/progress', label: 'Progress', icon: 'target' },

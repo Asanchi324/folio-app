@@ -8,6 +8,9 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePortfolio, newId } from '@/lib/store';
+import { useEffectivePlan } from '@/lib/account';
+import { shareExtras, useLiveShare } from '@/lib/share';
+import { linkInfo, normalizeUrl } from '@/lib/profile-card';
 import { profileBreakdown, completeness, gradeActivity, gradeHonor, strengthTier } from '@/lib/profile';
 import { track } from '@/lib/analytics';
 import { useT } from '@/lib/i18n';
@@ -37,6 +40,26 @@ export default function PortfolioPage() {
   const breakdown = useMemo(() => profileBreakdown(p), [p]);
   const complete = useMemo(() => completeness(p), [p]);
 
+  // Keep a live public link / "Students like you" listing in step with edits.
+  const { user, plan, org } = useEffectivePlan();
+  const extras = useMemo(() => shareExtras(plan, org), [plan, org]);
+  useLiveShare({ user, p, meta, extras, enabled: synced });
+
+  // Pencils on /profile link to /portfolio#section — scroll there once the
+  // form has rendered, and flash the section so the eye lands on it.
+  useEffect(() => {
+    if (!ready) return;
+    const id = window.location.hash.slice(1);
+    const el = id && document.getElementById(id);
+    if (!el) return;
+    const raf = requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.classList.add('pf-flash');
+      setTimeout(() => el.classList.remove('pf-flash'), 1800);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [ready]);
+
   if (!ready) return <Loading label={t('Loading your portfolio…')} />;
 
   return (
@@ -46,6 +69,9 @@ export default function PortfolioPage() {
           <h1>{t('Your portfolio')}</h1>
           <p>{t('Fill it in the way the Common App asks. Everything saves automatically.')}</p>
         </div>
+        <Link href="/profile" className="btn btn-ghost btn-sm">
+          <Icon name="user" size={15} /> {t('See my profile')}
+        </Link>
       </div>
 
       <ProgressStrip breakdown={breakdown} complete={complete} />
@@ -53,6 +79,7 @@ export default function PortfolioPage() {
       <div className="stagger" style={{ display: 'grid', gap: 18, marginTop: 18 }}>
         <CommentsCard meta={meta} />
         <Basics p={p} update={update} />
+        <Links p={p} update={update} />
         <Academics p={p} update={update} />
         <Testing p={p} update={update} />
         <Activities p={p} update={update} />
@@ -84,6 +111,8 @@ function ProgressStrip({ breakdown, complete }) {
       </Link>
       <style>{`
         .pf-strip{display:flex; align-items:center; gap:16px; padding:14px 18px; flex-wrap:wrap;}
+        .pf-flash{animation:pfFlash 1.8s var(--ease) both;}
+        @keyframes pfFlash{0%,35%{box-shadow:0 0 0 3px var(--primary-tint), 0 0 0 1px var(--primary);} 100%{box-shadow:0 0 0 0 transparent;}}
       `}</style>
     </div>
   );
@@ -94,7 +123,7 @@ function ProgressStrip({ breakdown, complete }) {
 function Basics({ p, update }) {
   const { t } = useT();
   return (
-    <Section title={t('Basics')}>
+    <Section title={t('Basics')} id="basics">
       <div className="row row-2">
         <Field label={t('Full name')}>
           <input value={p.fullName} onChange={(e) => update({ fullName: e.target.value })} placeholder="Aisha Karimova" maxLength={80} autoComplete="name" />
@@ -118,6 +147,90 @@ function Basics({ p, update }) {
           </select>
         </Field>
       </div>
+      <Field label={t('Profile headline')} hint={t('optional — built from your major and targets when empty')}>
+        <input
+          value={p.headline || ''}
+          onChange={(e) => update({ headline: e.target.value })}
+          placeholder={t('Aspiring economist | Olympiad medalist | Target: LSE, NYU')}
+          maxLength={140}
+        />
+      </Field>
+    </Section>
+  );
+}
+
+/* ---------------------------- Links ---------------------------- */
+function Links({ p, update }) {
+  const { t } = useT();
+  const [draft, setDraft] = useState('');
+  const [err, setErr] = useState('');
+  const links = p.links || [];
+  const add = () => {
+    const url = normalizeUrl(draft);
+    if (!url) {
+      setErr(t('That does not look like a link — try linkedin.com/in/you or t.me/you.'));
+      return;
+    }
+    setErr('');
+    if (!links.includes(url)) update({ links: [...links, url].slice(0, 6) });
+    setDraft('');
+  };
+  return (
+    <Section
+      id="links"
+      title={t('Links')}
+      hint={t('LinkedIn, Telegram, Instagram, GitHub or your site. They show on your profile so people can reach you.')}
+      count={`${links.length}/6`}
+    >
+      {links.length > 0 && (
+        <div style={{ display: 'grid', gap: 8, marginBottom: 12 }}>
+          {links.map((url) => {
+            const info = linkInfo(url);
+            return (
+              <div key={url} className="pf-link">
+                <span className="pf-link-ic">
+                  <Icon name={!info || info.kind === 'website' ? 'globe' : info.kind} size={17} />
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ fontSize: 14 }}>{t(info?.label || 'Website')}</b>
+                  <span className="muted pf-link-url">{info?.display || url}</span>
+                </span>
+                <button className="sb-icon" onClick={() => update({ links: links.filter((x) => x !== url) })} aria-label={t('Remove')}>
+                  <Icon name="trash" size={16} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {links.length < 6 && (
+        <form
+          style={{ display: 'flex', gap: 8 }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            add();
+          }}
+        >
+          <input
+            style={{ flex: 1, minWidth: 0 }}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="linkedin.com/in/you · t.me/you · you.dev"
+            maxLength={200}
+            inputMode="url"
+            aria-label={t('Link')}
+          />
+          <button type="submit" className="btn btn-ghost" disabled={!draft.trim()}>
+            <Icon name="plus" size={15} /> {t('Add')}
+          </button>
+        </form>
+      )}
+      {err && <p className="error-text">{err}</p>}
+      <style>{`
+        .pf-link{display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--line); border-radius:var(--r); background:var(--surface-2);}
+        .pf-link-ic{width:34px; height:34px; border-radius:9px; background:var(--surface); border:1px solid var(--line); display:grid; place-items:center; color:var(--primary-600); flex-shrink:0;}
+        .pf-link-url{display:block; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      `}</style>
     </Section>
   );
 }
@@ -127,7 +240,7 @@ function Academics({ p, update }) {
   const a = p.academics;
   const set = (patch) => update({ academics: { ...a, ...patch } });
   return (
-    <Section title={t('Academics')}>
+    <Section title={t('Academics')} id="academics">
       <div className="row row-3">
         <Field label="GPA">
           <input type="number" inputMode="decimal" step="0.01" min="0" value={a.gpa} onChange={(e) => set({ gpa: e.target.value })} placeholder="3.9" />
@@ -156,7 +269,7 @@ function Testing({ p, update }) {
   const set = (patch) => update({ testing: { ...tt, ...patch } });
   const aps = tt.apScores || [];
   return (
-    <Section title={t('Testing')}>
+    <Section title={t('Testing')} id="testing">
       <div className="row row-2">
         <Field label={t('SAT total')} hint="400–1600">
           <input type="number" inputMode="numeric" min="400" max="1600" value={tt.sat} onChange={(e) => set({ sat: e.target.value })} placeholder="1480" />
@@ -226,6 +339,7 @@ function Activities({ p, update }) {
 
   return (
     <Section
+      id="activities"
       title={t('Extracurriculars')}
       hint={t('Up to 10, most important first. Each one is graded on role, reach, measurable results and time — a specific description with numbers counts far more than a title.')}
       count={`${acts.length}/10`}
@@ -413,6 +527,7 @@ function Honors({ p, update }) {
 
   return (
     <Section
+      id="honors"
       title={t('Honors & awards')}
       hint={t('Up to 5. Include the result (gold, 2nd place, finalist) — level and placement decide the weight.')}
       count={`${honors.length}/5`}
@@ -462,7 +577,7 @@ function Narrative({ p, update }) {
   const set = (patch) => update({ narrative: { ...n, ...patch } });
   const words = String(n.personalStatement || '').trim().split(/\s+/).filter(Boolean).length;
   return (
-    <Section title={t('Narrative')} hint={t('The thread that ties your application together.')}>
+    <Section id="narrative" title={t('Narrative')} hint={t('The thread that ties your application together.')}>
       <Field label={t('Your spike')} hint={t('the one thing you are known for')}>
         <input value={n.spike} onChange={(e) => set({ spike: e.target.value })} placeholder={t('Building accessible tech for rural schools')} maxLength={160} />
       </Field>
